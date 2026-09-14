@@ -1,0 +1,33 @@
+# Enable rewrite engine
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # If the request is for a real file or directory, serve it directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Handle static assets
+  RewriteCond %{REQUEST_URI} \.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot|map|txt|xml)$ [NC]
+  RewriteRule ^ - [L]
+
+  # ===== CRITICAL: Route /product/<slug> to product/index.html =====
+  RewriteCond %{REQUEST_URI} ^/product/.+$ [NC]
+  RewriteRule ^ /product/index.html [L]
+  # ================================================================
+
+  # CRITICAL: Route all other requests to index.html for client-side routing
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Handle 404 errors by redirecting to index.html
+ErrorDocument 404 /index.html
+
+# Disable directory browsing
+Options -Indexes
+
+# Enable compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
