@@ -1089,7 +1089,7 @@ const PAGE_PERMISSIONS = {
   // Website Layout Group
   manageNavbar: { key: 'manage_navbar', label: 'Manage Navbar', icon: Menu, category: 'Website Layout' },
   createBanner: { key: 'create_banner', label: 'Create Banner', icon: PanelTop, category: 'Website Layout' },
-  manageBanner: { key: 'manage_banner', label: 'Manage Banner', icon: LayoutTemplate, category: 'Website Layout' },
+  // manageBanner: { key: 'manage_banner', label: 'Manage Banner', icon: LayoutTemplate, category: 'Website Layout' },
   manageHomepage: { key: 'manage_homepage', label: 'Manage Homepage', icon: Store, category: 'Website Layout' },
   manageFooter: { key: 'manage_footer', label: 'Manage Footer', icon: Globe, category: 'Website Layout' },
    manageWhyChooseUs: { key: 'manage_why_choose_us', label: 'Manage Why Choose Us', icon: Shield, category: 'Website Layout' },

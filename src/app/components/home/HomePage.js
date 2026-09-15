@@ -111,6 +111,7 @@ import { Loader2 } from 'lucide-react';
 import ProductGridSection from './ProductGridSection.js';
 import DealsSection from './DealsSection.js';
 import TrustResultsSection from './TrustResultsSection.js';
+import AchievementSection from './AchievementSection.js';
 
 export default function HomePage() {
   const [sections, setSections] = useState([]);
@@ -160,6 +161,9 @@ export default function HomePage() {
 
        case 'trust_results': // ✅ ADD THIS CASE
         return section.isActive !== false && <TrustResultsSection key={section.id} />;
+
+        case 'achievements':
+  return section.isActive !== false && <AchievementSection key={section.id} />;
 
       case 'custom':
         return section.isActive !== false && (

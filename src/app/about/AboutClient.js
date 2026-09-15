@@ -2284,7 +2284,7 @@ export default function AboutClient() {
     <>
       <Navbar />
 
-      <main className="relative -mt-24 overflow-hidden bg-[#f7f4ef]">
+      <main className="relative  overflow-hidden bg-[#f7f4ef]">
 
         {/* ==================================================
             HERO - Mobile Optimized

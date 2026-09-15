@@ -1,351 +1,206 @@
 
-
-
 // 'use client';
 
-// import Link from 'next/link';
 // import { useState, useEffect, useRef } from 'react';
+// import Link from 'next/link';
 // import { usePathname, useRouter } from 'next/navigation';
-
 // import {
-//   LogOut,
-//   User,
-//   LayoutDashboard,
-//   ShoppingBag,
 //   Search,
-//   X,
-//   Home,
-//   Package,
-//   Info,
-//   Phone,
-//   Menu,
-//   UserCircle,
-//   ChevronDown,
 //   MapPin,
-//   Zap,
+//   Phone,
+//   Truck,
+//   Menu,
 //   Heart,
-//   Sparkles,
+//   ShoppingBag,
+//   User,
+//   ChevronDown,
+//   X,
+//   Package,
+//   LayoutDashboard,
 //   Settings,
-//   Flower2,
+//   LogOut,
+//   UserCircle,
 // } from 'lucide-react';
-
+// import { motion, AnimatePresence } from 'framer-motion';
 // import { toast } from 'sonner';
+
 // import CartSidebar from '../CartSidebar';
+// import OutletModal from '../OutletModal';
+// import CategorySidebar from '../CategorySidebar';
+// import { useNavbar } from '@/app/hooks/useNavbar';
 
 // // ============================================================
-// // ICON MAPPING
+// // API URL
 // // ============================================================
-
-// const ICON_MAP = {
-//   Home: Home,
-//   Zap: Zap,
-//   MapPin: MapPin,
-//   Info: Info,
-//   Phone: Phone,
-//   Package: Package,
-//   User: User,
-//   Heart: Heart,
-//   Sparkles: Sparkles,
-//   Flower2: Flower2,
-// };
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 // // ============================================================
-// // COLOR PALETTE - BEAUTY THEME
+// // THEME COLOR
 // // ============================================================
-// // Foundation/Skin tones: Warm beige, nude, tan
-// // Green accents: Sage, olive, eucalyptus
-// // ============================================================
-
-// const COLORS = {
-//   primary: '#8B9D83', // Sage green - main accent
-//   primaryLight: '#A8B8A0', // Lighter sage
-//   primaryDark: '#6B7D63', // Darker sage
-//   primaryBg: '#F2F5F0', // Very light sage background
-//   skin: '#F5EDE3', // Light foundation/skin tone
-//   skinMedium: '#E8DCD0', // Medium skin tone
-//   skinDark: '#D4C4B4', // Darker skin tone
-//   text: '#3D3D3D',
-//   textLight: '#6B6B6B',
-//   white: '#FFFFFF',
-//   border: '#E8E0D8',
-// };
+// const ACCENT_COLOR = '#69272B';
 
 // export default function Navbar() {
 //   // ============================================================
+//   // HOOKS
+//   // ============================================================
+//   const { navbarData, loading: navbarLoading } = useNavbar();
+//   const pathname = usePathname();
+//   const router = useRouter();
+
+//   // ============================================================
 //   // STATES
 //   // ============================================================
+//   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+//   const [categorySidebarOpen, setCategorySidebarOpen] = useState(false);
+//   const [isScrolled, setIsScrolled] = useState(false);
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [outletModalOpen, setOutletModalOpen] = useState(false);
 
-//   const [navbarData, setNavbarData] = useState(null);
-//   const [navbarLoading, setNavbarLoading] = useState(true);
-
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-//   const [userMenuOpen, setUserMenuOpen] = useState(false);
-
+//   // Search states
 //   const [searchOpen, setSearchOpen] = useState(false);
+//   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 //   const [searchQuery, setSearchQuery] = useState('');
 //   const [searchResults, setSearchResults] = useState([]);
 //   const [searchLoading, setSearchLoading] = useState(false);
 //   const [showResults, setShowResults] = useState(false);
 
+//   // User states
 //   const [user, setUser] = useState(null);
-
+//   const [userMenuOpen, setUserMenuOpen] = useState(false);
+//   const [authLoading, setAuthLoading] = useState(true);
+//   const [profileImageError, setProfileImageError] = useState(false);
 //   const [cartCount, setCartCount] = useState(0);
 
-//   const [authLoading, setAuthLoading] = useState(true);
+//   // Mobile category expansion
+//   const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
 
-//   const [scrolled, setScrolled] = useState(false);
-
-//   const [profileImageError, setProfileImageError] = useState(false);
-
-//   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-
-//   const [isCartOpen, setIsCartOpen] = useState(false);
-
-//   // ============================================================
-//   // REFS
-//   // ============================================================
-
+//   // Refs
 //   const searchRef = useRef(null);
 //   const mobileSearchRef = useRef(null);
 
 //   // ============================================================
-//   // ROUTER
+//   // STYLING - from backend
 //   // ============================================================
-
-//   const pathname = usePathname();
-//   const router = useRouter();
-
-//   // ============================================================
-//   // HOME PAGE
-//   // ============================================================
-
-//   const isHomePage = pathname === '/';
-
-//   // ============================================================
-//   // API BASE URL
-//   // ============================================================
-
-//   const API_URL =
-//     process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+//   const styles = navbarData?.styling || {
+//     primaryColor: ACCENT_COLOR,
+//     primaryLight: '#A8B8A0',
+//     primaryDark: '#6B7D63',
+//     backgroundColor: '#F1EFE3',
+//     textColor: '#292725',
+//     accentColor: '#d83a38',
+//   };
 
 //   // ============================================================
-//   // FETCH NAVBAR DATA
+//   // SCROLL DETECTION
 //   // ============================================================
-
-//   useEffect(() => {
-//     const fetchNavbar = async () => {
-//       try {
-//         const response = await fetch(`${API_URL}/api/navbar`);
-
-//         if (response.ok) {
-//           const data = await response.json();
-
-//           if (data.success) {
-//             setNavbarData(data.data);
-//           } else {
-//             setNavbarData({
-//               items: [
-//                 {
-//                   id: '1',
-//                   name: 'Home',
-//                   href: '/',
-//                   icon: 'Home',
-//                   isActive: true,
-//                 },
-//                 {
-//                   id: '2',
-//                   name: 'Products',
-//                   href: '/products',
-//                   icon: 'Package',
-//                   isActive: true,
-//                 },
-//                 {
-//                   id: '3',
-//                   name: 'Track Order',
-//                   href: '/track',
-//                   icon: 'MapPin',
-//                   isActive: true,
-//                 },
-//                 {
-//                   id: '4',
-//                   name: 'About',
-//                   href: '/about',
-//                   icon: 'Flower2',
-//                   isActive: true,
-//                 },
-//                 {
-//                   id: '5',
-//                   name: 'Contact',
-//                   href: '/contact',
-//                   icon: 'Phone',
-//                   isActive: true,
-//                 },
-//               ],
-
-//               logo: {
-//                 text: 'Glow&Co',
-//                 highlightText: '',
-//                 icon: 'Package',
-//                 logoUrl: '/logo.png',
-//               },
-//             });
-//           }
-//         } else {
-//           setNavbarData({
-//             items: [
-//               {
-//                 id: '1',
-//                 name: 'Home',
-//                 href: '/',
-//                 icon: 'Home',
-//                 isActive: true,
-//               },
-//               {
-//                 id: '2',
-//                 name: 'Products',
-//                 href: '/products',
-//                 icon: 'Sparkles',
-//                 isActive: true,
-//               },
-//               {
-//                 id: '3',
-//                 name: 'Track Order',
-//                 href: '/track',
-//                 icon: 'MapPin',
-//                 isActive: true,
-//               },
-//               {
-//                 id: '4',
-//                 name: 'About',
-//                 href: '/about',
-//                 icon: 'Flower2',
-//                 isActive: true,
-//               },
-//               {
-//                 id: '5',
-//                 name: 'Contact',
-//                 href: '/contact',
-//                 icon: 'Phone',
-//                 isActive: true,
-//               },
-//             ],
-
-//             logo: {
-//               text: 'Glow&Co',
-//               highlightText: 'BEAUTY',
-//               icon: 'Package',
-//               logoUrl: '/logo.png',
-//             },
-//           });
-//         }
-//       } catch (error) {
-//         console.error('Error fetching navbar:', error);
-
-//         setNavbarData({
-//           items: [
-//             {
-//               id: '1',
-//               name: 'Home',
-//               href: '/',
-//               icon: 'Home',
-//               isActive: true,
-//             },
-//             {
-//               id: '2',
-//               name: 'Products',
-//               href: '/products',
-//               icon: 'Sparkles',
-//               isActive: true,
-//             },
-//             {
-//               id: '3',
-//               name: 'Track Order',
-//               href: '/track',
-//               icon: 'MapPin',
-//               isActive: true,
-//             },
-//             {
-//               id: '4',
-//               name: 'About',
-//               href: '/about',
-//               icon: 'Flower2',
-//               isActive: true,
-//             },
-//             {
-//               id: '5',
-//               name: 'Contact',
-//               href: '/contact',
-//               icon: 'Phone',
-//               isActive: true,
-//             },
-//           ],
-
-//           logo: {
-//             text: 'Glow&Co',
-//             highlightText: 'BEAUTY',
-//             icon: 'Package',
-//             logoUrl: '/logo.png',
-//           },
-//         });
-//       } finally {
-//         setNavbarLoading(false);
-//       }
-//     };
-
-//     fetchNavbar();
-//   }, [API_URL]);
-
-//   // ============================================================
-//   // SCROLL EFFECT
-//   // ============================================================
-
 //   useEffect(() => {
 //     const handleScroll = () => {
-//       setScrolled(window.scrollY > 10);
+//       setIsScrolled(window.scrollY > 50);
 //     };
 
 //     window.addEventListener('scroll', handleScroll);
+//     return () => window.removeEventListener('scroll', handleScroll);
+//   }, []);
+
+//   // Close mobile menu on scroll
+//   useEffect(() => {
+//     if (isScrolled) {
+//       setMobileMenuOpen(false);
+//     }
+//   }, [isScrolled]);
+
+//   // ============================================================
+//   // CHECK USER STATE
+//   // ============================================================
+//   const checkUserState = () => {
+//     if (typeof window !== 'undefined') {
+//       const userData = localStorage.getItem('user');
+//       if (userData) {
+//         try {
+//           const parsedUser = JSON.parse(userData);
+//           setUser(parsedUser);
+//           setProfileImageError(false);
+//         } catch (error) {
+//           console.error('Error parsing user data:', error);
+//           setUser(null);
+//         }
+//       } else {
+//         setUser(null);
+//       }
+//       setAuthLoading(false);
+//     }
+//   };
+
+//   // ============================================================
+//   // FETCH CART COUNT
+//   // ============================================================
+//   const fetchCartCount = async () => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const headers = {};
+
+//       if (token) {
+//         headers['Authorization'] = `Bearer ${token}`;
+//       } else {
+//         const sessionId = localStorage.getItem('cartSessionId');
+//         if (sessionId) {
+//           headers['x-session-id'] = sessionId;
+//         }
+//       }
+
+//       const response = await fetch(`${API_URL}/api/cart`, { headers });
+
+//       if (response.ok) {
+//         const data = await response.json();
+//         setCartCount(data.data?.totalItems || 0);
+//       } else {
+//         setCartCount(0);
+//       }
+//     } catch (error) {
+//       console.error('Fetch cart count error:', error);
+//       setCartCount(0);
+//     }
+//   };
+
+//   // ============================================================
+//   // AUTH + CART EVENTS
+//   // ============================================================
+//   useEffect(() => {
+//     checkUserState();
+//     fetchCartCount();
+
+//     const handleAuthChange = () => {
+//       checkUserState();
+//       fetchCartCount();
+//     };
+
+//     window.addEventListener('auth-change', handleAuthChange);
+//     window.addEventListener('focus', handleAuthChange);
+//     window.addEventListener('cart-update', fetchCartCount);
 
 //     return () => {
-//       window.removeEventListener('scroll', handleScroll);
+//       window.removeEventListener('auth-change', handleAuthChange);
+//       window.removeEventListener('focus', handleAuthChange);
+//       window.removeEventListener('cart-update', fetchCartCount);
 //     };
 //   }, []);
 
-//   // ============================================================
-//   // CLOSE DESKTOP SEARCH ON OUTSIDE CLICK
-//   // ============================================================
+//   // Fetch cart when pathname changes
+//   useEffect(() => {
+//     fetchCartCount();
+//   }, [pathname]);
 
+//   // ============================================================
+//   // CLOSE SEARCH ON OUTSIDE CLICK
+//   // ============================================================
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
-//       if (
-//         searchRef.current &&
-//         !searchRef.current.contains(event.target)
-//       ) {
+//       if (searchRef.current && !searchRef.current.contains(event.target)) {
 //         setShowResults(false);
-
 //         if (!event.target.closest('.search-trigger')) {
 //           setSearchOpen(false);
 //         }
 //       }
-//     };
-
-//     document.addEventListener('mousedown', handleClickOutside);
-
-//     return () => {
-//       document.removeEventListener(
-//         'mousedown',
-//         handleClickOutside
-//       );
-//     };
-//   }, []);
-
-//   // ============================================================
-//   // CLOSE MOBILE SEARCH ON OUTSIDE CLICK
-//   // ============================================================
-
-//   useEffect(() => {
-//     const handleClickOutside = (event) => {
 //       if (
 //         mobileSearchRef.current &&
 //         !mobileSearchRef.current.contains(event.target) &&
@@ -358,265 +213,30 @@
 //     };
 
 //     document.addEventListener('mousedown', handleClickOutside);
-
-//     return () => {
-//       document.removeEventListener(
-//         'mousedown',
-//         handleClickOutside
-//       );
-//     };
+//     return () => document.removeEventListener('mousedown', handleClickOutside);
 //   }, []);
 
 //   // ============================================================
 //   // PREVENT BODY SCROLL WHEN MOBILE MENU OPEN
 //   // ============================================================
-
 //   useEffect(() => {
-//     if (isMenuOpen) {
+//     if (mobileMenuOpen) {
 //       document.body.style.overflow = 'hidden';
 //     } else {
 //       document.body.style.overflow = 'unset';
 //     }
-
 //     return () => {
 //       document.body.style.overflow = 'unset';
 //     };
-//   }, [isMenuOpen]);
-
-//   // ============================================================
-//   // CHECK USER STATE
-//   // ============================================================
-
-//   const checkUserState = () => {
-//     if (typeof window !== 'undefined') {
-//       const userData = localStorage.getItem('user');
-
-//       if (userData) {
-//         try {
-//           const parsedUser = JSON.parse(userData);
-
-//           setUser(parsedUser);
-//           setProfileImageError(false);
-//         } catch (error) {
-//           console.error(
-//             'Error parsing user data:',
-//             error
-//           );
-
-//           setUser(null);
-//         }
-//       } else {
-//         setUser(null);
-//       }
-
-//       setAuthLoading(false);
-//     }
-//   };
-
-//   // ============================================================
-//   // FETCH CART COUNT
-//   // ============================================================
-
-//   const fetchCartCount = async () => {
-//     try {
-//       const token = localStorage.getItem('token');
-
-//       const headers = {};
-
-//       if (token) {
-//         headers['Authorization'] = `Bearer ${token}`;
-//       } else {
-//         const sessionId =
-//           localStorage.getItem('cartSessionId');
-
-//         if (sessionId) {
-//           headers['x-session-id'] = sessionId;
-//         }
-//       }
-
-//       const response = await fetch(
-//         `${API_URL}/api/cart`,
-//         {
-//           headers,
-//         }
-//       );
-
-//       if (response.ok) {
-//         const data = await response.json();
-
-//         setCartCount(
-//           data.data?.totalItems || 0
-//         );
-//       } else {
-//         setCartCount(0);
-//       }
-//     } catch (error) {
-//       console.error(
-//         'Fetch cart count error:',
-//         error
-//       );
-
-//       setCartCount(0);
-//     }
-//   };
-
-//   // ============================================================
-//   // AUTH + CART EVENTS
-//   // ============================================================
-
-//   useEffect(() => {
-//     checkUserState();
-//     fetchCartCount();
-
-//     const handleAuthChange = () => {
-//       checkUserState();
-//       fetchCartCount();
-//     };
-
-//     window.addEventListener(
-//       'auth-change',
-//       handleAuthChange
-//     );
-
-//     window.addEventListener(
-//       'focus',
-//       handleAuthChange
-//     );
-
-//     window.addEventListener(
-//       'cart-update',
-//       fetchCartCount
-//     );
-
-//     return () => {
-//       window.removeEventListener(
-//         'auth-change',
-//         handleAuthChange
-//       );
-
-//       window.removeEventListener(
-//         'focus',
-//         handleAuthChange
-//       );
-
-//       window.removeEventListener(
-//         'cart-update',
-//         fetchCartCount
-//       );
-//     };
-//   }, []);
-
-//   // ============================================================
-//   // FETCH CART WHEN PATHNAME CHANGES
-//   // ============================================================
-
-//   useEffect(() => {
-//     fetchCartCount();
-//   }, [pathname]);
-
-//   // ============================================================
-//   // CART UPDATE LISTENER
-//   // ============================================================
-
-//   useEffect(() => {
-//     const handleCartUpdate = () => {
-//       fetchCartCount();
-//     };
-
-//     window.addEventListener(
-//       'cart-update',
-//       handleCartUpdate
-//     );
-
-//     return () => {
-//       window.removeEventListener(
-//         'cart-update',
-//         handleCartUpdate
-//       );
-//     };
-//   }, []);
-
-//   // ============================================================
-//   // GET ICON
-//   // ============================================================
-
-//   const getIcon = (iconName) => {
-//     const Icon = ICON_MAP[iconName];
-
-//     return Icon || Package;
-//   };
-
-//   // ============================================================
-//   // NAVIGATION ITEMS
-//   // ============================================================
-
-//   const getNavItems = () => {
-//     if (
-//       navbarData?.items &&
-//       navbarData.items.length > 0
-//     ) {
-//       return navbarData.items.filter(
-//         (item) => item.isActive !== false
-//       );
-//     }
-
-//     return [
-//       {
-//         id: '1',
-//         name: 'Home',
-//         href: '/',
-//         icon: 'Home',
-//       },
-//       {
-//         id: '2',
-//         name: 'Products',
-//         href: '/products',
-//         icon: 'Sparkles',
-//       },
-//       {
-//         id: '3',
-//         name: 'Track Order',
-//         href: '/track',
-//         icon: 'MapPin',
-//       },
-//       {
-//         id: '4',
-//         name: 'About',
-//         href: '/about',
-//         icon: 'Flower2',
-//       },
-//       {
-//         id: '5',
-//         name: 'Contact',
-//         href: '/contact',
-//         icon: 'Phone',
-//       },
-//     ];
-//   };
-
-//   const navItems = getNavItems();
-
-//   // ============================================================
-//   // ACTIVE LINK
-//   // ============================================================
-
-//   const isActive = (path) => {
-//     if (path === '/') {
-//       return pathname === '/';
-//     }
-
-//     return pathname.startsWith(path);
-//   };
+//   }, [mobileMenuOpen]);
 
 //   // ============================================================
 //   // SEARCH
 //   // ============================================================
-
 //   const performSearch = async (query) => {
 //     if (!query.trim()) {
 //       setSearchResults([]);
 //       setShowResults(false);
-
 //       return;
 //     }
 
@@ -624,18 +244,11 @@
 
 //     try {
 //       const response = await fetch(
-//         `${API_URL}/api/products?search=${encodeURIComponent(
-//           query
-//         )}&limit=5`
+//         `${API_URL}/api/products?search=${encodeURIComponent(query)}&limit=5`
 //       );
-
 //       const data = await response.json();
 
-//       if (
-//         data.success &&
-//         data.data &&
-//         data.data.length > 0
-//       ) {
+//       if (data.success && data.data && data.data.length > 0) {
 //         setSearchResults(data.data);
 //         setShowResults(true);
 //       } else {
@@ -643,11 +256,7 @@
 //         setShowResults(false);
 //       }
 //     } catch (error) {
-//       console.error(
-//         'Search error:',
-//         error
-//       );
-
+//       console.error('Search error:', error);
 //       setSearchResults([]);
 //       setShowResults(false);
 //     } finally {
@@ -655,10 +264,7 @@
 //     }
 //   };
 
-//   // ============================================================
-//   // SEARCH DEBOUNCE
-//   // ============================================================
-
+//   // Search debounce
 //   useEffect(() => {
 //     const timer = setTimeout(() => {
 //       if (searchQuery) {
@@ -672,20 +278,11 @@
 //     return () => clearTimeout(timer);
 //   }, [searchQuery]);
 
-//   // ============================================================
-//   // SEARCH SUBMIT
-//   // ============================================================
-
+//   // Search submit
 //   const handleSearchSubmit = (e) => {
 //     e.preventDefault();
-
 //     if (searchQuery.trim()) {
-//       router.push(
-//         `/search?q=${encodeURIComponent(
-//           searchQuery
-//         )}`
-//       );
-
+//       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
 //       setSearchOpen(false);
 //       setMobileSearchOpen(false);
 //       setSearchQuery('');
@@ -693,128 +290,68 @@
 //     }
 //   };
 
-//   // ============================================================
-//   // SEARCH RESULT CLICK
-//   // ============================================================
-
+//   // Search result click
 //   const handleResultClick = (result) => {
 //     const productId = result._id;
-
-//     const productSlug =
-//       result.slug || productId;
+//     const productSlug = result.slug || productId;
 
 //     if (productSlug) {
 //       setSearchOpen(false);
 //       setMobileSearchOpen(false);
 //       setSearchQuery('');
 //       setShowResults(false);
-
 //       setTimeout(() => {
-//         router.push(
-//           `/product/${productSlug}`
-//         );
+//         router.push(`/product/${productSlug}`);
 //       }, 50);
 //     } else {
-//       router.push(
-//         `/search?q=${encodeURIComponent(
-//           searchQuery
-//         )}`
-//       );
+//       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
 //     }
 //   };
 
 //   // ============================================================
 //   // LOGOUT
 //   // ============================================================
-
 //   const logout = () => {
 //     localStorage.removeItem('token');
 //     localStorage.removeItem('user');
-
 //     setUser(null);
 //     setCartCount(0);
 //     setUserMenuOpen(false);
 
-//     window.dispatchEvent(
-//       new Event('cart-update')
-//     );
+//     window.dispatchEvent(new Event('cart-update'));
+//     window.dispatchEvent(new Event('auth-change'));
 
-//     window.dispatchEvent(
-//       new Event('auth-change')
-//     );
-
-//     toast.success(
-//       'Logged out successfully!'
-//     );
-
+//     toast.success('Logged out successfully!');
 //     router.push('/');
 //   };
 
 //   // ============================================================
-//   // DASHBOARD LINK
+//   // HELPER FUNCTIONS
 //   // ============================================================
-
 //   const getDashboardLink = () => {
-//     if (!user) {
-//       return '/';
-//     }
-
-//     if (
-//       [
-//         'admin',
-//         'super_admin',
-//         'moderator',
-//       ].includes(user.role)
-//     ) {
+//     if (!user) return '/';
+//     if (['admin', 'super_admin', 'moderator'].includes(user.role)) {
 //       return '/authorize/dashboard';
 //     }
-
-//     if (
-//       user.role === 'call_center_agent'
-//     ) {
+//     if (user.role === 'call_center_agent') {
 //       return '/agent/dashboard';
 //     }
-
 //     return '/customer/dashboard';
 //   };
 
-//   // ============================================================
-//   // SETTINGS LINK
-//   // ============================================================
-
 //   const getSettingsLink = () => {
-//     if (!user) {
-//       return '/';
-//     }
-
-//     if (
-//       [
-//         'admin',
-//         'super_admin',
-//         'moderator',
-//       ].includes(user.role)
-//     ) {
+//     if (!user) return '/';
+//     if (['admin', 'super_admin', 'moderator'].includes(user.role)) {
 //       return '/authorize/settings';
 //     }
-
-//     if (
-//       user.role === 'call_center_agent'
-//     ) {
+//     if (user.role === 'call_center_agent') {
 //       return '/agent/settings';
 //     }
-
 //     return '/customer/settings';
 //   };
 
-//   // ============================================================
-//   // DISPLAY NAME
-//   // ============================================================
-
 //   const getDisplayName = () => {
-//     if (!user) {
-//       return '';
-//     }
-
+//     if (!user) return '';
 //     return (
 //       user.companyName ||
 //       user.contactPerson ||
@@ -823,98 +360,51 @@
 //     );
 //   };
 
-//   // ============================================================
-//   // INITIALS
-//   // ============================================================
-
 //   const getInitials = () => {
-//     if (!user) {
-//       return 'U';
-//     }
-
-//     const name = getDisplayName();
-
-//     return name
-//       .charAt(0)
-//       .toUpperCase();
+//     if (!user) return 'U';
+//     return getDisplayName().charAt(0).toUpperCase();
 //   };
-
-//   // ============================================================
-//   // PROFILE PICTURE
-//   // ============================================================
 
 //   const getProfilePicture = () => {
-//     return (
-//       user?.profilePicture ||
-//       user?.photoURL ||
-//       null
-//     );
+//     return user?.profilePicture || user?.photoURL || null;
 //   };
 
-//   // ============================================================
-//   // LOGO URL
-//   // ============================================================
-
 //   const getLogoUrl = (url) => {
-//     if (!url) {
-//       return '/logo.png';
-//     }
-
-//     if (
-//       url.includes(
-//         'cloudinary.com'
-//       )
-//     ) {
-//       const parts =
-//         url.split('/upload/');
-
+//     if (!url) return '/logo.png';
+//     if (url.includes('cloudinary.com')) {
+//       const parts = url.split('/upload/');
 //       if (parts.length === 2) {
 //         return `${parts[0]}/upload/f_auto,q_auto:good,fl_preserve_transparency/${parts[1]}`;
 //       }
 //     }
-
 //     return url;
 //   };
 
-//   // ============================================================
-//   // AUTHORIZE ROLE
-//   // ============================================================
+//   const isActive = (path) => {
+//     if (path === '/') return pathname === '/';
+//     return pathname.startsWith(path);
+//   };
 
-//   const isAuthorizeRole =
-//     user &&
-//     [
-//       'admin',
-//       'super_admin',
-//       'moderator',
-//     ].includes(user.role);
+//   // Get navigation items from backend
+//   const navItems = navbarData?.items?.filter(item => item.isActive !== false) || [];
+
+//   // Toggle mobile category expansion
+//   const toggleMobileCategory = (itemId) => {
+//     setExpandedMobileCategory(prev => prev === itemId ? null : itemId);
+//   };
 
 //   // ============================================================
 //   // LOADING
 //   // ============================================================
-
-//   if (
-//     authLoading ||
-//     navbarLoading
-//   ) {
+//   if (authLoading || navbarLoading) {
 //     return (
-//       <div
-//         className="fixed top-0 z-50 w-full bg-white border-b border-[#E8E0D8]"
-//       >
-//         <div className="container mx-auto px-4">
-//           <div className="flex items-center justify-between h-16">
-
-//             <div className="w-10 h-10 bg-[#E8DCD0] rounded animate-pulse" />
-
-//             <div className="flex gap-4">
-
-//               <div className="w-8 h-8 bg-[#E8DCD0] rounded animate-pulse" />
-
-//               <div className="w-8 h-8 bg-[#E8DCD0] rounded animate-pulse" />
-
-//               <div className="w-16 h-8 bg-[#E8DCD0] rounded animate-pulse" />
-
-//             </div>
-
+//       <div className="fixed top-0 z-50 w-full bg-[#F1EFE3]">
+//         <div className="mx-auto flex h-16 max-w-[1600px] items-center px-4">
+//           <div className="h-10 w-24 animate-pulse rounded bg-black/10" />
+//           <div className="ml-auto flex gap-4">
+//             <div className="h-8 w-8 animate-pulse rounded bg-black/10" />
+//             <div className="h-8 w-8 animate-pulse rounded bg-black/10" />
+//             <div className="h-8 w-8 animate-pulse rounded bg-black/10" />
 //           </div>
 //         </div>
 //       </div>
@@ -922,1779 +412,968 @@
 //   }
 
 //   // ============================================================
-//   // RETURN
+//   // RENDER NAV ITEM (Desktop)
 //   // ============================================================
+//   const renderDesktopNavItem = (item, index, prefix = '') => {
+//     const itemKey = `${prefix}${item.id || index}`;
 
-//   return (
-//     <>
-//       {/* ======================================================
-//           MAIN NAVBAR - WHITE BACKGROUND
-//       ====================================================== */}
+//     // Category type with subcategories - show dropdown
+//     if (item.type === 'category' && item.category?.subcategories?.length > 0) {
+//       const categoryUrl = item.href || `/products?category=${item.category?.slug || item.category?._id}`;
 
-//       <nav
-//         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
-//           scrolled ? 'shadow-md' : 'shadow-sm'
+//       return (
+//         <div key={itemKey} className="group relative mr-5">
+//           <Link
+//             href={categoryUrl}
+//             className={`flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] transition hover:text-[#69272B] ${
+//               item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+//             }`}
+//           >
+//             <span>{item.name}</span>
+//             <ChevronDown
+//               size={11}
+//               strokeWidth={1.4}
+//               className="transition-transform duration-200 group-hover:rotate-180"
+//             />
+//           </Link>
+
+//           {/* Dropdown with subcategories and their children */}
+//           <div className="invisible absolute left-0 top-full z-50 mt-1 min-w-[220px] rounded-lg border border-gray-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+//             {item.category.subcategories.map((sub) => {
+//               const subSlug = sub.slug || sub._id;
+//               const hasChildren = sub.children?.length > 0;
+
+//               if (hasChildren) {
+//                 // Subcategory with children - nested dropdown
+//                 return (
+//                   <div key={sub._id || sub.id} className="group/sub relative">
+//                     <Link
+//                       href={`/products?category=${item.category.slug || item.category._id}&subcategory=${subSlug}`}
+//                       className="flex items-center justify-between px-4 py-2 text-[12px] text-gray-700 transition hover:bg-gray-50 hover:text-[#69272B]"
+//                     >
+//                       <span>{sub.name}</span>
+//                       <ChevronDown size={12} className="-rotate-90" />
+//                     </Link>
+
+//                     {/* Child subcategories */}
+//                     <div className="invisible absolute left-full top-0 ml-1 min-w-[180px] rounded-lg border border-gray-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-200 group-hover/sub:visible group-hover/sub:opacity-100">
+//                       {sub.children.map((child) => (
+//                         <Link
+//                           key={child._id || child.id}
+//                           href={`/products?category=${item.category.slug || item.category._id}&subcategory=${subSlug}&child=${child.slug || child._id}`}
+//                           className="block px-4 py-2 text-[12px] text-gray-600 transition hover:bg-gray-50 hover:text-[#69272B]"
+//                         >
+//                           {child.name}
+//                         </Link>
+//                       ))}
+//                     </div>
+//                   </div>
+//                 );
+//               }
+
+//               // Simple subcategory link
+//               return (
+//                 <Link
+//                   key={sub._id || sub.id}
+//                   href={`/products?category=${item.category.slug || item.category._id}&subcategory=${subSlug}`}
+//                   className="block px-4 py-2 text-[12px] text-gray-700 transition hover:bg-gray-50 hover:text-[#69272B]"
+//                 >
+//                   {sub.name}
+//                 </Link>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       );
+//     }
+
+//     // Category type without subcategories - simple link
+//     if (item.type === 'category' && item.category) {
+//       const categoryUrl = item.href || `/products?category=${item.category?.slug || item.category?._id}`;
+//       return (
+//         <Link
+//           key={itemKey}
+//           href={categoryUrl}
+//           className={`group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] transition hover:text-[#69272B] ${
+//             item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+//           }`}
+//         >
+//           <span>{item.name}</span>
+//         </Link>
+//       );
+//     }
+
+//     // Normal link item
+//     return (
+//       <Link
+//         key={itemKey}
+//         href={item.href || '/'}
+//         className={`group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] transition hover:text-[#69272B] ${
+//           item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
 //         }`}
 //       >
-//         <div className="container mx-auto px-4">
+//         <span>{item.name}</span>
+//       </Link>
+//     );
+//   };
 
-//           <div className="flex items-center justify-between h-16">
+//   // ============================================================
+//   // RENDER MOBILE NAV ITEM
+//   // ============================================================
+//   const renderMobileNavItem = (item, index) => {
+//     const itemKey = `mobile-${item.id || index}`;
+//     const hasSubcategories = item.type === 'category' && item.category?.subcategories?.length > 0;
+//     const isExpanded = expandedMobileCategory === (item.id || index);
 
-//             {/* ==================================================
-//                 LEFT SECTION
-//             ================================================== */}
+//     if (hasSubcategories) {
+//       const categoryUrl = item.href || `/products?category=${item.category?.slug || item.category?._id}`;
 
-//             <div className="flex items-center gap-1 md:gap-0 flex-1">
+//       return (
+//         <div key={itemKey}>
+//           <div
+//             className={`flex min-h-[40px] items-center justify-between border-b border-[#eeeeee] text-[12px] font-medium ${
+//               item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+//             }`}
+//           >
+//             <Link
+//               href={categoryUrl}
+//               onClick={() => setMobileMenuOpen(false)}
+//               className="flex-1 py-2"
+//             >
+//               {item.name}
+//             </Link>
+//             <button
+//               onClick={() => toggleMobileCategory(item.id || index)}
+//               className="p-2"
+//             >
+//               <ChevronDown
+//                 size={13}
+//                 strokeWidth={1.4}
+//                 className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+//               />
+//             </button>
+//           </div>
 
-//               {/* Mobile Menu */}
-//               <button
-//                 onClick={() =>
-//                   setIsMenuOpen(
-//                     !isMenuOpen
-//                   )
-//                 }
-//                 className="md:hidden p-2 -ml-1 rounded-lg transition-all duration-200 hover:bg-[#F2F5F0]"
+//           {/* Mobile Subcategories */}
+//           <AnimatePresence>
+//             {isExpanded && (
+//               <motion.div
+//                 initial={{ height: 0, opacity: 0 }}
+//                 animate={{ height: 'auto', opacity: 1 }}
+//                 exit={{ height: 0, opacity: 0 }}
+//                 transition={{ duration: 0.2 }}
+//                 className="overflow-hidden bg-gray-50"
 //               >
-//                 <Menu
-//                   className="w-5 h-5 text-[#3D3D3D]"
-//                 />
-//               </button>
-
-//               {/* Desktop Navigation */}
-//               <div className="hidden md:flex items-center space-x-1">
-
-//                 {navItems.map((item) => {
-//                   const Icon =
-//                     getIcon(item.icon);
-
-//                   return (
-//                     <Link
-//                       key={
-//                         item.id ||
-//                         item.name
-//                       }
-//                       href={item.href}
-//                       className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-//                         isActive(
-//                           item.href
-//                         )
-//                           ? 'text-[#8B9D83]'
-//                           : 'text-[#3D3D3D] hover:text-[#8B9D83]'
-//                       }`}
-//                       style={{
-//                         fontFamily:
-//                           '"Raleway", "Inter", sans-serif',
-//                       }}
-//                     >
-//                       {item.name}
-
-//                       {isActive(
-//                         item.href
-//                       ) && (
-//                         <span
-//                           className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 rounded-full bg-[#8B9D83]"
-//                         />
-//                       )}
-//                     </Link>
-//                   );
-//                 })}
-
-//               </div>
-//             </div>
-
-//             {/* ==================================================
-//                 CENTER LOGO
-//             ================================================== */}
-
-//             <div className="flex items-center justify-center flex-shrink-0">
-
-//               <Link
-//                 href="/"
-//                 className="flex items-center group"
-//               >
-//                 <div className="relative w-24 h-11 md:w-28 md:h-12 lg:w-32 lg:h-14 transition-transform group-hover:scale-105 duration-300">
-
-//                   {navbarData?.logo?.logoUrl ? (
-//                     <img
-//                       src={getLogoUrl(
-//                         navbarData.logo.logoUrl
-//                       )}
-//                       alt={
-//                         navbarData.logo.text ||
-//                         'Glow&Co'
-//                       }
-//                       className="w-full h-full object-contain"
-//                       style={{
-//                         background:
-//                           'transparent',
-//                       }}
-//                     />
-//                   ) : (
-//                     <img
-//                       src="/logo.png"
-//                       alt="Glow&Co Logo"
-//                       className="w-full h-full object-contain"
-//                     />
-//                   )}
-
+//                 <div className="py-1">
+//                   {item.category.subcategories.map((sub) => {
+//                     const subSlug = sub.slug || sub._id;
+//                     return (
+//                       <Link
+//                         key={sub._id || sub.id}
+//                         href={`/products?category=${item.category.slug || item.category._id}&subcategory=${subSlug}`}
+//                         onClick={() => setMobileMenuOpen(false)}
+//                         className="block px-6 py-2 text-[11px] text-gray-600 transition hover:bg-gray-100 hover:text-[#69272B]"
+//                       >
+//                         {sub.name}
+//                       </Link>
+//                     );
+//                   })}
 //                 </div>
-//               </Link>
+//               </motion.div>
+//             )}
+//           </AnimatePresence>
+//         </div>
+//       );
+//     }
 
+//     return (
+//       <Link
+//         key={itemKey}
+//         href={item.href || '/'}
+//         onClick={() => setMobileMenuOpen(false)}
+//         className={`flex min-h-[40px] items-center justify-between border-b border-[#eeeeee] text-[12px] font-medium ${
+//           item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+//         }`}
+//       >
+//         <span>{item.name}</span>
+//       </Link>
+//     );
+//   };
+
+//   // ============================================================
+//   // RENDER
+//   // ============================================================
+//   return (
+//     <>
+//       {/* =====================================================
+//           ORIGINAL HEADER
+//       ===================================================== */}
+//       <header
+//         className={`
+//           relative -mt-16 w-full bg-[#F1EFE3] text-[#292725]
+//           transition-all duration-300
+//           ${isScrolled ? 'pointer-events-none opacity-0' : 'opacity-100'}
+//         `}
+//       >
+//         {/* =================================================
+//             LOGO - COVERS BOTH ROWS
+//         ================================================= */}
+//         <Link
+//           href="/"
+//           className="absolute left-4 top-0 z-30 flex h-[89px] w-[100px] items-center justify-center lg:left-7"
+//         >
+//           {navbarData?.logo?.logoUrl ? (
+//             <img
+//               src={getLogoUrl(navbarData.logo.logoUrl)}
+//               alt={navbarData.logo.text || 'Logo'}
+//               className="h-auto max-h-[78px] w-auto max-w-[90px] object-contain"
+//             />
+//           ) : (
+//             <div className="flex flex-col items-center">
+//               <span className="text-lg font-bold" style={{ color: styles.textColor }}>
+//                 {navbarData?.logo?.text || "Nishat's Collection"}
+//               </span>
+//               {navbarData?.logo?.highlightText && (
+//                 <span
+//                   className="text-[10px] font-medium tracking-widest"
+//                   style={{ color: ACCENT_COLOR }}
+//                 >
+//                   {navbarData.logo.highlightText}
+//                 </span>
+//               )}
 //             </div>
+//           )}
+//         </Link>
 
-//             {/* ==================================================
-//                 RIGHT SECTION - BEAUTY THEME
-//             ================================================== */}
+//         {/* =================================================
+//             TOP NAVBAR
+//         ================================================= */}
+//         <div className="border-b border-[#dedcd2]">
+//           <div className="relative mx-auto flex h-[46px] max-w-[1600px] items-center px-4 lg:px-7">
+//             {/* Logo Space */}
+//             <div className="w-[100px] shrink-0" />
 
-//             <div className="flex items-center justify-end flex-1">
-
-//               {/* ==================================================
-//                   DESKTOP SEARCH
-//               ================================================== */}
-
-//               <div
-//                 className="hidden md:block relative"
-//                 ref={searchRef}
-//               >
-
+//             {/* ================= SEARCH ================= */}
+//             <div className="absolute left-1/2 top-1/2 w-[320px] -translate-x-1/2 -translate-y-1/2">
+//               <div className="relative w-full" ref={searchRef}>
 //                 {!searchOpen ? (
-
-//                   /* Search Trigger - Skin tone style */
 //                   <button
 //                     type="button"
-//                     onClick={() =>
-//                       setSearchOpen(true)
-//                     }
-//                     className="search-trigger group flex items-center w-[200px] lg:w-[260px] border-b border-[#E8E0D8] hover:border-[#8B9D83] transition-colors duration-200 py-2"
+//                     onClick={() => setSearchOpen(true)}
+//                     className="search-trigger flex h-[33px] w-full items-center rounded-[8px] border border-[#dedbd7] bg-white pl-9 pr-3 text-left transition hover:border-[#69272B]"
 //                   >
-
 //                     <Search
-//                       className="w-[18px] h-[18px] text-[#6B6B6B] flex-shrink-0"
-//                       strokeWidth={1.7}
+//                       size={15}
+//                       strokeWidth={1.4}
+//                       className="absolute left-3 text-[#777]"
 //                     />
-
-//                     <span
-//                       className="ml-4 text-[14px] text-[#6B6B6B] group-hover:text-[#3D3D3D] transition-colors"
-//                       style={{
-//                         fontFamily:
-//                           '"Raleway", "Inter", sans-serif',
-//                       }}
-//                     >
-//                       Search beauty...
+//                     <span className="text-[11px] text-[#999]">
+//                       Search products here
 //                     </span>
-
 //                   </button>
-
 //                 ) : (
-
-//                   /* Active Search */
 //                   <div className="relative">
-
-//                     <form
-//                       onSubmit={
-//                         handleSearchSubmit
-//                       }
-//                       className="relative"
-//                     >
-
-//                       <div className="flex items-center w-[200px] lg:w-[260px] border-b border-[#8B9D83] py-1.5">
-
-//                         <Search
-//                           className="w-[18px] h-[18px] text-[#3D3D3D] flex-shrink-0"
-//                           strokeWidth={1.7}
-//                         />
-
-//                         <input
-//                           type="text"
-//                           value={
-//                             searchQuery
-//                           }
-//                           onChange={(e) =>
-//                             setSearchQuery(
-//                               e.target.value
-//                             )
-//                           }
-//                           placeholder="Search beauty..."
-//                           className="w-full ml-4 pr-16 text-[14px] text-[#3D3D3D] placeholder:text-[#6B6B6B] bg-transparent focus:outline-none"
-//                           style={{
-//                             fontFamily:
-//                               '"Raleway", "Inter", sans-serif',
-//                           }}
-//                           autoFocus
-//                         />
-
-//                         <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
-
-//                           {searchLoading ? (
-//                             <div className="w-4 h-4 border-2 border-[#8B9D83] border-t-transparent rounded-full animate-spin" />
-//                           ) : (
-//                             <button
-//                               type="submit"
-//                               className="p-1 text-[#6B6B6B] hover:text-[#3D3D3D] transition-colors"
-//                             >
-//                               <Search
-//                                 className="w-[15px] h-[15px]"
-//                                 strokeWidth={1.7}
-//                               />
-//                             </button>
-//                           )}
-
-//                           <button
-//                             type="button"
-//                             onClick={() => {
-//                               setSearchOpen(
-//                                 false
-//                               );
-
-//                               setSearchQuery(
-//                                 ''
-//                               );
-
-//                               setShowResults(
-//                                 false
-//                               );
-//                             }}
-//                             className="p-1 ml-1 text-[#6B6B6B] hover:text-[#3D3D3D] transition-colors"
-//                           >
-//                             <X
-//                               className="w-[15px] h-[15px]"
-//                               strokeWidth={1.7}
-//                             />
+//                     <form onSubmit={handleSearchSubmit}>
+//                       <Search
+//                         size={15}
+//                         strokeWidth={1.4}
+//                         className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777]"
+//                       />
+//                       <input
+//                         type="text"
+//                         value={searchQuery}
+//                         onChange={(e) => setSearchQuery(e.target.value)}
+//                         placeholder="Search products here"
+//                         className="h-[33px] w-full rounded-[8px] border border-[#69272B] bg-white pl-9 pr-16 text-[11px] text-[#333] outline-none"
+//                         autoFocus
+//                       />
+//                       <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
+//                         {searchLoading ? (
+//                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#69272B] border-t-transparent" />
+//                         ) : (
+//                           <button type="submit" className="p-1">
+//                             <Search size={14} className="text-[#777]" />
 //                           </button>
-
-//                         </div>
-
+//                         )}
+//                         <button
+//                           type="button"
+//                           onClick={() => {
+//                             setSearchOpen(false);
+//                             setSearchQuery('');
+//                             setShowResults(false);
+//                           }}
+//                           className="p-1"
+//                         >
+//                           <X size={14} className="text-[#777]" />
+//                         </button>
 //                       </div>
-
 //                     </form>
 
-//                     {/* ==================================================
-//                         DESKTOP SEARCH RESULTS
-//                     ================================================== */}
-
-//                     {showResults &&
-//                       searchResults.length >
-//                         0 && (
-
-//                         <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-[#E8E0D8] max-h-96 overflow-y-auto z-50">
-
-//                           <div className="py-2">
-
-//                             {searchResults.map(
-//                               (product) => (
-
-//                                 <button
-//                                   key={
-//                                     product._id
-//                                   }
-//                                   onMouseDown={(
-//                                     e
-//                                   ) => {
-//                                     e.preventDefault();
-
-//                                     handleResultClick(
-//                                       product
-//                                     );
-//                                   }}
-//                                   className="w-full px-4 py-3 text-left hover:bg-[#F2F5F0] transition-colors flex items-center gap-3 border-b border-[#E8E0D8] last:border-0"
-//                                 >
-
-//                                   {product.images &&
-//                                   product
-//                                     .images
-//                                     .length >
-//                                     0 ? (
-
-//                                     <img
-//                                       src={
-//                                         product
-//                                           .images[0]
-//                                           ?.url ||
-//                                         product
-//                                           .images[0]
-//                                       }
-//                                       alt={
-//                                         product.productName ||
-//                                         product.name
-//                                       }
-//                                       className="w-10 h-10 rounded-lg object-cover bg-[#F5EDE3]"
-//                                     />
-
-//                                   ) : (
-
-//                                     <div className="w-10 h-10 rounded-lg bg-[#F5EDE3] flex items-center justify-center">
-
-//                                       <Package
-//                                         className="w-5 h-5 text-[#6B6B6B]"
-//                                         strokeWidth={
-//                                           1.5
-//                                         }
-//                                       />
-
-//                                     </div>
-//                                   )}
-
-//                                   <div className="flex-1 min-w-0">
-
-//                                     <p
-//                                       className="font-medium text-[#3D3D3D] text-sm line-clamp-1"
-//                                       style={{
-//                                         fontFamily:
-//                                           '"Raleway", "Inter", sans-serif',
-//                                       }}
-//                                     >
-//                                       {product.productName ||
-//                                         product.name ||
-//                                         product.title}
-//                                     </p>
-
-//                                     <div className="flex items-center gap-2 mt-0.5">
-
-//                                       <p
-//                                         className="text-sm font-semibold text-[#8B9D83]"
-//                                         style={{
-//                                           fontFamily:
-//                                             '"Raleway", "Inter", sans-serif',
-//                                         }}
-//                                       >
-//                                         ৳
-//                                         {product.discountPrice ||
-//                                           product.regularPrice ||
-//                                           product.price}
-//                                       </p>
-
-//                                       {product.discountPrice &&
-//                                         product.regularPrice && (
-//                                           <p className="text-xs text-[#6B6B6B] line-through">
-//                                             ৳
-//                                             {
-//                                               product.regularPrice
-//                                             }
-//                                           </p>
-//                                         )}
-
-//                                     </div>
-
-//                                   </div>
-
-//                                 </button>
-//                               )
+//                     {/* Desktop Search Results */}
+//                     {showResults && searchResults.length > 0 && (
+//                       <div className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg z-50">
+//                         {searchResults.map((product) => (
+//                           <button
+//                             key={product._id}
+//                             onMouseDown={(e) => {
+//                               e.preventDefault();
+//                               handleResultClick(product);
+//                             }}
+//                             className="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left transition hover:bg-gray-50 last:border-0"
+//                           >
+//                             {product.images?.[0] ? (
+//                               <img
+//                                 src={product.images[0]?.url || product.images[0]}
+//                                 alt={product.productName || product.name}
+//                                 className="h-10 w-10 rounded-lg object-cover bg-gray-100"
+//                               />
+//                             ) : (
+//                               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+//                                 <Package className="h-5 w-5 text-gray-400" />
+//                               </div>
 //                             )}
-
-//                             <button
-//                               onClick={
-//                                 handleSearchSubmit
-//                               }
-//                               className="w-full px-4 py-2.5 text-center text-sm text-[#8B9D83] hover:bg-[#F2F5F0] font-medium border-t border-[#E8E0D8] transition-colors"
-//                               style={{
-//                                 fontFamily:
-//                                   '"Raleway", "Inter", sans-serif',
-//                               }}
-//                             >
-//                               View all results
-//                               for "
-//                               {
-//                                 searchQuery
-//                               }
-//                               " →
-//                             </button>
-
-//                           </div>
-
-//                         </div>
-//                       )}
-
+//                             <div className="flex-1 min-w-0">
+//                               <p className="truncate text-sm font-medium text-gray-900">
+//                                 {product.productName || product.name || product.title}
+//                               </p>
+//                               <p className="text-sm font-semibold" style={{ color: ACCENT_COLOR }}>
+//                                 ৳{product.discountPrice || product.regularPrice || product.price}
+//                               </p>
+//                             </div>
+//                           </button>
+//                         ))}
+//                         <button
+//                           onClick={handleSearchSubmit}
+//                           className="w-full px-4 py-3 text-center text-sm font-medium border-t border-gray-100 transition hover:bg-gray-50"
+//                           style={{ color: ACCENT_COLOR }}
+//                         >
+//                           View all results for &quot;{searchQuery}&quot; →
+//                         </button>
+//                       </div>
+//                     )}
 //                   </div>
 //                 )}
-
 //               </div>
+//             </div>
 
-//               {/* ==================================================
-//                   MOBILE SEARCH TRIGGER
-//               ================================================== */}
+//             {/* ================= TOP INFORMATION ================= */}
+//             <div className="ml-auto hidden items-center gap-6 lg:flex">
+//               {/* PHONE */}
+//               {navbarData?.topBar?.phone && (
+//                 <Link
+//                   href={navbarData.topBar.phoneLink || '/contact'}
+//                   className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[#292725] transition hover:text-[#69272B]"
+//                 >
+//                   <Phone size={17} strokeWidth={1.4} />
+//                   <span>{navbarData.topBar.phone}</span>
+//                 </Link>
+//               )}
 
+//               {/* OUR OUTLET */}
+//               {navbarData?.topBar?.showOutlet !== false && (
+//                 <button
+//                   onClick={() => setOutletModalOpen(true)}
+//                   className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[#292725] transition hover:text-[#69272B]"
+//                 >
+//                   <MapPin size={17} strokeWidth={1.4} />
+//                   <span>{navbarData?.topBar?.outletText || 'Our Outlet'}</span>
+//                 </button>
+//               )}
+
+//               {/* TRACK ORDER */}
+//               {navbarData?.topBar?.showTrackOrder !== false && (
+//                 <Link
+//                   href={navbarData.topBar.trackOrderLink || '/track'}
+//                   className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[#292725] transition hover:text-[#69272B]"
+//                 >
+//                   <Truck size={19} strokeWidth={1.4} />
+//                   <span>{navbarData?.topBar?.trackOrderText || 'Track Order'}</span>
+//                 </Link>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* =================================================
+//             BOTTOM NAVBAR
+//         ================================================= */}
+//         <div className="border-b border-[#dedcd2]">
+//           <div className="mx-auto flex h-[43px] max-w-[1600px] items-center px-4 lg:px-7">
+//             {/* Logo Space */}
+//             <div className="w-[100px] shrink-0" />
+
+//             {/* ================= DESKTOP NAV ================= */}
+//             <nav className="hidden items-center lg:flex">
+//               {/* ALL Button */}
 //               <button
-//                 onClick={() =>
-//                   setMobileSearchOpen(
-//                     true
-//                   )
-//                 }
-//                 className="mobile-search-trigger md:hidden p-2 hover:bg-[#F2F5F0] rounded-full transition-colors"
+//                 type="button"
+//                 onClick={() => setCategorySidebarOpen(true)}
+//                 className="group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] text-[#292725] transition hover:text-[#69272B]"
 //               >
-//                 <Search
-//                   className="w-[20px] h-[20px] text-[#3D3D3D]"
-//                   strokeWidth={1.7}
-//                 />
+//                 <Menu size={17} strokeWidth={1.6} className="mr-[2px]" />
+//                 <span>ALL</span>
 //               </button>
 
-//               {/* ==================================================
-//                   USER ICON
-//               ================================================== */}
+//               {/* Nav Items from Backend */}
+//               {navItems.map((item, index) => renderDesktopNavItem(item, index, 'desktop-'))}
+//             </nav>
 
+//             {/* ================= RIGHT ICONS ================= */}
+//             <div className="ml-auto flex items-center gap-4">
+//               {/* Mobile Search Trigger */}
+//               <button
+//                 onClick={() => setMobileSearchOpen(true)}
+//                 className="mobile-search-trigger lg:hidden"
+//                 aria-label="Search"
+//               >
+//                 <Search size={20} strokeWidth={1.4} />
+//               </button>
+
+//               {/* Wishlist */}
+//               <Link
+//                 href="/wishlist"
+//                 aria-label="Wishlist"
+//                 className="text-[#292725] transition hover:text-[#69272B]"
+//               >
+//                 <Heart size={20} strokeWidth={1.4} />
+//               </Link>
+
+//               {/* Shopping Bag */}
+//               <button
+//                 onClick={() => setIsCartOpen(true)}
+//                 aria-label="Shopping bag"
+//                 className="relative text-[#292725] transition hover:text-[#69272B]"
+//               >
+//                 <ShoppingBag size={19} strokeWidth={1.4} />
+//                 {cartCount > 0 && (
+//                   <span
+//                     className="absolute -right-2 -top-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-1 text-[9px] font-semibold text-white"
+//                     style={{ backgroundColor: ACCENT_COLOR }}
+//                   >
+//                     {cartCount > 9 ? '9+' : cartCount}
+//                   </span>
+//                 )}
+//               </button>
+
+//               {/* Account */}
 //               {user ? (
-
-//                 <div className="relative ml-5">
-
+//                 <div className="relative">
 //                   <button
-//                     onClick={() =>
-//                       setUserMenuOpen(
-//                         !userMenuOpen
-//                       )
-//                     }
-//                     className="flex items-center justify-center hover:opacity-70 transition-opacity"
+//                     onClick={() => setUserMenuOpen(!userMenuOpen)}
+//                     className="flex items-center justify-center"
 //                     aria-label="Account"
 //                   >
-
-//                     {getProfilePicture() &&
-//                     !profileImageError ? (
-
+//                     {getProfilePicture() && !profileImageError ? (
 //                       <img
 //                         src={getProfilePicture()}
 //                         alt={getDisplayName()}
-//                         onError={() =>
-//                           setProfileImageError(
-//                             true
-//                           )
-//                         }
-//                         className="w-[24px] h-[24px] rounded-full object-cover"
+//                         onError={() => setProfileImageError(true)}
+//                         className="h-6 w-6 rounded-full object-cover"
 //                       />
-
 //                     ) : (
-
-//                       <UserCircle
-//                         className="w-[25px] h-[25px] text-[#3D3D3D]"
-//                         strokeWidth={1.5}
-//                       />
-
+//                       <UserCircle size={20} strokeWidth={1.4} />
 //                     )}
-
 //                   </button>
 
-//                   {/* USER DROPDOWN */}
-
+//                   {/* User Dropdown */}
 //                   {userMenuOpen && (
 //                     <>
 //                       <div
 //                         className="fixed inset-0 z-40"
-//                         onClick={() =>
-//                           setUserMenuOpen(
-//                             false
-//                           )
-//                         }
+//                         onClick={() => setUserMenuOpen(false)}
 //                       />
-
-//                       <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-[#E8E0D8] overflow-hidden z-50 animate-fadeIn">
-
-//                         {/* User Info */}
-
-//                         <div className="px-4 py-3 border-b border-[#E8E0D8] bg-[#F5EDE3]">
-
-//                           <p
-//                             className="text-[#3D3D3D] font-semibold text-sm truncate"
-//                             style={{
-//                               fontFamily:
-//                                 '"Raleway", "Inter", sans-serif',
-//                             }}
-//                           >
+//                       <div className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+//                         <div className="border-b border-gray-100 bg-[#F5EDE3] px-4 py-3">
+//                           <p className="truncate text-sm font-semibold text-gray-900">
 //                             {getDisplayName()}
 //                           </p>
-
-//                           <p
-//                             className="text-[#6B6B6B] text-xs truncate mt-0.5"
-//                             style={{
-//                               fontFamily:
-//                                 '"Raleway", "Inter", sans-serif',
-//                             }}
-//                           >
+//                           <p className="truncate text-xs text-gray-500">
 //                             {user.email}
 //                           </p>
-
-//                           <div className="mt-1.5">
-
-//                             <span
-//                               className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#8B9D83] text-white"
-//                               style={{
-//                                 fontFamily:
-//                                   '"Raleway", "Inter", sans-serif',
-//                               }}
-//                             >
-//                               {user.role ===
-//                               'call_center_agent'
-//                                 ? 'Call Center Agent'
-//                                 : user.role ===
-//                                   'super_admin'
-//                                 ? 'Super Admin'
-//                                 : user.role ===
-//                                   'admin'
-//                                 ? 'Admin'
-//                                 : user.role ===
-//                                   'moderator'
-//                                 ? 'Moderator'
-//                                 : 'Customer'}
-//                             </span>
-
-//                           </div>
-
 //                         </div>
-
-//                         {/* Dropdown Actions */}
-
 //                         <div className="py-2">
-
-//                           {/* Dashboard */}
-
-//                           <div
-//                             onClick={() => {
-//                               setUserMenuOpen(
-//                                 false
-//                               );
-
-//                               window.location.href =
-//                                 getDashboardLink();
-//                             }}
-//                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors cursor-pointer"
-//                             style={{
-//                               fontFamily:
-//                                 '"Raleway", "Inter", sans-serif',
-//                             }}
-//                           >
-
-//                             <LayoutDashboard
-//                               className="w-4 h-4 text-[#8B9D83]"
-//                               strokeWidth={
-//                                 1.7
-//                               }
-//                             />
-
-//                             <span>
-//                               Dashboard
-//                             </span>
-
-//                           </div>
-
-//                           {/* Settings */}
-
-//                           <div
-//                             onClick={() => {
-//                               setUserMenuOpen(
-//                                 false
-//                               );
-
-//                               window.location.href =
-//                                 getSettingsLink();
-//                             }}
-//                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors cursor-pointer"
-//                             style={{
-//                               fontFamily:
-//                                 '"Raleway", "Inter", sans-serif',
-//                             }}
-//                           >
-
-//                             <Settings
-//                               className="w-4 h-4 text-[#8B9D83]"
-//                               strokeWidth={
-//                                 1.7
-//                               }
-//                             />
-
-//                             <span>
-//                               Settings
-//                             </span>
-
-//                           </div>
-
-//                           <div className="border-t border-[#E8E0D8] my-1" />
-
-//                           {/* Logout */}
-
 //                           <button
 //                             onClick={() => {
-//                               setUserMenuOpen(
-//                                 false
-//                               );
-
+//                               setUserMenuOpen(false);
+//                               router.push(getDashboardLink());
+//                             }}
+//                             className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+//                           >
+//                             <LayoutDashboard className="h-4 w-4" style={{ color: ACCENT_COLOR }} />
+//                             <span>Dashboard</span>
+//                           </button>
+//                           <button
+//                             onClick={() => {
+//                               setUserMenuOpen(false);
+//                               router.push(getSettingsLink());
+//                             }}
+//                             className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+//                           >
+//                             <Settings className="h-4 w-4" style={{ color: ACCENT_COLOR }} />
+//                             <span>Settings</span>
+//                           </button>
+//                           <div className="my-1 border-t border-gray-100" />
+//                           <button
+//                             onClick={() => {
+//                               setUserMenuOpen(false);
 //                               logout();
 //                             }}
-//                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors w-full"
-//                             style={{
-//                               fontFamily:
-//                                 '"Raleway", "Inter", sans-serif',
-//                             }}
+//                             className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-500 transition hover:bg-red-50"
 //                           >
-
-//                             <LogOut
-//                               className="w-4 h-4"
-//                               strokeWidth={
-//                                 1.7
-//                               }
-//                             />
-
-//                             <span>
-//                               Logout
-//                             </span>
-
+//                             <LogOut className="h-4 w-4" />
+//                             <span>Logout</span>
 //                           </button>
-
 //                         </div>
-
 //                       </div>
 //                     </>
 //                   )}
-
 //                 </div>
-
 //               ) : (
-
-//                 /* Logged Out User Icon */
-
 //                 <Link
 //                   href="/login"
-//                   className="ml-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-//                   aria-label="Sign In"
+//                   aria-label="Account"
+//                   className="text-[#292725] transition hover:text-[#69272B]"
 //                 >
-//                   <UserCircle
-//                     className="w-[25px] h-[25px] text-[#3D3D3D]"
-//                     strokeWidth={1.5}
-//                   />
+//                   <User size={20} strokeWidth={1.4} />
 //                 </Link>
-
 //               )}
 
-//               {/* ==================================================
-//                   SHOPPING BAG
-//               ================================================== */}
-
+//               {/* Mobile Menu Toggle */}
 //               <button
-//                 onClick={() =>
-//                   setIsCartOpen(true)
-//                 }
-//                 className="relative ml-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-//                 aria-label="Shopping bag"
+//                 type="button"
+//                 onClick={() => setMobileMenuOpen((prev) => !prev)}
+//                 aria-label="Toggle menu"
+//                 className="lg:hidden"
 //               >
-
-//                 <ShoppingBag
-//                   className="w-[25px] h-[25px] text-[#3D3D3D]"
-//                   strokeWidth={1.5}
-//                 />
-
-//                 {/* Cart Count */}
-
-//                 {cartCount > 0 && (
-//                   <span
-//                     className="absolute -top-2 -right-2 bg-[#8B9D83] text-white text-[9px] font-semibold rounded-full min-w-[15px] h-[15px] flex items-center justify-center px-1"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-//                     }}
-//                   >
-//                     {cartCount > 9
-//                       ? '9+'
-//                       : cartCount}
-//                   </span>
+//                 {mobileMenuOpen ? (
+//                   <X size={22} strokeWidth={1.5} />
+//                 ) : (
+//                   <Menu size={22} strokeWidth={1.5} />
 //                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
 
+//         {/* =================================================
+//             MOBILE MENU
+//         ================================================= */}
+//         {mobileMenuOpen && (
+//           <div className="border-b border-[#ededeb] bg-white lg:hidden">
+//             <nav className="flex flex-col px-4">
+//               {/* ALL Button */}
+//               <button
+//                 type="button"
+//                 onClick={() => {
+//                   setCategorySidebarOpen(true);
+//                   setMobileMenuOpen(false);
+//                 }}
+//                 className="flex min-h-[40px] items-center justify-between border-b border-[#eeeeee] text-left text-[12px] font-medium text-[#292725]"
+//               >
+//                 <span className="flex items-center gap-2">
+//                   <Menu size={17} strokeWidth={1.6} />
+//                   ALL
+//                 </span>
 //               </button>
 
-//             </div>
-
+//               {/* Nav Items */}
+//               {navItems.map((item, index) => renderMobileNavItem(item, index))}
+//             </nav>
 //           </div>
+//         )}
+//       </header>
 
-//         </div>
-//       </nav>
-
-//       {/* ========================================================
+//       {/* =====================================================
 //           MOBILE SEARCH OVERLAY
-//       ======================================================== */}
-
+//       ===================================================== */}
 //       {mobileSearchOpen && (
-//         <div className="fixed top-16 left-0 right-0 z-40 bg-white shadow-lg border-b border-[#E8E0D8] animate-slideDown md:hidden">
-
-//           <div
-//             className="container mx-auto px-4 py-3"
-//             ref={mobileSearchRef}
-//           >
-
-//             <form
-//               onSubmit={
-//                 handleSearchSubmit
-//               }
-//               className="relative"
-//             >
-
+//         <div className="fixed left-0 right-0 top-16 z-40 border-b border-[#E8E0D8] bg-white shadow-lg lg:hidden">
+//           <div className="mx-auto px-4 py-3" ref={mobileSearchRef}>
+//             <form onSubmit={handleSearchSubmit} className="relative">
 //               <input
 //                 type="text"
 //                 value={searchQuery}
-//                 onChange={(e) =>
-//                   setSearchQuery(
-//                     e.target.value
-//                   )
-//                 }
-//                 placeholder="Search beauty..."
-//                 className="w-full px-4 py-3 pr-20 text-sm text-[#3D3D3D] bg-[#F5EDE3] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#8B9D83] focus:ring-2 focus:ring-[#8B9D83]/20 transition-all"
-//                 style={{
-//                   fontFamily:
-//                     '"Raleway", "Inter", sans-serif',
-//                 }}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 placeholder="Search products here"
+//                 className="w-full rounded-lg border-2 border-transparent bg-[#F5EDE3] px-4 py-3 pr-20 text-sm text-[#3D3D3D] transition-all focus:border-[#69272B] focus:outline-none"
 //                 autoFocus
 //               />
-
-//               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-
-//                 <button
-//                   type="submit"
-//                   className="p-1.5"
-//                 >
-
+//               <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
+//                 <button type="submit" className="p-1.5">
 //                   {searchLoading ? (
-//                     <div className="w-4 h-4 border-2 border-[#8B9D83] border-t-transparent rounded-full animate-spin" />
+//                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#69272B] border-t-transparent" />
 //                   ) : (
-//                     <Search className="w-4 h-4 text-[#8B9D83]" />
+//                     <Search className="h-4 w-4 text-[#69272B]" />
 //                   )}
-
 //                 </button>
-
 //                 <button
 //                   type="button"
 //                   onClick={() => {
-//                     setMobileSearchOpen(
-//                       false
-//                     );
-
+//                     setMobileSearchOpen(false);
 //                     setSearchQuery('');
 //                     setShowResults(false);
 //                   }}
-//                   className="p-1.5 text-[#6B6B6B] hover:text-[#3D3D3D] transition-colors"
+//                   className="p-1.5"
 //                 >
-//                   <X className="w-4 h-4" />
+//                   <X className="h-4 w-4 text-gray-500" />
 //                 </button>
-
 //               </div>
-
 //             </form>
 
 //             {/* Mobile Search Results */}
-
-//             {showResults &&
-//               searchResults.length >
-//                 0 && (
-
-//                 <div className="mt-3 bg-white rounded-lg border border-[#E8E0D8] max-h-96 overflow-y-auto">
-
-//                   {searchResults.map(
-//                     (product) => (
-
-//                       <button
-//                         key={
-//                           product._id
-//                         }
-//                         onMouseDown={(
-//                           e
-//                         ) => {
-//                           e.preventDefault();
-
-//                           handleResultClick(
-//                             product
-//                           );
-//                         }}
-//                         className="w-full px-3 py-3 text-left hover:bg-[#F2F5F0] transition-colors flex items-center gap-3 border-b border-[#E8E0D8] last:border-0"
-//                       >
-
-//                         {product.images &&
-//                         product.images.length >
-//                           0 ? (
-
-//                           <img
-//                             src={
-//                               product
-//                                 .images[0]
-//                                 ?.url ||
-//                               product
-//                                 .images[0]
-//                             }
-//                             alt={
-//                               product.productName ||
-//                               product.name
-//                             }
-//                             className="w-12 h-12 rounded-lg object-cover bg-[#F5EDE3]"
-//                           />
-
-//                         ) : (
-
-//                           <div className="w-12 h-12 rounded-lg bg-[#F5EDE3] flex items-center justify-center">
-
-//                             <Package className="w-6 h-6 text-[#6B6B6B]" />
-
-//                           </div>
-
-//                         )}
-
-//                         <div className="flex-1">
-
-//                           <p
-//                             className="font-medium text-[#3D3D3D] text-sm line-clamp-1"
-//                             style={{
-//                               fontFamily:
-//                                 '"Raleway", "Inter", sans-serif',
-//                             }}
-//                           >
-//                             {product.productName ||
-//                               product.name ||
-//                               product.title}
-//                           </p>
-
-//                           <p
-//                             className="text-sm font-semibold text-[#8B9D83] mt-0.5"
-//                             style={{
-//                               fontFamily:
-//                                 '"Raleway", "Inter", sans-serif',
-//                             }}
-//                           >
-//                             ৳
-//                             {product.discountPrice ||
-//                               product.regularPrice ||
-//                               product.price}
-//                           </p>
-
-//                         </div>
-
-//                       </button>
-//                     )
-//                   )}
-
+//             {showResults && searchResults.length > 0 && (
+//               <div className="mt-3 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white">
+//                 {searchResults.map((product) => (
 //                   <button
-//                     onClick={
-//                       handleSearchSubmit
-//                     }
-//                     className="w-full px-4 py-3 text-center text-sm text-[#8B9D83] hover:bg-[#F2F5F0] font-medium border-t border-[#E8E0D8]"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
+//                     key={product._id}
+//                     onMouseDown={(e) => {
+//                       e.preventDefault();
+//                       handleResultClick(product);
 //                     }}
+//                     className="flex w-full items-center gap-3 border-b border-gray-100 px-3 py-3 text-left transition hover:bg-gray-50 last:border-0"
 //                   >
-//                     View all results
-//                     for "
-//                     {searchQuery}"
-//                     →
+//                     {product.images?.[0] ? (
+//                       <img
+//                         src={product.images[0]?.url || product.images[0]}
+//                         alt={product.productName || product.name}
+//                         className="h-12 w-12 rounded-lg object-cover bg-gray-100"
+//                       />
+//                     ) : (
+//                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100">
+//                         <Package className="h-6 w-6 text-gray-400" />
+//                       </div>
+//                     )}
+//                     <div className="flex-1">
+//                       <p className="truncate text-sm font-medium text-gray-900">
+//                         {product.productName || product.name || product.title}
+//                       </p>
+//                       <p className="text-sm font-semibold" style={{ color: ACCENT_COLOR }}>
+//                         ৳{product.discountPrice || product.regularPrice || product.price}
+//                       </p>
+//                     </div>
 //                   </button>
-
-//                 </div>
-//               )}
-
+//                 ))}
+//                 <button
+//                   onClick={handleSearchSubmit}
+//                   className="w-full px-4 py-3 text-center text-sm font-medium border-t border-gray-100"
+//                   style={{ color: ACCENT_COLOR }}
+//                 >
+//                   View all results for &quot;{searchQuery}&quot; →
+//                 </button>
+//               </div>
+//             )}
 //           </div>
-
 //         </div>
 //       )}
 
-//       {/* ========================================================
-//           MOBILE MENU SIDEBAR
-//       ======================================================== */}
-
+//       {/* =====================================================
+//           STICKY NAVBAR AFTER SCROLL
+//       ===================================================== */}
 //       <div
-//         className={`fixed inset-0 z-50 md:hidden ${
-//           isMenuOpen
-//             ? 'visible'
-//             : 'invisible'
-//         }`}
+//         className={`
+//           fixed left-0 right-0 top-0 z-50 border-b border-[#dedcd2] bg-[#F1EFE3]
+//           shadow-[0_2px_10px_rgba(0,0,0,0.04)] transition-all duration-300
+//           ${isScrolled ? 'translate-y-0 opacity-100' : '-translate-y-full pointer-events-none opacity-0'}
+//         `}
 //       >
-
-//         {/* Overlay */}
-
-//         <div
-//           className={`absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${
-//             isMenuOpen
-//               ? 'opacity-100'
-//               : 'opacity-0'
-//           }`}
-//           onClick={() =>
-//             setIsMenuOpen(false)
-//           }
-//         />
-
-//         {/* Sidebar */}
-
-//         <div
-//           className={`absolute left-0 top-0 h-full w-[80%] max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-out ${
-//             isMenuOpen
-//               ? 'translate-x-0'
-//               : '-translate-x-full'
-//           }`}
-//         >
-
-//           <div className="flex flex-col h-full">
-
-//             {/* Header */}
-
-//             <div className="flex items-center justify-between p-5 border-b border-[#E8E0D8]">
-
-//               <div className="flex items-center space-x-2.5">
-
-//                 <div className="w-8 h-8">
-
-//                   {navbarData?.logo?.logoUrl ? (
-
-//                     <img
-//                       src={getLogoUrl(
-//                         navbarData.logo.logoUrl
-//                       )}
-//                       alt={
-//                         navbarData.logo.text ||
-//                         'Glow&Co'
-//                       }
-//                       className="w-full h-full object-contain"
-//                     />
-
-//                   ) : (
-
-//                     <img
-//                       src="/logo.png"
-//                       alt="Logo"
-//                       className="w-full h-full object-contain"
-//                     />
-
-//                   )}
-
-//                 </div>
-
-//                 <div>
-
-//                   <span
-//                     className="font-bold text-[#3D3D3D] text-base"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-//                     }}
-//                   >
-//                     {navbarData?.logo
-//                       ?.text ||
-//                       'Glow&Co'}
-
-//                     {navbarData?.logo
-//                       ?.highlightText && (
-//                       <span className="text-[#8B9D83]">
-//                         {
-//                           navbarData
-//                             .logo
-//                             .highlightText
-//                         }
-//                       </span>
-//                     )}
-//                   </span>
-
-//                   <span
-//                     className="text-[10px] text-[#8B9D83] block -mt-1 tracking-wider"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-//                     }}
-//                   >
-//                     BEAUTY
-//                   </span>
-
-//                 </div>
-
+//         <div className="mx-auto flex h-[52px] max-w-[1600px] items-center px-4 lg:px-7">
+//           {/* Small Logo */}
+//           <Link href="/" className="flex h-full w-[100px] shrink-0 items-center justify-start">
+//             {navbarData?.logo?.logoUrl ? (
+//               <img
+//                 src={getLogoUrl(navbarData.logo.logoUrl)}
+//                 alt="Logo"
+//                 className="max-h-[44px] max-w-[70px] object-contain"
+//               />
+//             ) : (
+//               <div className="flex flex-col">
+//                 <span className="text-sm font-bold" style={{ color: styles.textColor }}>
+//                   {navbarData?.logo?.text || "Nishat's Collection"}
+//                 </span>
 //               </div>
+//             )}
+//           </Link>
 
-//               <button
-//                 onClick={() =>
-//                   setIsMenuOpen(
-//                     false
-//                   )
-//                 }
-//                 className="p-2 rounded-lg hover:bg-[#F2F5F0] transition-colors"
-//               >
-//                 <X className="w-5 h-5 text-[#3D3D3D]" />
-//               </button>
+//           {/* Sticky Desktop Nav */}
+//           <nav className="hidden items-center lg:flex">
+//             <button
+//               type="button"
+//               onClick={() => setCategorySidebarOpen(true)}
+//               className="group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium text-[#292725] transition hover:text-[#69272B]"
+//             >
+//               <Menu size={17} strokeWidth={1.6} className="mr-[2px]" />
+//               ALL
+//             </button>
 
-//             </div>
+//             {navItems.map((item, index) => renderDesktopNavItem(item, index, 'sticky-'))}
+//           </nav>
 
-//             {/* Navigation Items */}
-
-//             <div className="flex-1 overflow-y-auto py-3">
-
-//               {navItems.map((item) => {
-
-//                 const Icon =
-//                   getIcon(item.icon);
-
-//                 return (
-//                   <Link
-//                     key={
-//                       item.id ||
-//                       item.name
-//                     }
-//                     href={item.href}
-//                     onClick={() =>
-//                       setIsMenuOpen(
-//                         false
-//                       )
-//                     }
-//                     className={`flex items-center gap-3 px-5 py-3 mx-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-//                       isActive(
-//                         item.href
-//                       )
-//                         ? 'text-[#8B9D83] font-semibold'
-//                         : 'text-[#3D3D3D] hover:text-[#8B9D83] hover:bg-[#F2F5F0]'
-//                     }`}
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-
-//                       borderLeft:
-//                         isActive(
-//                           item.href
-//                         )
-//                           ? '3px solid #8B9D83'
-//                           : 'none',
-
-//                       paddingLeft:
-//                         isActive(
-//                           item.href
-//                         )
-//                           ? '17px'
-//                           : '20px',
-//                     }}
-//                   >
-
-//                     <Icon
-//                       className={`w-4.5 h-4.5 ${
-//                         isActive(
-//                           item.href
-//                         )
-//                           ? 'text-[#8B9D83]'
-//                           : 'text-[#6B6B6B]'
-//                       }`}
-//                     />
-
-//                     <span>
-//                       {item.name}
-//                     </span>
-
-//                   </Link>
-//                 );
-//               })}
-
-//               <div className="my-3 mx-5 h-px bg-gradient-to-r from-[#8B9D83]/20 via-[#8B9D83]/40 to-[#8B9D83]/20" />
-
-//               {/* ==================================================
-//                   MOBILE AUTH
-//               ================================================== */}
-
-//               {!user ? (
-
-//                 <div className="px-5 mt-3">
-
-//                   <Link
-//                     href="/login"
-//                     onClick={() =>
-//                       setIsMenuOpen(
-//                         false
-//                       )
-//                     }
-//                     className="flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-[#8B9D83] text-white hover:bg-[#6B7D63] transition-all shadow-sm"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-//                     }}
-//                   >
-//                     Sign In
-//                   </Link>
-
-//                 </div>
-
-//               ) : (
-
-//                 <div className="px-5 mt-3">
-
-//                   {/* Mobile User Info */}
-
-//                   <div className="flex items-center gap-3 p-3 bg-[#F5EDE3] rounded-lg mb-3">
-
-//                     {getProfilePicture() &&
-//                     !profileImageError ? (
-
-//                       <img
-//                         src={getProfilePicture()}
-//                         alt={getDisplayName()}
-//                         onError={() =>
-//                           setProfileImageError(
-//                             true
-//                           )
-//                         }
-//                         className="w-10 h-10 rounded-full object-cover border-2 border-[#8B9D83]/30"
-//                       />
-
-//                     ) : (
-
-//                       <div className="w-10 h-10 rounded-full bg-[#8B9D83] flex items-center justify-center text-white font-semibold text-sm">
-
-//                         {getInitials()}
-
-//                       </div>
-
-//                     )}
-
-//                     <div className="flex-1">
-
-//                       <p
-//                         className="font-semibold text-[#3D3D3D] text-sm"
-//                         style={{
-//                           fontFamily:
-//                             '"Raleway", "Inter", sans-serif',
-//                         }}
-//                       >
-//                         {getDisplayName()}
-//                       </p>
-
-//                       <p
-//                         className="text-[#8B9D83] text-xs truncate"
-//                         style={{
-//                           fontFamily:
-//                             '"Raleway", "Inter", sans-serif',
-//                         }}
-//                       >
-//                         {user.email}
-//                       </p>
-
-//                     </div>
-
-//                   </div>
-
-//                   {/* Dashboard */}
-
-//                   <div
-//                     onClick={() => {
-//                       setIsMenuOpen(
-//                         false
-//                       );
-
-//                       window.location.href =
-//                         getDashboardLink();
-//                     }}
-//                     className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors mb-1 cursor-pointer"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-//                     }}
-//                   >
-
-//                     <LayoutDashboard className="w-4 h-4 text-[#8B9D83]" />
-
-//                     Dashboard
-
-//                   </div>
-
-//                   {/* Settings */}
-
-//                   <div
-//                     onClick={() => {
-//                       setIsMenuOpen(
-//                         false
-//                       );
-
-//                       window.location.href =
-//                         getSettingsLink();
-//                     }}
-//                     className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors mb-2 cursor-pointer"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-//                     }}
-//                   >
-
-//                     <Settings className="w-4 h-4 text-[#8B9D83]" />
-
-//                     Settings
-
-//                   </div>
-
-//                   {/* Logout */}
-
-//                   <button
-//                     onClick={() => {
-//                       setIsMenuOpen(
-//                         false
-//                       );
-
-//                       logout();
-//                     }}
-//                     className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-all"
-//                     style={{
-//                       fontFamily:
-//                         '"Raleway", "Inter", sans-serif',
-//                     }}
-//                   >
-
-//                     <LogOut className="w-4 h-4" />
-
-//                     Logout
-
-//                   </button>
-
-//                 </div>
-
+//           {/* Sticky Right Icons */}
+//           <div className="ml-auto flex items-center gap-4">
+//             <Link href="/wishlist" aria-label="Wishlist" className="text-[#292725] transition hover:text-[#69272B]">
+//               <Heart size={20} strokeWidth={1.4} />
+//             </Link>
+//             <button
+//               onClick={() => setIsCartOpen(true)}
+//               aria-label="Shopping bag"
+//               className="relative text-[#292725] transition hover:text-[#69272B]"
+//             >
+//               <ShoppingBag size={19} strokeWidth={1.4} />
+//               {cartCount > 0 && (
+//                 <span
+//                   className="absolute -right-2 -top-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-1 text-[9px] font-semibold text-white"
+//                   style={{ backgroundColor: ACCENT_COLOR }}
+//                 >
+//                   {cartCount > 9 ? '9+' : cartCount}
+//                 </span>
 //               )}
-
-//             </div>
-
+//             </button>
+//             {user ? (
+//               <div className="relative">
+//                 <button
+//                   onClick={() => setUserMenuOpen(!userMenuOpen)}
+//                   className="flex items-center justify-center"
+//                   aria-label="Account"
+//                 >
+//                   {getProfilePicture() && !profileImageError ? (
+//                     <img
+//                       src={getProfilePicture()}
+//                       alt={getDisplayName()}
+//                       onError={() => setProfileImageError(true)}
+//                       className="h-6 w-6 rounded-full object-cover"
+//                     />
+//                   ) : (
+//                     <UserCircle size={20} strokeWidth={1.4} />
+//                   )}
+//                 </button>
+//                 {userMenuOpen && (
+//                   <>
+//                     <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+//                     <div className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+//                       <div className="border-b border-gray-100 bg-[#F5EDE3] px-4 py-3">
+//                         <p className="truncate text-sm font-semibold text-gray-900">{getDisplayName()}</p>
+//                         <p className="truncate text-xs text-gray-500">{user.email}</p>
+//                       </div>
+//                       <div className="py-2">
+//                         <button
+//                           onClick={() => {
+//                             setUserMenuOpen(false);
+//                             router.push(getDashboardLink());
+//                           }}
+//                           className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+//                         >
+//                           <LayoutDashboard className="h-4 w-4" style={{ color: ACCENT_COLOR }} />
+//                           <span>Dashboard</span>
+//                         </button>
+//                         <button
+//                           onClick={() => {
+//                             setUserMenuOpen(false);
+//                             router.push(getSettingsLink());
+//                           }}
+//                           className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+//                         >
+//                           <Settings className="h-4 w-4" style={{ color: ACCENT_COLOR }} />
+//                           <span>Settings</span>
+//                         </button>
+//                         <div className="my-1 border-t border-gray-100" />
+//                         <button
+//                           onClick={() => {
+//                             setUserMenuOpen(false);
+//                             logout();
+//                           }}
+//                           className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-500 transition hover:bg-red-50"
+//                         >
+//                           <LogOut className="h-4 w-4" />
+//                           <span>Logout</span>
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </>
+//                 )}
+//               </div>
+//             ) : (
+//               <Link href="/login" aria-label="Account" className="text-[#292725] transition hover:text-[#69272B]">
+//                 <User size={20} strokeWidth={1.4} />
+//               </Link>
+//             )}
+//             <button
+//               type="button"
+//               onClick={() => setMobileMenuOpen((prev) => !prev)}
+//               aria-label="Toggle menu"
+//               className="lg:hidden"
+//             >
+//               {mobileMenuOpen ? <X size={22} strokeWidth={1.5} /> : <Menu size={22} strokeWidth={1.5} />}
+//             </button>
 //           </div>
-
 //         </div>
-
 //       </div>
 
-//       {/* ========================================================
-//           CART SIDEBAR
-//       ======================================================== */}
-
-//       <CartSidebar
-//         isOpen={isCartOpen}
-//         onClose={() =>
-//           setIsCartOpen(false)
-//         }
+//       {/* =====================================================
+//           CATEGORY SIDEBAR
+//       ===================================================== */}
+//       <CategorySidebar
+//         isOpen={categorySidebarOpen}
+//         onClose={() => setCategorySidebarOpen(false)}
+//         categories={navbarData?.categories || []}
 //       />
 
-//       {/* ========================================================
-//           ANIMATIONS
-//       ======================================================== */}
+//       {/* =====================================================
+//           OUTLET MODAL
+//       ===================================================== */}
+//       <OutletModal
+//         isOpen={outletModalOpen}
+//         onClose={() => setOutletModalOpen(false)}
+//         outlet={navbarData?.outlet}
+//       />
 
-//       <style jsx>{`
-
-//         @keyframes slideLeft {
-//           from {
-//             opacity: 0;
-//             transform: translateX(20px);
-//           }
-
-//           to {
-//             opacity: 1;
-//             transform: translateX(0);
-//           }
-//         }
-
-//         .animate-slideLeft {
-//           animation: slideLeft 0.25s ease-out;
-//         }
-
-//         @keyframes slideDown {
-//           from {
-//             opacity: 0;
-//             transform: translateY(-10px);
-//           }
-
-//           to {
-//             opacity: 1;
-//             transform: translateY(0);
-//           }
-//         }
-
-//         .animate-slideDown {
-//           animation: slideDown 0.25s ease-out;
-//         }
-
-//         @keyframes fadeIn {
-//           from {
-//             opacity: 0;
-//             transform: translateY(-10px);
-//           }
-
-//           to {
-//             opacity: 1;
-//             transform: translateY(0);
-//           }
-//         }
-
-//         .animate-fadeIn {
-//           animation: fadeIn 0.2s ease-out;
-//         }
-
-//         .w-4.5 {
-//           width: 1.125rem;
-//         }
-
-//         .h-4.5 {
-//           height: 1.125rem;
-//         }
-
-//       `}</style>
+//       {/* =====================================================
+//           CART SIDEBAR
+//       ===================================================== */}
+//       <CartSidebar
+//         isOpen={isCartOpen}
+//         onClose={() => setIsCartOpen(false)}
+//       />
 //     </>
 //   );
 // }
-
-
-
 'use client';
 
-import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-
 import {
-  LogOut,
-  User,
-  LayoutDashboard,
-  ShoppingBag,
   Search,
-  X,
-  Home,
-  Package,
-  Info,
-  Phone,
-  Menu,
-  UserCircle,
-  ChevronDown,
   MapPin,
-  Zap,
+  Phone,
+  Truck,
+  Menu,
   Heart,
-  Sparkles,
+  ShoppingBag,
+  User,
+  ChevronDown,
+  X,
+  Package,
+  LayoutDashboard,
   Settings,
-  Flower2,
+  LogOut,
+  UserCircle,
 } from 'lucide-react';
-
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+
 import CartSidebar from '../CartSidebar';
+import OutletModal from '../OutletModal';
+import CategorySidebar from '../CategorySidebar';
+import { useNavbar } from '@/app/hooks/useNavbar';
 
 // ============================================================
-// TYPEWRITER CUSTOM HOOK
+// API URL
 // ============================================================
-
-function useTypewriter(words, speed = 100, deleteSpeed = 50, pause = 2000) {
-  const [text, setText] = useState('');
-  const [wordIndex, setWordIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-
-  useEffect(() => {
-    const currentWord = words[wordIndex];
-    let timer;
-
-    if (isPaused) {
-      timer = setTimeout(() => {
-        setIsPaused(false);
-        setIsDeleting(true);
-      }, pause);
-      return () => clearTimeout(timer);
-    }
-
-    if (isDeleting) {
-      timer = setTimeout(() => {
-        setText(currentWord.substring(0, text.length - 1));
-        if (text.length === 0) {
-          setIsDeleting(false);
-          setWordIndex((prev) => (prev + 1) % words.length);
-        }
-      }, deleteSpeed);
-    } else {
-      timer = setTimeout(() => {
-        setText(currentWord.substring(0, text.length + 1));
-        if (text.length === currentWord.length) {
-          setIsPaused(true);
-        }
-      }, speed);
-    }
-
-    return () => clearTimeout(timer);
-  }, [text, wordIndex, isDeleting, isPaused, words, speed, deleteSpeed, pause]);
-
-  return text;
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 // ============================================================
-// ICON MAPPING
+// THEME COLOR
 // ============================================================
-
-const ICON_MAP = {
-  Home: Home,
-  Zap: Zap,
-  MapPin: MapPin,
-  Info: Info,
-  Phone: Phone,
-  Package: Package,
-  User: User,
-  Heart: Heart,
-  Sparkles: Sparkles,
-  Flower2: Flower2,
-};
-
-// ============================================================
-// COLOR PALETTE - BEAUTY THEME
-// ============================================================
-// Foundation/Skin tones: Warm beige, nude, tan
-// Green accents: Sage, olive, eucalyptus
-// ============================================================
-
-const COLORS = {
-  primary: '#8B9D83', // Sage green - main accent
-  primaryLight: '#A8B8A0', // Lighter sage
-  primaryDark: '#6B7D63', // Darker sage
-  primaryBg: '#F2F5F0', // Very light sage background
-  skin: '#F5EDE3', // Light foundation/skin tone
-  skinMedium: '#E8DCD0', // Medium skin tone
-  skinDark: '#D4C4B4', // Darker skin tone
-  text: '#3D3D3D',
-  textLight: '#6B6B6B',
-  white: '#FFFFFF',
-  border: '#E8E0D8',
-};
+const ACCENT_COLOR = '#69272B';
 
 export default function Navbar() {
   // ============================================================
+  // HOOKS
+  // ============================================================
+  const { navbarData, loading: navbarLoading } = useNavbar();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // ============================================================
   // STATES
   // ============================================================
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categorySidebarOpen, setCategorySidebarOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [outletModalOpen, setOutletModalOpen] = useState(false);
 
-  const [navbarData, setNavbarData] = useState(null);
-  const [navbarLoading, setNavbarLoading] = useState(true);
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
+  // Search states
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
+  // User states
   const [user, setUser] = useState(null);
-
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [profileImageError, setProfileImageError] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
-  const [authLoading, setAuthLoading] = useState(true);
+  // Mobile expansion state
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
 
-  const [scrolled, setScrolled] = useState(false);
-
-  const [profileImageError, setProfileImageError] = useState(false);
-
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // ============================================================
-  // TYPEWRITER PLACEHOLDER WORDS
-  // ============================================================
-
-  const searchPlaceholders = [
-    'Search Products...',
-    'Makeup...',
-    'Skincare...',
-    'Hair Care...',
-    'Face cream...',
-    'Lipstick...',
-    'Serum...',
-    'Moisturizer...',
-    'Sunscreen...',
-    'Face wash...',
-    'Perfume...'
-  ];
-
-  const typewriterText = useTypewriter(searchPlaceholders, 80, 40, 2000);
-
-  // ============================================================
-  // REFS
-  // ============================================================
-
+  // Refs
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
 
   // ============================================================
-  // ROUTER
+  // STYLING - from backend
   // ============================================================
-
-  const pathname = usePathname();
-  const router = useRouter();
-
-  // ============================================================
-  // HOME PAGE
-  // ============================================================
-
-  const isHomePage = pathname === '/';
-
-  // ============================================================
-  // API BASE URL
-  // ============================================================
-
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const styles = navbarData?.styling || {
+    primaryColor: ACCENT_COLOR,
+    primaryLight: '#A8B8A0',
+    primaryDark: '#6B7D63',
+    backgroundColor: '#F1EFE3',
+    textColor: '#292725',
+    accentColor: '#d83a38',
+  };
 
   // ============================================================
-  // FETCH NAVBAR DATA
+  // SCROLL DETECTION
   // ============================================================
-
-  useEffect(() => {
-    const fetchNavbar = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/navbar`);
-
-        if (response.ok) {
-          const data = await response.json();
-
-          if (data.success) {
-            setNavbarData(data.data);
-          } else {
-            setNavbarData({
-              items: [
-                {
-                  id: '1',
-                  name: 'Home',
-                  href: '/',
-                  icon: 'Home',
-                  isActive: true,
-                },
-                {
-                  id: '2',
-                  name: 'Products',
-                  href: '/products',
-                  icon: 'Package',
-                  isActive: true,
-                },
-                {
-                  id: '3',
-                  name: 'Track Order',
-                  href: '/track',
-                  icon: 'MapPin',
-                  isActive: true,
-                },
-                {
-                  id: '4',
-                  name: 'About',
-                  href: '/about',
-                  icon: 'Flower2',
-                  isActive: true,
-                },
-                {
-                  id: '5',
-                  name: 'Contact',
-                  href: '/contact',
-                  icon: 'Phone',
-                  isActive: true,
-                },
-              ],
-
-              logo: {
-                text: 'Glow&Co',
-                highlightText: '',
-                icon: 'Package',
-                logoUrl: '/logo.png',
-              },
-            });
-          }
-        } else {
-          setNavbarData({
-            items: [
-              {
-                id: '1',
-                name: 'Home',
-                href: '/',
-                icon: 'Home',
-                isActive: true,
-              },
-              {
-                id: '2',
-                name: 'Products',
-                href: '/products',
-                icon: 'Sparkles',
-                isActive: true,
-              },
-              {
-                id: '3',
-                name: 'Track Order',
-                href: '/track',
-                icon: 'MapPin',
-                isActive: true,
-              },
-              {
-                id: '4',
-                name: 'About',
-                href: '/about',
-                icon: 'Flower2',
-                isActive: true,
-              },
-              {
-                id: '5',
-                name: 'Contact',
-                href: '/contact',
-                icon: 'Phone',
-                isActive: true,
-              },
-            ],
-
-            logo: {
-              text: 'Glow&Co',
-              highlightText: 'BEAUTY',
-              icon: 'Package',
-              logoUrl: '/logo.png',
-            },
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching navbar:', error);
-
-        setNavbarData({
-          items: [
-            {
-              id: '1',
-              name: 'Home',
-              href: '/',
-              icon: 'Home',
-              isActive: true,
-            },
-            {
-              id: '2',
-              name: 'Products',
-              href: '/products',
-              icon: 'Sparkles',
-              isActive: true,
-            },
-            {
-              id: '3',
-              name: 'Track Order',
-              href: '/track',
-              icon: 'MapPin',
-              isActive: true,
-            },
-            {
-              id: '4',
-              name: 'About',
-              href: '/about',
-              icon: 'Flower2',
-              isActive: true,
-            },
-            {
-              id: '5',
-              name: 'Contact',
-              href: '/contact',
-              icon: 'Phone',
-              isActive: true,
-            },
-          ],
-
-          logo: {
-            text: 'Glow&Co',
-            highlightText: 'BEAUTY',
-            icon: 'Package',
-            logoUrl: '/logo.png',
-          },
-        });
-      } finally {
-        setNavbarLoading(false);
-      }
-    };
-
-    fetchNavbar();
-  }, [API_URL]);
-
-  // ============================================================
-  // SCROLL EFFECT
-  // ============================================================
-
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, {
+      passive: true,
+    });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  // ============================================================
-  // CLOSE DESKTOP SEARCH ON OUTSIDE CLICK
-  // ============================================================
-
+  // Close mobile menu on scroll (desktop only behavior — mobile menu is independent)
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target)
-      ) {
-        setShowResults(false);
-
-        if (!event.target.closest('.search-trigger')) {
-          setSearchOpen(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener(
-        'mousedown',
-        handleClickOutside
-      );
-    };
-  }, []);
-
-  // ============================================================
-  // CLOSE MOBILE SEARCH ON OUTSIDE CLICK
-  // ============================================================
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        mobileSearchRef.current &&
-        !mobileSearchRef.current.contains(event.target) &&
-        !event.target.closest('.mobile-search-trigger')
-      ) {
-        setMobileSearchOpen(false);
-        setShowResults(false);
-        setSearchQuery('');
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener(
-        'mousedown',
-        handleClickOutside
-      );
-    };
-  }, []);
-
-  // ============================================================
-  // PREVENT BODY SCROLL WHEN MOBILE MENU OPEN
-  // ============================================================
-
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+    if (
+      isScrolled &&
+      typeof window !== 'undefined' &&
+      window.innerWidth >= 1024
+    ) {
+      setMobileMenuOpen(false);
     }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMenuOpen]);
+  }, [isScrolled]);
 
   // ============================================================
   // CHECK USER STATE
   // ============================================================
-
   const checkUserState = () => {
     if (typeof window !== 'undefined') {
       const userData = localStorage.getItem('user');
-
       if (userData) {
         try {
           const parsedUser = JSON.parse(userData);
-
           setUser(parsedUser);
           setProfileImageError(false);
         } catch (error) {
-          console.error(
-            'Error parsing user data:',
-            error
-          );
-
+          console.error('Error parsing user data:', error);
           setUser(null);
         }
       } else {
         setUser(null);
       }
-
       setAuthLoading(false);
     }
   };
@@ -2702,46 +1381,30 @@ export default function Navbar() {
   // ============================================================
   // FETCH CART COUNT
   // ============================================================
-
   const fetchCartCount = async () => {
     try {
       const token = localStorage.getItem('token');
-
       const headers = {};
 
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       } else {
-        const sessionId =
-          localStorage.getItem('cartSessionId');
-
+        const sessionId = localStorage.getItem('cartSessionId');
         if (sessionId) {
           headers['x-session-id'] = sessionId;
         }
       }
 
-      const response = await fetch(
-        `${API_URL}/api/cart`,
-        {
-          headers,
-        }
-      );
+      const response = await fetch(`${API_URL}/api/cart`, { headers });
 
       if (response.ok) {
         const data = await response.json();
-
-        setCartCount(
-          data.data?.totalItems || 0
-        );
+        setCartCount(data.data?.totalItems || 0);
       } else {
         setCartCount(0);
       }
     } catch (error) {
-      console.error(
-        'Fetch cart count error:',
-        error
-      );
-
+      console.error('Fetch cart count error:', error);
       setCartCount(0);
     }
   };
@@ -2749,7 +1412,6 @@ export default function Navbar() {
   // ============================================================
   // AUTH + CART EVENTS
   // ============================================================
-
   useEffect(() => {
     checkUserState();
     fetchCartCount();
@@ -2759,150 +1421,66 @@ export default function Navbar() {
       fetchCartCount();
     };
 
-    window.addEventListener(
-      'auth-change',
-      handleAuthChange
-    );
-
-    window.addEventListener(
-      'focus',
-      handleAuthChange
-    );
-
-    window.addEventListener(
-      'cart-update',
-      fetchCartCount
-    );
+    window.addEventListener('auth-change', handleAuthChange);
+    window.addEventListener('focus', handleAuthChange);
+    window.addEventListener('cart-update', fetchCartCount);
 
     return () => {
-      window.removeEventListener(
-        'auth-change',
-        handleAuthChange
-      );
-
-      window.removeEventListener(
-        'focus',
-        handleAuthChange
-      );
-
-      window.removeEventListener(
-        'cart-update',
-        fetchCartCount
-      );
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('focus', handleAuthChange);
+      window.removeEventListener('cart-update', fetchCartCount);
     };
   }, []);
 
-  // ============================================================
-  // FETCH CART WHEN PATHNAME CHANGES
-  // ============================================================
-
+  // Fetch cart when pathname changes
   useEffect(() => {
     fetchCartCount();
   }, [pathname]);
 
   // ============================================================
-  // CART UPDATE LISTENER
+  // CLOSE SEARCH ON OUTSIDE CLICK
   // ============================================================
-
   useEffect(() => {
-    const handleCartUpdate = () => {
-      fetchCartCount();
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowResults(false);
+        if (!event.target.closest('.search-trigger')) {
+          setSearchOpen(false);
+        }
+      }
+      if (
+        mobileSearchRef.current &&
+        !mobileSearchRef.current.contains(event.target)
+      ) {
+        // Keep mobile search query so user can continue typing
+      }
     };
 
-    window.addEventListener(
-      'cart-update',
-      handleCartUpdate
-    );
-
-    return () => {
-      window.removeEventListener(
-        'cart-update',
-        handleCartUpdate
-      );
-    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // ============================================================
-  // GET ICON
+  // PREVENT BODY SCROLL WHEN MOBILE MENU OPEN
   // ============================================================
-
-  const getIcon = (iconName) => {
-    const Icon = ICON_MAP[iconName];
-
-    return Icon || Package;
-  };
-
-  // ============================================================
-  // NAVIGATION ITEMS
-  // ============================================================
-
-  const getNavItems = () => {
-    if (
-      navbarData?.items &&
-      navbarData.items.length > 0
-    ) {
-      return navbarData.items.filter(
-        (item) => item.isActive !== false
-      );
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-
-    return [
-      {
-        id: '1',
-        name: 'Home',
-        href: '/',
-        icon: 'Home',
-      },
-      {
-        id: '2',
-        name: 'Products',
-        href: '/products',
-        icon: 'Sparkles',
-      },
-      {
-        id: '3',
-        name: 'Track Order',
-        href: '/track',
-        icon: 'MapPin',
-      },
-      {
-        id: '4',
-        name: 'About',
-        href: '/about',
-        icon: 'Flower2',
-      },
-      {
-        id: '5',
-        name: 'Contact',
-        href: '/contact',
-        icon: 'Phone',
-      },
-    ];
-  };
-
-  const navItems = getNavItems();
-
-  // ============================================================
-  // ACTIVE LINK
-  // ============================================================
-
-  const isActive = (path) => {
-    if (path === '/') {
-      return pathname === '/';
-    }
-
-    return pathname.startsWith(path);
-  };
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   // ============================================================
   // SEARCH
   // ============================================================
-
   const performSearch = async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
       setShowResults(false);
-
       return;
     }
 
@@ -2910,18 +1488,11 @@ export default function Navbar() {
 
     try {
       const response = await fetch(
-        `${API_URL}/api/products?search=${encodeURIComponent(
-          query
-        )}&limit=5`
+        `${API_URL}/api/products?search=${encodeURIComponent(query)}&limit=5`
       );
-
       const data = await response.json();
 
-      if (
-        data.success &&
-        data.data &&
-        data.data.length > 0
-      ) {
+      if (data.success && data.data && data.data.length > 0) {
         setSearchResults(data.data);
         setShowResults(true);
       } else {
@@ -2929,11 +1500,7 @@ export default function Navbar() {
         setShowResults(false);
       }
     } catch (error) {
-      console.error(
-        'Search error:',
-        error
-      );
-
+      console.error('Search error:', error);
       setSearchResults([]);
       setShowResults(false);
     } finally {
@@ -2941,10 +1508,7 @@ export default function Navbar() {
     }
   };
 
-  // ============================================================
-  // SEARCH DEBOUNCE
-  // ============================================================
-
+  // Search debounce
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchQuery) {
@@ -2958,149 +1522,78 @@ export default function Navbar() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // ============================================================
-  // SEARCH SUBMIT
-  // ============================================================
-
+  // Search submit
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-
     if (searchQuery.trim()) {
-      router.push(
-        `/search?q=${encodeURIComponent(
-          searchQuery
-        )}`
-      );
-
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchOpen(false);
-      setMobileSearchOpen(false);
       setSearchQuery('');
       setShowResults(false);
     }
   };
 
-  // ============================================================
-  // SEARCH RESULT CLICK
-  // ============================================================
-
+  // Search result click
   const handleResultClick = (result) => {
     const productId = result._id;
-
-    const productSlug =
-      result.slug || productId;
+    const productSlug = result.slug || productId;
 
     if (productSlug) {
       setSearchOpen(false);
-      setMobileSearchOpen(false);
       setSearchQuery('');
       setShowResults(false);
-
       setTimeout(() => {
-        router.push(
-          `/product/${productSlug}`
-        );
+        router.push(`/product/${productSlug}`);
       }, 50);
     } else {
-      router.push(
-        `/search?q=${encodeURIComponent(
-          searchQuery
-        )}`
-      );
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
 
   // ============================================================
   // LOGOUT
   // ============================================================
-
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-
     setUser(null);
     setCartCount(0);
     setUserMenuOpen(false);
 
-    window.dispatchEvent(
-      new Event('cart-update')
-    );
+    window.dispatchEvent(new Event('cart-update'));
+    window.dispatchEvent(new Event('auth-change'));
 
-    window.dispatchEvent(
-      new Event('auth-change')
-    );
-
-    toast.success(
-      'Logged out successfully!'
-    );
-
+    toast.success('Logged out successfully!');
     router.push('/');
   };
 
   // ============================================================
-  // DASHBOARD LINK
+  // HELPER FUNCTIONS
   // ============================================================
-
   const getDashboardLink = () => {
-    if (!user) {
-      return '/';
-    }
-
-    if (
-      [
-        'admin',
-        'super_admin',
-        'moderator',
-      ].includes(user.role)
-    ) {
+    if (!user) return '/';
+    if (['admin', 'super_admin', 'moderator'].includes(user.role)) {
       return '/authorize/dashboard';
     }
-
-    if (
-      user.role === 'call_center_agent'
-    ) {
+    if (user.role === 'call_center_agent') {
       return '/agent/dashboard';
     }
-
     return '/customer/dashboard';
   };
 
-  // ============================================================
-  // SETTINGS LINK
-  // ============================================================
-
   const getSettingsLink = () => {
-    if (!user) {
-      return '/';
-    }
-
-    if (
-      [
-        'admin',
-        'super_admin',
-        'moderator',
-      ].includes(user.role)
-    ) {
+    if (!user) return '/';
+    if (['admin', 'super_admin', 'moderator'].includes(user.role)) {
       return '/authorize/settings';
     }
-
-    if (
-      user.role === 'call_center_agent'
-    ) {
+    if (user.role === 'call_center_agent') {
       return '/agent/settings';
     }
-
     return '/customer/settings';
   };
 
-  // ============================================================
-  // DISPLAY NAME
-  // ============================================================
-
   const getDisplayName = () => {
-    if (!user) {
-      return '';
-    }
-
+    if (!user) return '';
     return (
       user.companyName ||
       user.contactPerson ||
@@ -3109,98 +1602,52 @@ export default function Navbar() {
     );
   };
 
-  // ============================================================
-  // INITIALS
-  // ============================================================
-
   const getInitials = () => {
-    if (!user) {
-      return 'U';
-    }
-
-    const name = getDisplayName();
-
-    return name
-      .charAt(0)
-      .toUpperCase();
+    if (!user) return 'U';
+    return getDisplayName().charAt(0).toUpperCase();
   };
-
-  // ============================================================
-  // PROFILE PICTURE
-  // ============================================================
 
   const getProfilePicture = () => {
-    return (
-      user?.profilePicture ||
-      user?.photoURL ||
-      null
-    );
+    return user?.profilePicture || user?.photoURL || null;
   };
 
-  // ============================================================
-  // LOGO URL
-  // ============================================================
-
   const getLogoUrl = (url) => {
-    if (!url) {
-      return '/logo.png';
-    }
-
-    if (
-      url.includes(
-        'cloudinary.com'
-      )
-    ) {
-      const parts =
-        url.split('/upload/');
-
+    if (!url) return '/logo.png';
+    if (url.includes('cloudinary.com')) {
+      const parts = url.split('/upload/');
       if (parts.length === 2) {
         return `${parts[0]}/upload/f_auto,q_auto:good,fl_preserve_transparency/${parts[1]}`;
       }
     }
-
     return url;
   };
 
-  // ============================================================
-  // AUTHORIZE ROLE
-  // ============================================================
+  const isActive = (path) => {
+    if (path === '/') return pathname === '/';
+    return pathname.startsWith(path);
+  };
 
-  const isAuthorizeRole =
-    user &&
-    [
-      'admin',
-      'super_admin',
-      'moderator',
-    ].includes(user.role);
+  // Get navigation items from backend
+  const navItems =
+    navbarData?.items?.filter((item) => item.isActive !== false) || [];
+
+  // Toggle mobile category expansion
+  const toggleMobileCategory = (itemId) => {
+    setExpandedMobileCategory((prev) => (prev === itemId ? null : itemId));
+  };
 
   // ============================================================
   // LOADING
   // ============================================================
-
-  if (
-    authLoading ||
-    navbarLoading
-  ) {
+  if (authLoading || navbarLoading) {
     return (
-      <div
-        className="fixed top-0 z-50 w-full bg-white border-b border-[#E8E0D8]"
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-
-            <div className="w-10 h-10 bg-[#E8DCD0] rounded animate-pulse" />
-
-            <div className="flex gap-4">
-
-              <div className="w-8 h-8 bg-[#E8DCD0] rounded animate-pulse" />
-
-              <div className="w-8 h-8 bg-[#E8DCD0] rounded animate-pulse" />
-
-              <div className="w-16 h-8 bg-[#E8DCD0] rounded animate-pulse" />
-
-            </div>
-
+      <div className="fixed top-0 z-50 w-full bg-[#F1EFE3]">
+        <div className="mx-auto flex h-16 max-w-[1600px] items-center px-4">
+          <div className="h-10 w-24 animate-pulse rounded bg-black/10" />
+          <div className="ml-auto flex gap-4">
+            <div className="h-8 w-8 animate-pulse rounded bg-black/10" />
+            <div className="h-8 w-8 animate-pulse rounded bg-black/10" />
+            <div className="h-8 w-8 animate-pulse rounded bg-black/10" />
           </div>
         </div>
       </div>
@@ -3208,1300 +1655,1398 @@ export default function Navbar() {
   }
 
   // ============================================================
-  // RETURN
+  // RENDER NAV ITEM (Desktop)
   // ============================================================
+  const renderDesktopNavItem = (item, index, prefix = '') => {
+    const itemKey = `${prefix}${item.id || index}`;
 
-  return (
-    <>
-      {/* ======================================================
-          MAIN NAVBAR - WHITE BACKGROUND
-      ====================================================== */}
+    // Category type with subcategories - show dropdown
+    if (
+      item.type === 'category' &&
+      item.category?.subcategories?.length > 0
+    ) {
+      const categoryUrl =
+        item.href ||
+        `/products?category=${item.category?.slug || item.category?._id}`;
 
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
-          scrolled ? 'shadow-md' : 'shadow-sm'
+      return (
+        <div key={itemKey} className="group relative mr-5">
+          <Link
+            href={categoryUrl}
+            className={`flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] transition hover:text-[#69272B] ${
+              item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+            }`}
+          >
+            <span>{item.name}</span>
+            <ChevronDown
+              size={11}
+              strokeWidth={1.4}
+              className="transition-transform duration-200 group-hover:rotate-180"
+            />
+          </Link>
+
+          {/* Dropdown */}
+          <div className="invisible absolute left-0 top-full z-50 mt-1 min-w-[220px] rounded-lg border border-gray-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+            {item.category.subcategories.map((sub) => {
+              const subSlug = sub.slug || sub._id;
+              const hasChildren = sub.children?.length > 0;
+
+              if (hasChildren) {
+                return (
+                  <div key={sub._id || sub.id} className="group/sub relative">
+                    <Link
+                      href={`/products?category=${
+                        item.category.slug || item.category._id
+                      }&subcategory=${subSlug}`}
+                      className="flex items-center justify-between px-4 py-2 text-[12px] text-gray-700 transition hover:bg-gray-50 hover:text-[#69272B]"
+                    >
+                      <span>{sub.name}</span>
+                      <ChevronDown size={12} className="-rotate-90" />
+                    </Link>
+
+                    <div className="invisible absolute left-full top-0 ml-1 min-w-[180px] rounded-lg border border-gray-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-200 group-hover/sub:visible group-hover/sub:opacity-100">
+                      {sub.children.map((child) => (
+                        <Link
+                          key={child._id || child.id}
+                          href={`/products?category=${
+                            item.category.slug || item.category._id
+                          }&subcategory=${subSlug}&child=${
+                            child.slug || child._id
+                          }`}
+                          className="block px-4 py-2 text-[12px] text-gray-600 transition hover:bg-gray-50 hover:text-[#69272B]"
+                        >
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={sub._id || sub.id}
+                  href={`/products?category=${
+                    item.category.slug || item.category._id
+                  }&subcategory=${subSlug}`}
+                  className="block px-4 py-2 text-[12px] text-gray-700 transition hover:bg-gray-50 hover:text-[#69272B]"
+                >
+                  {sub.name}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Category type without subcategories
+    if (item.type === 'category' && item.category) {
+      const categoryUrl =
+        item.href ||
+        `/products?category=${item.category?.slug || item.category?._id}`;
+      return (
+        <Link
+          key={itemKey}
+          href={categoryUrl}
+          className={`group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] transition hover:text-[#69272B] ${
+            item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+          }`}
+        >
+          <span>{item.name}</span>
+        </Link>
+      );
+    }
+
+    // Normal link item
+    return (
+      <Link
+        key={itemKey}
+        href={item.href || '/'}
+        className={`group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] transition hover:text-[#69272B] ${
+          item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
         }`}
       >
-        <div className="container mx-auto px-4">
+        <span>{item.name}</span>
+      </Link>
+    );
+  };
 
-          <div className="flex items-center justify-between h-16">
+  // ============================================================
+  // RENDER MOBILE NAV ITEM (inside sidebar)
+  // ============================================================
+  const renderMobileNavItem = (item, index) => {
+    const itemKey = `mobile-${item.id || index}`;
+    const hasSubcategories =
+      item.type === 'category' && item.category?.subcategories?.length > 0;
+    const isExpanded = expandedMobileCategory === (item.id || index);
 
-            {/* ==================================================
-                LEFT SECTION
-            ================================================== */}
+    if (hasSubcategories) {
+      const categoryUrl =
+        item.href ||
+        `/products?category=${item.category?.slug || item.category?._id}`;
 
-            <div className="flex items-center gap-1 md:gap-0 flex-1">
+      return (
+        <div key={itemKey}>
+          <div
+            className={`flex min-h-[48px] items-center justify-between border-b border-[#eeeeee] text-[13px] font-medium ${
+              item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+            }`}
+          >
+            <Link
+              href={categoryUrl}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex-1 py-3"
+            >
+              {item.name}
+            </Link>
+            <button
+              onClick={() => toggleMobileCategory(item.id || index)}
+              className="p-3"
+              aria-label="Toggle subcategories"
+            >
+              <ChevronDown
+                size={16}
+                strokeWidth={1.6}
+                className={`transition-transform duration-200 ${
+                  isExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+          </div>
 
-              {/* Mobile Menu */}
-              <button
-                onClick={() =>
-                  setIsMenuOpen(
-                    !isMenuOpen
-                  )
-                }
-                className="md:hidden p-2 -ml-1 rounded-lg transition-all duration-200 hover:bg-[#F2F5F0]"
+          <AnimatePresence>
+            {isExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden bg-gray-50"
               >
-                <Menu
-                  className="w-5 h-5 text-[#3D3D3D]"
+                <div className="py-1">
+                  {item.category.subcategories.map((sub) => {
+                    const subSlug = sub.slug || sub._id;
+                    return (
+                      <Link
+                        key={sub._id || sub.id}
+                        href={`/products?category=${
+                          item.category.slug || item.category._id
+                        }&subcategory=${subSlug}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-6 py-2.5 text-[12px] text-gray-600 transition hover:bg-gray-100 hover:text-[#69272B]"
+                      >
+                        {sub.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
+    return (
+      <Link
+        key={itemKey}
+        href={item.href || '/'}
+        onClick={() => setMobileMenuOpen(false)}
+        className={`flex min-h-[48px] items-center justify-between border-b border-[#eeeeee] text-[13px] font-medium ${
+          item.highlight ? 'text-[#d83a38]' : 'text-[#292725]'
+        }`}
+      >
+        <span>{item.name}</span>
+      </Link>
+    );
+  };
+
+  // ============================================================
+  // RENDER
+  // ============================================================
+  return (
+    <>
+      {/* =====================================================
+          MOBILE HEADER
+          TOP:
+            Search + Phone / Truck / MapPin
+          BOTTOM:
+            Menu + Logo + Wishlist / Bag / User
+
+          On scroll:
+            TOP ROW hides
+            BOTTOM ROW becomes fixed to top
+      ===================================================== */}
+      <header
+        className={`
+          block w-full bg-[#F1EFE3] text-[#292725] lg:hidden
+          transition-all duration-300
+          ${isScrolled ? 'pt-0' : '-mt-16'}
+        `}
+      >
+        {/* =================================================
+            MOBILE TOP ROW — hidden after scrolling
+            Height reduced: 52 → 42
+        ================================================= */}
+        <div
+          className={`
+            overflow-hidden border-b border-[#dedcd2]
+            transition-all duration-300
+            ${
+              isScrolled
+                ? 'max-h-0 border-b-0 opacity-0'
+                : 'max-h-[42px] opacity-100'
+            }
+          `}
+        >
+          <div className="flex h-[42px] items-center gap-2 px-3">
+            {/* Search bar */}
+            <div className="relative flex-1" ref={mobileSearchRef}>
+              <form onSubmit={handleSearchSubmit} className="relative">
+                <Search
+                  size={14}
+                  strokeWidth={1.5}
+                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[#777]"
                 />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="
+                    h-[30px] w-full rounded-full
+                    border border-[#dedbd7]
+                    bg-white pl-8 pr-3
+                    text-[11px] text-[#333]
+                    outline-none
+                    focus:border-[#69272B]
+                  "
+                />
+              </form>
+
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute left-0 right-0 top-[38px] z-[60] max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                  {searchResults.map((product) => (
+                    <button
+                      key={product._id}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleResultClick(product);
+                      }}
+                      className="
+                        flex w-full items-center gap-3
+                        border-b border-gray-100
+                        px-3 py-3 text-left
+                        transition hover:bg-gray-50
+                        last:border-0
+                      "
+                    >
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]?.url || product.images[0]}
+                          alt={product.productName || product.name}
+                          className="h-12 w-12 rounded-lg bg-gray-100 object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100">
+                          <Package className="h-6 w-6 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-gray-900">
+                          {product.productName ||
+                            product.name ||
+                            product.title}
+                        </p>
+                        <p
+                          className="text-sm font-semibold"
+                          style={{ color: ACCENT_COLOR }}
+                        >
+                          ৳
+                          {product.discountPrice ||
+                            product.regularPrice ||
+                            product.price}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right icons */}
+            <div className="flex shrink-0 items-center gap-0.5">
+              {navbarData?.topBar?.phone && (
+                <Link
+                  href={navbarData.topBar.phoneLink || '/contact'}
+                  aria-label="Call us"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
+                >
+                  <Phone size={16} strokeWidth={1.6} />
+                </Link>
+              )}
+
+              {navbarData?.topBar?.showTrackOrder !== false && (
+                <Link
+                  href={navbarData.topBar.trackOrderLink || '/track'}
+                  aria-label="Track order"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
+                >
+                  <Truck size={16} strokeWidth={1.6} />
+                </Link>
+              )}
+
+              {navbarData?.topBar?.showOutlet !== false && (
+                <button
+                  onClick={() => setOutletModalOpen(true)}
+                  aria-label="Our outlet"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
+                >
+                  <MapPin size={16} strokeWidth={1.6} />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* =================================================
+            MOBILE BOTTOM ROW — becomes fixed on scroll
+            Height reduced: 56 → 48
+        ================================================= */}
+        <div
+          className={`
+            border-b border-[#dedcd2] bg-[#F1EFE3]
+            transition-all duration-300
+            ${
+              isScrolled
+                ? 'fixed left-0 right-0 top-0 z-50 shadow-[0_2px_10px_rgba(0,0,0,0.04)]'
+                : 'relative'
+            }
+          `}
+        >
+          <div className="flex h-[48px] items-center px-3">
+            {/* Left: Menu + Logo */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open menu"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
+              >
+                <Menu size={20} strokeWidth={1.6} />
               </button>
 
-              {/* Desktop Navigation */}
-              <div className="hidden md:flex items-center space-x-1">
-
-                {navItems.map((item) => {
-                  const Icon =
-                    getIcon(item.icon);
-
-                  return (
-                    <Link
-                      key={
-                        item.id ||
-                        item.name
+              <Link href="/" className="flex items-center pl-1">
+                {navbarData?.logo?.logoUrl ? (
+                  <img
+                    src={getLogoUrl(navbarData.logo.logoUrl)}
+                    alt={navbarData.logo.text || 'Logo'}
+                    className={`
+                      w-auto object-contain transition-all duration-300
+                      ${
+                        isScrolled
+                          ? 'h-6 max-w-[90px]'
+                          : 'h-7 max-w-[100px]'
                       }
-                      href={item.href}
-                      className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        isActive(
-                          item.href
-                        )
-                          ? 'text-[#8B9D83]'
-                          : 'text-[#3D3D3D] hover:text-[#8B9D83]'
-                      }`}
-                      style={{
-                        fontFamily:
-                          '"Raleway", "Inter", sans-serif',
-                      }}
-                    >
-                      {item.name}
-
-                      {isActive(
-                        item.href
-                      ) && (
-                        <span
-                          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 rounded-full bg-[#8B9D83]"
-                        />
-                      )}
-                    </Link>
-                  );
-                })}
-
-              </div>
-            </div>
-
-            {/* ==================================================
-                CENTER LOGO
-            ================================================== */}
-
-            <div className="flex items-center justify-center flex-shrink-0">
-
-              <Link
-                href="/"
-                className="flex items-center group"
-              >
-                <div className="relative w-24 h-11 md:w-28 md:h-12 lg:w-32 lg:h-14 transition-transform group-hover:scale-105 duration-300">
-
-                  {navbarData?.logo?.logoUrl ? (
-                    <img
-                      src={getLogoUrl(
-                        navbarData.logo.logoUrl
-                      )}
-                      alt={
-                        navbarData.logo.text ||
-                        'Glow&Co'
-                      }
-                      className="w-full h-full object-contain"
-                      style={{
-                        background:
-                          'transparent',
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src="/logo.png"
-                      alt="Glow&Co Logo"
-                      className="w-full h-full object-contain"
-                    />
-                  )}
-
-                </div>
-              </Link>
-
-            </div>
-
-            {/* ==================================================
-                RIGHT SECTION - BEAUTY THEME
-            ================================================== */}
-
-            <div className="flex items-center justify-end flex-1">
-
-              {/* ==================================================
-                  DESKTOP SEARCH
-              ================================================== */}
-
-              <div
-                className="hidden md:block relative"
-                ref={searchRef}
-              >
-
-                {!searchOpen ? (
-
-                  /* Search Trigger - Skin tone style */
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSearchOpen(true)
-                    }
-                    className="search-trigger group flex items-center w-[200px] lg:w-[260px] border-b border-[#E8E0D8] hover:border-[#8B9D83] transition-colors duration-200 py-2"
-                  >
-
-                    <Search
-                      className="w-[18px] h-[18px] text-[#6B6B6B] flex-shrink-0"
-                      strokeWidth={1.7}
-                    />
-
-                    <span
-                      className="ml-4 text-[14px] text-[#6B6B6B] group-hover:text-[#3D3D3D] transition-colors"
-                      style={{
-                        fontFamily:
-                          '"Raleway", "Inter", sans-serif',
-                      }}
-                    >
-                      {typewriterText}
-                    </span>
-
-                  </button>
-
+                    `}
+                  />
                 ) : (
-
-                  /* Active Search */
-                  <div className="relative">
-
-                    <form
-                      onSubmit={
-                        handleSearchSubmit
-                      }
-                      className="relative"
+                  <div className="flex flex-col leading-tight">
+                    <span
+                      className="text-[13px] font-bold"
+                      style={{ color: styles.textColor }}
                     >
-
-                      <div className="flex items-center w-[200px] lg:w-[260px] border-b border-[#8B9D83] py-1.5">
-
-                        <Search
-                          className="w-[18px] h-[18px] text-[#3D3D3D] flex-shrink-0"
-                          strokeWidth={1.7}
-                        />
-
-                        <input
-                          type="text"
-                          value={
-                            searchQuery
-                          }
-                          onChange={(e) =>
-                            setSearchQuery(
-                              e.target.value
-                            )
-                          }
-                          placeholder={typewriterText}
-                          className="w-full ml-4 pr-16 text-[14px] text-[#3D3D3D] placeholder:text-[#6B6B6B] bg-transparent focus:outline-none"
-                          style={{
-                            fontFamily:
-                              '"Raleway", "Inter", sans-serif',
-                          }}
-                          autoFocus
-                        />
-
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
-
-                          {searchLoading ? (
-                            <div className="w-4 h-4 border-2 border-[#8B9D83] border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <button
-                              type="submit"
-                              className="p-1 text-[#6B6B6B] hover:text-[#3D3D3D] transition-colors"
-                            >
-                              <Search
-                                className="w-[15px] h-[15px]"
-                                strokeWidth={1.7}
-                              />
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSearchOpen(
-                                false
-                              );
-
-                              setSearchQuery(
-                                ''
-                              );
-
-                              setShowResults(
-                                false
-                              );
-                            }}
-                            className="p-1 ml-1 text-[#6B6B6B] hover:text-[#3D3D3D] transition-colors"
-                          >
-                            <X
-                              className="w-[15px] h-[15px]"
-                              strokeWidth={1.7}
-                            />
-                          </button>
-
-                        </div>
-
-                      </div>
-
-                    </form>
-
-                    {/* ==================================================
-                        DESKTOP SEARCH RESULTS
-                    ================================================== */}
-
-                    {showResults &&
-                      searchResults.length >
-                        0 && (
-
-                        <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-[#E8E0D8] max-h-96 overflow-y-auto z-50">
-
-                          <div className="py-2">
-
-                            {searchResults.map(
-                              (product) => (
-
-                                <button
-                                  key={
-                                    product._id
-                                  }
-                                  onMouseDown={(
-                                    e
-                                  ) => {
-                                    e.preventDefault();
-
-                                    handleResultClick(
-                                      product
-                                    );
-                                  }}
-                                  className="w-full px-4 py-3 text-left hover:bg-[#F2F5F0] transition-colors flex items-center gap-3 border-b border-[#E8E0D8] last:border-0"
-                                >
-
-                                  {product.images &&
-                                  product
-                                    .images
-                                    .length >
-                                    0 ? (
-
-                                    <img
-                                      src={
-                                        product
-                                          .images[0]
-                                          ?.url ||
-                                        product
-                                          .images[0]
-                                      }
-                                      alt={
-                                        product.productName ||
-                                        product.name
-                                      }
-                                      className="w-10 h-10 rounded-lg object-cover bg-[#F5EDE3]"
-                                    />
-
-                                  ) : (
-
-                                    <div className="w-10 h-10 rounded-lg bg-[#F5EDE3] flex items-center justify-center">
-
-                                      <Package
-                                        className="w-5 h-5 text-[#6B6B6B]"
-                                        strokeWidth={
-                                          1.5
-                                        }
-                                      />
-
-                                    </div>
-                                  )}
-
-                                  <div className="flex-1 min-w-0">
-
-                                    <p
-                                      className="font-medium text-[#3D3D3D] text-sm line-clamp-1"
-                                      style={{
-                                        fontFamily:
-                                          '"Raleway", "Inter", sans-serif',
-                                      }}
-                                    >
-                                      {product.productName ||
-                                        product.name ||
-                                        product.title}
-                                    </p>
-
-                                    <div className="flex items-center gap-2 mt-0.5">
-
-                                      <p
-                                        className="text-sm font-semibold text-[#8B9D83]"
-                                        style={{
-                                          fontFamily:
-                                            '"Raleway", "Inter", sans-serif',
-                                        }}
-                                      >
-                                        ৳
-                                        {product.discountPrice ||
-                                          product.regularPrice ||
-                                          product.price}
-                                      </p>
-
-                                      {product.discountPrice &&
-                                        product.regularPrice && (
-                                          <p className="text-xs text-[#6B6B6B] line-through">
-                                            ৳
-                                            {
-                                              product.regularPrice
-                                            }
-                                          </p>
-                                        )}
-
-                                    </div>
-
-                                  </div>
-
-                                </button>
-                              )
-                            )}
-
-                            <button
-                              onClick={
-                                handleSearchSubmit
-                              }
-                              className="w-full px-4 py-2.5 text-center text-sm text-[#8B9D83] hover:bg-[#F2F5F0] font-medium border-t border-[#E8E0D8] transition-colors"
-                              style={{
-                                fontFamily:
-                                  '"Raleway", "Inter", sans-serif',
-                              }}
-                            >
-                              View all results
-                              for "
-                              {
-                                searchQuery
-                              }
-                              " →
-                            </button>
-
-                          </div>
-
-                        </div>
-                      )}
-
+                      {navbarData?.logo?.text || "Nishat's Collection"}
+                    </span>
+                    {navbarData?.logo?.highlightText && (
+                      <span
+                        className="text-[7px] font-medium tracking-widest"
+                        style={{ color: ACCENT_COLOR }}
+                      >
+                        {navbarData.logo.highlightText}
+                      </span>
+                    )}
                   </div>
                 )}
+              </Link>
+            </div>
 
-              </div>
-
-              {/* ==================================================
-                  MOBILE SEARCH TRIGGER
-              ================================================== */}
+            {/* Right: Wishlist + Bag + Account */}
+            <div className="ml-auto flex items-center gap-0.5">
+              <Link
+                href="/wishlist"
+                aria-label="Wishlist"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
+              >
+                <Heart size={18} strokeWidth={1.5} />
+              </Link>
 
               <button
-                onClick={() =>
-                  setMobileSearchOpen(
-                    true
-                  )
-                }
-                className="mobile-search-trigger md:hidden p-2 hover:bg-[#F2F5F0] rounded-full transition-colors"
+                onClick={() => setIsCartOpen(true)}
+                aria-label="Shopping bag"
+                className="relative flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
               >
-                <Search
-                  className="w-[20px] h-[20px] text-[#3D3D3D]"
-                  strokeWidth={1.7}
-                />
+                <ShoppingBag size={18} strokeWidth={1.5} />
+                {cartCount > 0 && (
+                  <span
+                    className="absolute right-0 top-0 flex h-[14px] min-w-[14px] items-center justify-center rounded-full px-1 text-[8px] font-semibold text-white"
+                    style={{ backgroundColor: ACCENT_COLOR }}
+                  >
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
               </button>
 
-              {/* ==================================================
-                  USER ICON
-              ================================================== */}
+              {user ? (
+                <Link
+                  href={getDashboardLink()}
+                  aria-label="Account"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
+                >
+                  {getProfilePicture() && !profileImageError ? (
+                    <img
+                      src={getProfilePicture()}
+                      alt={getDisplayName()}
+                      onError={() => setProfileImageError(true)}
+                      className="h-5 w-5 rounded-full object-cover"
+                    />
+                  ) : (
+                    <UserCircle size={18} strokeWidth={1.5} />
+                  )}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  aria-label="Account"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#292725] transition hover:bg-black/5"
+                >
+                  <User size={18} strokeWidth={1.5} />
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* =================================================
+            SPACER — matches new bottom row height (48)
+        ================================================= */}
+        <div
+          className={`
+            transition-[height] duration-300 ease-out
+            ${isScrolled ? 'h-[48px]' : 'h-0'}
+          `}
+          aria-hidden="true"
+        />
+      </header>
+
+      {/* =====================================================
+          DESKTOP HEADER (hidden below lg)
+      ===================================================== */}
+      <header
+        className={`
+          relative hidden w-full bg-[#F1EFE3] text-[#292725] lg:-mt-16 lg:block
+          transition-all duration-300
+          ${
+            isScrolled
+              ? 'pointer-events-none opacity-0'
+              : 'opacity-100'
+          }
+        `}
+      >
+        {/* LOGO */}
+        <Link
+          href="/"
+          className="absolute left-4 top-0 z-30 flex h-[89px] w-[100px] items-center justify-center lg:left-7"
+        >
+          {navbarData?.logo?.logoUrl ? (
+            <img
+              src={getLogoUrl(navbarData.logo.logoUrl)}
+              alt={navbarData.logo.text || 'Logo'}
+              className="h-auto max-h-[78px] w-auto max-w-[90px] object-contain"
+            />
+          ) : (
+            <div className="flex flex-col items-center">
+              <span
+                className="text-lg font-bold"
+                style={{ color: styles.textColor }}
+              >
+                {navbarData?.logo?.text || "Nishat's Collection"}
+              </span>
+              {navbarData?.logo?.highlightText && (
+                <span
+                  className="text-[10px] font-medium tracking-widest"
+                  style={{ color: ACCENT_COLOR }}
+                >
+                  {navbarData.logo.highlightText}
+                </span>
+              )}
+            </div>
+          )}
+        </Link>
+
+        {/* TOP NAVBAR */}
+        <div className="border-b border-[#dedcd2]">
+          <div className="relative mx-auto flex h-[46px] max-w-[1600px] items-center px-4 lg:px-7">
+            <div className="w-[100px] shrink-0" />
+
+            {/* SEARCH */}
+            <div className="absolute left-1/2 top-1/2 w-[320px] -translate-x-1/2 -translate-y-1/2">
+              <div className="relative w-full" ref={searchRef}>
+                {!searchOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setSearchOpen(true)}
+                    className="search-trigger flex h-[33px] w-full items-center rounded-[8px] border border-[#dedbd7] bg-white pl-9 pr-3 text-left transition hover:border-[#69272B]"
+                  >
+                    <Search
+                      size={15}
+                      strokeWidth={1.4}
+                      className="absolute left-3 text-[#777]"
+                    />
+                    <span className="text-[11px] text-[#999]">
+                      Search products here
+                    </span>
+                  </button>
+                ) : (
+                  <div className="relative">
+                    <form onSubmit={handleSearchSubmit}>
+                      <Search
+                        size={15}
+                        strokeWidth={1.4}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777]"
+                      />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search products here"
+                        className="h-[33px] w-full rounded-[8px] border border-[#69272B] bg-white pl-9 pr-16 text-[11px] text-[#333] outline-none"
+                        autoFocus
+                      />
+                      <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
+                        {searchLoading ? (
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#69272B] border-t-transparent" />
+                        ) : (
+                          <button type="submit" className="p-1">
+                            <Search size={14} className="text-[#777]" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearchOpen(false);
+                            setSearchQuery('');
+                            setShowResults(false);
+                          }}
+                          className="p-1"
+                        >
+                          <X size={14} className="text-[#777]" />
+                        </button>
+                      </div>
+                    </form>
+
+                    {showResults && searchResults.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg z-50">
+                        {searchResults.map((product) => (
+                          <button
+                            key={product._id}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleResultClick(product);
+                            }}
+                            className="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left transition hover:bg-gray-50 last:border-0"
+                          >
+                            {product.images?.[0] ? (
+                              <img
+                                src={
+                                  product.images[0]?.url ||
+                                  product.images[0]
+                                }
+                                alt={product.productName || product.name}
+                                className="h-10 w-10 rounded-lg object-cover bg-gray-100"
+                              />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+                                <Package className="h-5 w-5 text-gray-400" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="truncate text-sm font-medium text-gray-900">
+                                {product.productName ||
+                                  product.name ||
+                                  product.title}
+                              </p>
+                              <p
+                                className="text-sm font-semibold"
+                                style={{ color: ACCENT_COLOR }}
+                              >
+                                ৳
+                                {product.discountPrice ||
+                                  product.regularPrice ||
+                                  product.price}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                        <button
+                          onClick={handleSearchSubmit}
+                          className="w-full px-4 py-3 text-center text-sm font-medium border-t border-gray-100 transition hover:bg-gray-50"
+                          style={{ color: ACCENT_COLOR }}
+                        >
+                          View all results for &quot;{searchQuery}&quot; →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* TOP INFO */}
+            <div className="ml-auto hidden items-center gap-6 lg:flex">
+              {navbarData?.topBar?.phone && (
+                <Link
+                  href={navbarData.topBar.phoneLink || '/contact'}
+                  className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[#292725] transition hover:text-[#69272B]"
+                >
+                  <Phone size={17} strokeWidth={1.4} />
+                  <span>{navbarData.topBar.phone}</span>
+                </Link>
+              )}
+
+              {navbarData?.topBar?.showOutlet !== false && (
+                <button
+                  onClick={() => setOutletModalOpen(true)}
+                  className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[#292725] transition hover:text-[#69272B]"
+                >
+                  <MapPin size={17} strokeWidth={1.4} />
+                  <span>
+                    {navbarData?.topBar?.outletText || 'Our Outlet'}
+                  </span>
+                </button>
+              )}
+
+              {navbarData?.topBar?.showTrackOrder !== false && (
+                <Link
+                  href={navbarData.topBar.trackOrderLink || '/track'}
+                  className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[#292725] transition hover:text-[#69272B]"
+                >
+                  <Truck size={19} strokeWidth={1.4} />
+                  <span>
+                    {navbarData?.topBar?.trackOrderText || 'Track Order'}
+                  </span>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* BOTTOM NAVBAR */}
+        <div className="border-b border-[#dedcd2]">
+          <div className="mx-auto flex h-[43px] max-w-[1600px] items-center px-4 lg:px-7">
+            <div className="w-[100px] shrink-0" />
+
+            <nav className="hidden items-center lg:flex">
+              <button
+                type="button"
+                onClick={() => setCategorySidebarOpen(true)}
+                className="group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium tracking-[-0.1px] text-[#292725] transition hover:text-[#69272B]"
+              >
+                <Menu size={17} strokeWidth={1.6} className="mr-[2px]" />
+                <span>ALL</span>
+              </button>
+
+              {navItems.map((item, index) =>
+                renderDesktopNavItem(item, index, 'desktop-')
+              )}
+            </nav>
+
+            <div className="ml-auto flex items-center gap-4">
+              <Link
+                href="/wishlist"
+                aria-label="Wishlist"
+                className="text-[#292725] transition hover:text-[#69272B]"
+              >
+                <Heart size={20} strokeWidth={1.4} />
+              </Link>
+
+              <button
+                onClick={() => setIsCartOpen(true)}
+                aria-label="Shopping bag"
+                className="relative text-[#292725] transition hover:text-[#69272B]"
+              >
+                <ShoppingBag size={19} strokeWidth={1.4} />
+                {cartCount > 0 && (
+                  <span
+                    className="absolute -right-2 -top-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-1 text-[9px] font-semibold text-white"
+                    style={{ backgroundColor: ACCENT_COLOR }}
+                  >
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </button>
 
               {user ? (
-
-                <div className="relative ml-5">
-
+                <div className="relative">
                   <button
-                    onClick={() =>
-                      setUserMenuOpen(
-                        !userMenuOpen
-                      )
-                    }
-                    className="flex items-center justify-center hover:opacity-70 transition-opacity"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center justify-center"
                     aria-label="Account"
                   >
-
-                    {getProfilePicture() &&
-                    !profileImageError ? (
-
+                    {getProfilePicture() && !profileImageError ? (
                       <img
                         src={getProfilePicture()}
                         alt={getDisplayName()}
-                        onError={() =>
-                          setProfileImageError(
-                            true
-                          )
-                        }
-                        className="w-[24px] h-[24px] rounded-full object-cover"
+                        onError={() => setProfileImageError(true)}
+                        className="h-6 w-6 rounded-full object-cover"
                       />
-
                     ) : (
-
-                      <UserCircle
-                        className="w-[25px] h-[25px] text-[#3D3D3D]"
-                        strokeWidth={1.5}
-                      />
-
+                      <UserCircle size={20} strokeWidth={1.4} />
                     )}
-
                   </button>
-
-                  {/* USER DROPDOWN */}
 
                   {userMenuOpen && (
                     <>
                       <div
                         className="fixed inset-0 z-40"
-                        onClick={() =>
-                          setUserMenuOpen(
-                            false
-                          )
-                        }
+                        onClick={() => setUserMenuOpen(false)}
                       />
-
-                      <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-[#E8E0D8] overflow-hidden z-50 animate-fadeIn">
-
-                        {/* User Info */}
-
-                        <div className="px-4 py-3 border-b border-[#E8E0D8] bg-[#F5EDE3]">
-
-                          <p
-                            className="text-[#3D3D3D] font-semibold text-sm truncate"
-                            style={{
-                              fontFamily:
-                                '"Raleway", "Inter", sans-serif',
-                            }}
-                          >
+                      <div className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+                        <div className="border-b border-gray-100 bg-[#F5EDE3] px-4 py-3">
+                          <p className="truncate text-sm font-semibold text-gray-900">
                             {getDisplayName()}
                           </p>
-
-                          <p
-                            className="text-[#6B6B6B] text-xs truncate mt-0.5"
-                            style={{
-                              fontFamily:
-                                '"Raleway", "Inter", sans-serif',
-                            }}
-                          >
+                          <p className="truncate text-xs text-gray-500">
                             {user.email}
                           </p>
-
-                          <div className="mt-1.5">
-
-                            <span
-                              className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#8B9D83] text-white"
-                              style={{
-                                fontFamily:
-                                  '"Raleway", "Inter", sans-serif',
-                              }}
-                            >
-                              {user.role ===
-                              'call_center_agent'
-                                ? 'Call Center Agent'
-                                : user.role ===
-                                  'super_admin'
-                                ? 'Super Admin'
-                                : user.role ===
-                                  'admin'
-                                ? 'Admin'
-                                : user.role ===
-                                  'moderator'
-                                ? 'Moderator'
-                                : 'Customer'}
-                            </span>
-
-                          </div>
-
                         </div>
-
-                        {/* Dropdown Actions */}
-
                         <div className="py-2">
-
-                          {/* Dashboard */}
-
-                          <div
-                            onClick={() => {
-                              setUserMenuOpen(
-                                false
-                              );
-
-                              window.location.href =
-                                getDashboardLink();
-                            }}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors cursor-pointer"
-                            style={{
-                              fontFamily:
-                                '"Raleway", "Inter", sans-serif',
-                            }}
-                          >
-
-                            <LayoutDashboard
-                              className="w-4 h-4 text-[#8B9D83]"
-                              strokeWidth={
-                                1.7
-                              }
-                            />
-
-                            <span>
-                              Dashboard
-                            </span>
-
-                          </div>
-
-                          {/* Settings */}
-
-                          <div
-                            onClick={() => {
-                              setUserMenuOpen(
-                                false
-                              );
-
-                              window.location.href =
-                                getSettingsLink();
-                            }}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors cursor-pointer"
-                            style={{
-                              fontFamily:
-                                '"Raleway", "Inter", sans-serif',
-                            }}
-                          >
-
-                            <Settings
-                              className="w-4 h-4 text-[#8B9D83]"
-                              strokeWidth={
-                                1.7
-                              }
-                            />
-
-                            <span>
-                              Settings
-                            </span>
-
-                          </div>
-
-                          <div className="border-t border-[#E8E0D8] my-1" />
-
-                          {/* Logout */}
-
                           <button
                             onClick={() => {
-                              setUserMenuOpen(
-                                false
-                              );
-
+                              setUserMenuOpen(false);
+                              router.push(getDashboardLink());
+                            }}
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+                          >
+                            <LayoutDashboard
+                              className="h-4 w-4"
+                              style={{ color: ACCENT_COLOR }}
+                            />
+                            <span>Dashboard</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              router.push(getSettingsLink());
+                            }}
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+                          >
+                            <Settings
+                              className="h-4 w-4"
+                              style={{ color: ACCENT_COLOR }}
+                            />
+                            <span>Settings</span>
+                          </button>
+                          <div className="my-1 border-t border-gray-100" />
+                          <button
+                            onClick={() => {
+                              setUserMenuOpen(false);
                               logout();
                             }}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors w-full"
-                            style={{
-                              fontFamily:
-                                '"Raleway", "Inter", sans-serif',
-                            }}
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-500 transition hover:bg-red-50"
                           >
-
-                            <LogOut
-                              className="w-4 h-4"
-                              strokeWidth={
-                                1.7
-                              }
-                            />
-
-                            <span>
-                              Logout
-                            </span>
-
+                            <LogOut className="h-4 w-4" />
+                            <span>Logout</span>
                           </button>
-
                         </div>
-
                       </div>
                     </>
                   )}
-
                 </div>
-
               ) : (
-
-                /* Logged Out User Icon */
-
                 <Link
                   href="/login"
-                  className="ml-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-                  aria-label="Sign In"
+                  aria-label="Account"
+                  className="text-[#292725] transition hover:text-[#69272B]"
                 >
-                  <UserCircle
-                    className="w-[25px] h-[25px] text-[#3D3D3D]"
-                    strokeWidth={1.5}
-                  />
+                  <User size={20} strokeWidth={1.4} />
                 </Link>
-
               )}
-
-              {/* ==================================================
-                  SHOPPING BAG
-              ================================================== */}
-
-              <button
-                onClick={() =>
-                  setIsCartOpen(true)
-                }
-                className="relative ml-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-                aria-label="Shopping bag"
-              >
-
-                <ShoppingBag
-                  className="w-[25px] h-[25px] text-[#3D3D3D]"
-                  strokeWidth={1.5}
-                />
-
-                {/* Cart Count */}
-
-                {cartCount > 0 && (
-                  <span
-                    className="absolute -top-2 -right-2 bg-[#8B9D83] text-white text-[9px] font-semibold rounded-full min-w-[15px] h-[15px] flex items-center justify-center px-1"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
-                  >
-                    {cartCount > 9
-                      ? '9+'
-                      : cartCount}
-                  </span>
-                )}
-
-              </button>
-
             </div>
-
           </div>
-
         </div>
-      </nav>
+      </header>
 
-      {/* ========================================================
-          MOBILE SEARCH OVERLAY
-      ======================================================== */}
-
-      {mobileSearchOpen && (
-        <div className="fixed top-16 left-0 right-0 z-40 bg-white shadow-lg border-b border-[#E8E0D8] animate-slideDown md:hidden">
-
-          <div
-            className="container mx-auto px-4 py-3"
-            ref={mobileSearchRef}
-          >
-
-            <form
-              onSubmit={
-                handleSearchSubmit
-              }
-              className="relative"
-            >
-
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) =>
-                  setSearchQuery(
-                    e.target.value
-                  )
-                }
-                placeholder={typewriterText}
-                className="w-full px-4 py-3 pr-20 text-sm text-[#3D3D3D] bg-[#F5EDE3] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#8B9D83] focus:ring-2 focus:ring-[#8B9D83]/20 transition-all"
-                style={{
-                  fontFamily:
-                    '"Raleway", "Inter", sans-serif',
-                }}
-                autoFocus
-              />
-
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-
-                <button
-                  type="submit"
-                  className="p-1.5"
-                >
-
-                  {searchLoading ? (
-                    <div className="w-4 h-4 border-2 border-[#8B9D83] border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Search className="w-4 h-4 text-[#8B9D83]" />
-                  )}
-
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileSearchOpen(
-                      false
-                    );
-
-                    setSearchQuery('');
-                    setShowResults(false);
-                  }}
-                  className="p-1.5 text-[#6B6B6B] hover:text-[#3D3D3D] transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-
-              </div>
-
-            </form>
-
-            {/* Mobile Search Results */}
-
-            {showResults &&
-              searchResults.length >
-                0 && (
-
-                <div className="mt-3 bg-white rounded-lg border border-[#E8E0D8] max-h-96 overflow-y-auto">
-
-                  {searchResults.map(
-                    (product) => (
-
-                      <button
-                        key={
-                          product._id
-                        }
-                        onMouseDown={(
-                          e
-                        ) => {
-                          e.preventDefault();
-
-                          handleResultClick(
-                            product
-                          );
-                        }}
-                        className="w-full px-3 py-3 text-left hover:bg-[#F2F5F0] transition-colors flex items-center gap-3 border-b border-[#E8E0D8] last:border-0"
-                      >
-
-                        {product.images &&
-                        product.images.length >
-                          0 ? (
-
-                          <img
-                            src={
-                              product
-                                .images[0]
-                                ?.url ||
-                              product
-                                .images[0]
-                            }
-                            alt={
-                              product.productName ||
-                              product.name
-                            }
-                            className="w-12 h-12 rounded-lg object-cover bg-[#F5EDE3]"
-                          />
-
-                        ) : (
-
-                          <div className="w-12 h-12 rounded-lg bg-[#F5EDE3] flex items-center justify-center">
-
-                            <Package className="w-6 h-6 text-[#6B6B6B]" />
-
-                          </div>
-
-                        )}
-
-                        <div className="flex-1">
-
-                          <p
-                            className="font-medium text-[#3D3D3D] text-sm line-clamp-1"
-                            style={{
-                              fontFamily:
-                                '"Raleway", "Inter", sans-serif',
-                            }}
-                          >
-                            {product.productName ||
-                              product.name ||
-                              product.title}
-                          </p>
-
-                          <p
-                            className="text-sm font-semibold text-[#8B9D83] mt-0.5"
-                            style={{
-                              fontFamily:
-                                '"Raleway", "Inter", sans-serif',
-                            }}
-                          >
-                            ৳
-                            {product.discountPrice ||
-                              product.regularPrice ||
-                              product.price}
-                          </p>
-
-                        </div>
-
-                      </button>
-                    )
-                  )}
-
-                  <button
-                    onClick={
-                      handleSearchSubmit
-                    }
-                    className="w-full px-4 py-3 text-center text-sm text-[#8B9D83] hover:bg-[#F2F5F0] font-medium border-t border-[#E8E0D8]"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
-                  >
-                    View all results
-                    for "
-                    {searchQuery}"
-                    →
-                  </button>
-
-                </div>
-              )}
-
-          </div>
-
-        </div>
-      )}
-
-      {/* ========================================================
-          MOBILE MENU SIDEBAR
-      ======================================================== */}
-
+      {/* =====================================================
+          STICKY NAVBAR AFTER SCROLL (DESKTOP ONLY)
+      ===================================================== */}
       <div
-        className={`fixed inset-0 z-50 md:hidden ${
-          isMenuOpen
-            ? 'visible'
-            : 'invisible'
-        }`}
-      >
-
-        {/* Overlay */}
-
-        <div
-          className={`absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${
-            isMenuOpen
-              ? 'opacity-100'
-              : 'opacity-0'
-          }`}
-          onClick={() =>
-            setIsMenuOpen(false)
+        className={`
+          fixed left-0 right-0 top-0 z-50 hidden border-b border-[#dedcd2] bg-[#F1EFE3] lg:block
+          shadow-[0_2px_10px_rgba(0,0,0,0.04)] transition-all duration-300
+          ${
+            isScrolled
+              ? 'translate-y-0 opacity-100'
+              : '-translate-y-full pointer-events-none opacity-0'
           }
-        />
+        `}
+      >
+        <div className="mx-auto flex h-[52px] max-w-[1600px] items-center px-4 lg:px-7">
+          <Link
+            href="/"
+            className="flex h-full w-[100px] shrink-0 items-center justify-start"
+          >
+            {navbarData?.logo?.logoUrl ? (
+              <img
+                src={getLogoUrl(navbarData.logo.logoUrl)}
+                alt="Logo"
+                className="max-h-[44px] max-w-[70px] object-contain"
+              />
+            ) : (
+              <div className="flex flex-col">
+                <span
+                  className="text-sm font-bold"
+                  style={{ color: styles.textColor }}
+                >
+                  {navbarData?.logo?.text || "Nishat's Collection"}
+                </span>
+              </div>
+            )}
+          </Link>
 
-        {/* Sidebar */}
+          <nav className="hidden items-center lg:flex">
+            <button
+              type="button"
+              onClick={() => setCategorySidebarOpen(true)}
+              className="group mr-5 flex items-center gap-[3px] whitespace-nowrap text-[12px] font-medium text-[#292725] transition hover:text-[#69272B]"
+            >
+              <Menu size={17} strokeWidth={1.6} className="mr-[2px]" />
+              ALL
+            </button>
 
-        <div
-          className={`absolute left-0 top-0 h-full w-[80%] max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-out ${
-            isMenuOpen
-              ? 'translate-x-0'
-              : '-translate-x-full'
-          }`}
-        >
+            {navItems.map((item, index) =>
+              renderDesktopNavItem(item, index, 'sticky-')
+            )}
+          </nav>
 
-          <div className="flex flex-col h-full">
-
-            {/* Header */}
-
-            <div className="flex items-center justify-between p-5 border-b border-[#E8E0D8]">
-
-              <div className="flex items-center space-x-2.5">
-
-                <div className="w-8 h-8">
-
-                  {navbarData?.logo?.logoUrl ? (
-
+          <div className="ml-auto flex items-center gap-4">
+            <Link
+              href="/wishlist"
+              aria-label="Wishlist"
+              className="text-[#292725] transition hover:text-[#69272B]"
+            >
+              <Heart size={20} strokeWidth={1.4} />
+            </Link>
+            <button
+              onClick={() => setIsCartOpen(true)}
+              aria-label="Shopping bag"
+              className="relative text-[#292725] transition hover:text-[#69272B]"
+            >
+              <ShoppingBag size={19} strokeWidth={1.4} />
+              {cartCount > 0 && (
+                <span
+                  className="absolute -right-2 -top-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-1 text-[9px] font-semibold text-white"
+                  style={{ backgroundColor: ACCENT_COLOR }}
+                >
+                  {cartCount > 9 ? '9+' : cartCount}
+                </span>
+              )}
+            </button>
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center justify-center"
+                  aria-label="Account"
+                >
+                  {getProfilePicture() && !profileImageError ? (
                     <img
-                      src={getLogoUrl(
-                        navbarData.logo.logoUrl
-                      )}
-                      alt={
-                        navbarData.logo.text ||
-                        'Glow&Co'
-                      }
-                      className="w-full h-full object-contain"
+                      src={getProfilePicture()}
+                      alt={getDisplayName()}
+                      onError={() => setProfileImageError(true)}
+                      className="h-6 w-6 rounded-full object-cover"
                     />
-
                   ) : (
-
-                    <img
-                      src="/logo.png"
-                      alt="Logo"
-                      className="w-full h-full object-contain"
-                    />
-
+                    <UserCircle size={20} strokeWidth={1.4} />
                   )}
+                </button>
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+                      <div className="border-b border-gray-100 bg-[#F5EDE3] px-4 py-3">
+                        <p className="truncate text-sm font-semibold text-gray-900">
+                          {getDisplayName()}
+                        </p>
+                        <p className="truncate text-xs text-gray-500">
+                          {user.email}
+                        </p>
+                      </div>
+                      <div className="py-2">
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            router.push(getDashboardLink());
+                          }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+                        >
+                          <LayoutDashboard
+                            className="h-4 w-4"
+                            style={{ color: ACCENT_COLOR }}
+                          />
+                          <span>Dashboard</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            router.push(getSettingsLink());
+                          }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50"
+                        >
+                          <Settings
+                            className="h-4 w-4"
+                            style={{ color: ACCENT_COLOR }}
+                          />
+                          <span>Settings</span>
+                        </button>
+                        <div className="my-1 border-t border-gray-100" />
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            logout();
+                          }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-500 transition hover:bg-red-50"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                aria-label="Account"
+                className="text-[#292725] transition hover:text-[#69272B]"
+              >
+                <User size={20} strokeWidth={1.4} />
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
 
-                </div>
+      {/* =====================================================
+          MOBILE SIDEBAR MENU
+      ===================================================== */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 z-[90] bg-black/50 backdrop-blur-sm lg:hidden"
+            />
 
-                <div>
-
-                  <span
-                    className="font-bold text-[#3D3D3D] text-base"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
-                  >
-                    {navbarData?.logo
-                      ?.text ||
-                      'Glow&Co'}
-
-                    {navbarData?.logo
-                      ?.highlightText && (
-                      <span className="text-[#8B9D83]">
-                        {
-                          navbarData
-                            .logo
-                            .highlightText
-                        }
-                      </span>
-                    )}
-                  </span>
-
-                  <span
-                    className="text-[10px] text-[#8B9D83] block -mt-1 tracking-wider"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
-                  >
-                    BEAUTY
-                  </span>
-
-                </div>
-
+            {/* Sidebar */}
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+              className="fixed left-0 top-0 z-[100] flex h-screen w-[85vw] max-w-[360px] flex-col bg-white shadow-2xl lg:hidden"
+            >
+              {/* Header */}
+              <div className="flex h-[56px] shrink-0 items-center justify-between border-b border-gray-200 px-4">
+                <span className="text-sm font-semibold uppercase tracking-wide text-[#292725]">
+                  Menu
+                </span>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100"
+                >
+                  <X size={20} strokeWidth={1.8} />
+                </button>
               </div>
 
-              <button
-                onClick={() =>
-                  setIsMenuOpen(
-                    false
-                  )
-                }
-                className="p-2 rounded-lg hover:bg-[#F2F5F0] transition-colors"
-              >
-                <X className="w-5 h-5 text-[#3D3D3D]" />
-              </button>
+              {/* Nav Items */}
+              <div className="flex-1 overflow-y-auto">
+                <nav className="flex flex-col px-2 py-2">
+                  {/* ========================================
+                      ALL CATEGORIES — expands inline
+                  ======================================== */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleMobileCategory('__all_categories__')
+                      }
+                      className="flex min-h-[48px] w-full items-center justify-between rounded-lg px-3 text-left text-[13px] font-semibold text-[#292725] transition hover:bg-gray-50"
+                    >
+                      <span>ALL CATEGORIES</span>
+                      <ChevronDown
+                        size={16}
+                        strokeWidth={1.8}
+                        className={`transition-transform duration-200 ${
+                          expandedMobileCategory === '__all_categories__'
+                            ? 'rotate-180'
+                            : ''
+                        }`}
+                      />
+                    </button>
 
-            </div>
+                    <AnimatePresence initial={false}>
+                      {expandedMobileCategory === '__all_categories__' && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: 'easeOut' }}
+                          className="overflow-hidden"
+                        >
+                          <div className="mb-2 ml-3 border-l border-[#eeeeee] py-1 pl-2">
+                            {(navbarData?.categories || []).length === 0 ? (
+                              <p className="px-3 py-3 text-[12px] text-gray-400">
+                                No categories found.
+                              </p>
+                            ) : (
+                              (navbarData?.categories || []).map(
+                                (category) => {
+                                  const categoryId =
+                                    category._id || category.id;
+                                  const categorySlug =
+                                    category.slug || categoryId;
+                                  const hasSubcategories =
+                                    category.subcategories?.length > 0;
+                                  const catKey = `cat-${categoryId}`;
+                                  const isCatExpanded =
+                                    expandedMobileCategory === catKey;
 
-            {/* Navigation Items */}
+                                  return (
+                                    <div key={categoryId}>
+                                      {/* Category row */}
+                                      <div className="flex items-center justify-between">
+                                        <Link
+                                          href={`/products?category=${categorySlug}`}
+                                          onClick={() =>
+                                            setMobileMenuOpen(false)
+                                          }
+                                          className="flex-1 rounded-md px-3 py-2.5 text-[12.5px] font-medium text-[#292725] transition hover:bg-gray-50 hover:text-[#69272B]"
+                                        >
+                                          {category.name}
+                                        </Link>
 
-            <div className="flex-1 overflow-y-auto py-3">
+                                        {hasSubcategories && (
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              toggleMobileCategory(
+                                                catKey
+                                              )
+                                            }
+                                            aria-label="Toggle subcategories"
+                                            className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-[#69272B]"
+                                          >
+                                            <ChevronDown
+                                              size={14}
+                                              strokeWidth={1.8}
+                                              className={`transition-transform duration-200 ${
+                                                isCatExpanded
+                                                  ? 'rotate-180'
+                                                  : ''
+                                              }`}
+                                            />
+                                          </button>
+                                        )}
+                                      </div>
 
-              {navItems.map((item) => {
+                                      {/* Subcategories */}
+                                      <AnimatePresence initial={false}>
+                                        {hasSubcategories &&
+                                          isCatExpanded && (
+                                            <motion.div
+                                              initial={{
+                                                height: 0,
+                                                opacity: 0,
+                                              }}
+                                              animate={{
+                                                height: 'auto',
+                                                opacity: 1,
+                                              }}
+                                              exit={{
+                                                height: 0,
+                                                opacity: 0,
+                                              }}
+                                              transition={{
+                                                duration: 0.2,
+                                                ease: 'easeOut',
+                                              }}
+                                              className="overflow-hidden"
+                                            >
+                                              <div className="ml-3 border-l border-[#eeeeee] py-0.5 pl-2">
+                                                {category.subcategories.map(
+                                                  (sub) => {
+                                                    const subId =
+                                                      sub._id || sub.id;
+                                                    const subSlug =
+                                                      sub.slug || subId;
+                                                    const hasChildren =
+                                                      sub.children?.length >
+                                                      0;
+                                                    const subKey = `sub-${subId}`;
+                                                    const isSubExpanded =
+                                                      expandedMobileCategory ===
+                                                      subKey;
 
-                const Icon =
-                  getIcon(item.icon);
+                                                    return (
+                                                      <div key={subId}>
+                                                        <div className="flex items-center justify-between">
+                                                          <Link
+                                                            href={`/products?category=${categorySlug}&subcategory=${subSlug}`}
+                                                            onClick={() =>
+                                                              setMobileMenuOpen(
+                                                                false
+                                                              )
+                                                            }
+                                                            className="flex-1 rounded-md px-3 py-2 text-[12px] text-gray-600 transition hover:bg-gray-50 hover:text-[#69272B]"
+                                                          >
+                                                            {sub.name}
+                                                          </Link>
 
-                return (
-                  <Link
-                    key={
-                      item.id ||
-                      item.name
-                    }
-                    href={item.href}
-                    onClick={() =>
-                      setIsMenuOpen(
-                        false
-                      )
-                    }
-                    className={`flex items-center gap-3 px-5 py-3 mx-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isActive(
-                        item.href
-                      )
-                        ? 'text-[#8B9D83] font-semibold'
-                        : 'text-[#3D3D3D] hover:text-[#8B9D83] hover:bg-[#F2F5F0]'
-                    }`}
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
+                                                          {hasChildren && (
+                                                            <button
+                                                              type="button"
+                                                              onClick={() =>
+                                                                toggleMobileCategory(
+                                                                  subKey
+                                                                )
+                                                              }
+                                                              aria-label="Toggle child subcategories"
+                                                              className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-[#69272B]"
+                                                            >
+                                                              <ChevronDown
+                                                                size={12}
+                                                                strokeWidth={
+                                                                  1.8
+                                                                }
+                                                                className={`transition-transform duration-200 ${
+                                                                  isSubExpanded
+                                                                    ? 'rotate-180'
+                                                                    : ''
+                                                                }`}
+                                                              />
+                                                            </button>
+                                                          )}
+                                                        </div>
 
-                      borderLeft:
-                        isActive(
-                          item.href
-                        )
-                          ? '3px solid #8B9D83'
-                          : 'none',
+                                                        {/* Child subcategories */}
+                                                        <AnimatePresence
+                                                          initial={false}
+                                                        >
+                                                          {hasChildren &&
+                                                            isSubExpanded && (
+                                                              <motion.div
+                                                                initial={{
+                                                                  height: 0,
+                                                                  opacity: 0,
+                                                                }}
+                                                                animate={{
+                                                                  height:
+                                                                    'auto',
+                                                                  opacity: 1,
+                                                                }}
+                                                                exit={{
+                                                                  height: 0,
+                                                                  opacity: 0,
+                                                                }}
+                                                                transition={{
+                                                                  duration: 0.2,
+                                                                  ease: 'easeOut',
+                                                                }}
+                                                                className="overflow-hidden"
+                                                              >
+                                                                <div className="ml-3 border-l border-[#eeeeee] py-0.5 pl-2">
+                                                                  {sub.children.map(
+                                                                    (
+                                                                      child
+                                                                    ) => {
+                                                                      const childId =
+                                                                        child._id ||
+                                                                        child.id;
+                                                                      const childSlug =
+                                                                        child.slug ||
+                                                                        childId;
+                                                                      return (
+                                                                        <Link
+                                                                          key={
+                                                                            childId
+                                                                          }
+                                                                          href={`/products?category=${categorySlug}&subcategory=${subSlug}&child=${childSlug}`}
+                                                                          onClick={() =>
+                                                                            setMobileMenuOpen(
+                                                                              false
+                                                                            )
+                                                                          }
+                                                                          className="block rounded-md px-3 py-1.5 text-[11.5px] text-gray-500 transition hover:bg-gray-50 hover:text-[#69272B]"
+                                                                        >
+                                                                          {
+                                                                            child.name
+                                                                          }
+                                                                        </Link>
+                                                                      );
+                                                                    }
+                                                                  )}
+                                                                </div>
+                                                              </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
+                                                      </div>
+                                                    );
+                                                  }
+                                                )}
+                                              </div>
+                                            </motion.div>
+                                          )}
+                                      </AnimatePresence>
+                                    </div>
+                                  );
+                                }
+                              )
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
-                      paddingLeft:
-                        isActive(
-                          item.href
-                        )
-                          ? '17px'
-                          : '20px',
-                    }}
-                  >
+                  {/* Nav items */}
+                  {navItems.map((item, index) =>
+                    renderMobileNavItem(item, index)
+                  )}
+                </nav>
+              </div>
 
-                    <Icon
-                      className={`w-4.5 h-4.5 ${
-                        isActive(
-                          item.href
-                        )
-                          ? 'text-[#8B9D83]'
-                          : 'text-[#6B6B6B]'
-                      }`}
-                    />
+              {/* Footer — user / auth */}
+              <div className="shrink-0 border-t border-gray-200 p-4">
+                {user ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
+                      {getProfilePicture() && !profileImageError ? (
+                        <img
+                          src={getProfilePicture()}
+                          alt={getDisplayName()}
+                          onError={() => setProfileImageError(true)}
+                          className="h-9 w-9 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-white"
+                          style={{ backgroundColor: ACCENT_COLOR }}
+                        >
+                          {getInitials()}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-[#292725]">
+                          {getDisplayName()}
+                        </p>
+                        <p className="truncate text-xs text-gray-500">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
 
-                    <span>
-                      {item.name}
-                    </span>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        router.push(getDashboardLink());
+                      }}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-[#292725] transition hover:bg-gray-50"
+                    >
+                      <LayoutDashboard
+                        size={16}
+                        style={{ color: ACCENT_COLOR }}
+                      />
+                      <span>Dashboard</span>
+                    </button>
 
-                  </Link>
-                );
-              })}
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        router.push(getSettingsLink());
+                      }}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-[#292725] transition hover:bg-gray-50"
+                    >
+                      <Settings
+                        size={16}
+                        style={{ color: ACCENT_COLOR }}
+                      />
+                      <span>Settings</span>
+                    </button>
 
-              <div className="my-3 mx-5 h-px bg-gradient-to-r from-[#8B9D83]/20 via-[#8B9D83]/40 to-[#8B9D83]/20" />
-
-              {/* ==================================================
-                  MOBILE AUTH
-              ================================================== */}
-
-              {!user ? (
-
-                <div className="px-5 mt-3">
-
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        logout();
+                      }}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-red-500 transition hover:bg-red-50"
+                    >
+                      <LogOut size={16} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                ) : (
                   <Link
                     href="/login"
-                    onClick={() =>
-                      setIsMenuOpen(
-                        false
-                      )
-                    }
-                    className="flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-[#8B9D83] text-white hover:bg-[#6B7D63] transition-all shadow-sm"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex w-full items-center justify-center rounded-lg py-3 text-sm font-medium text-white transition hover:opacity-90"
+                    style={{ backgroundColor: ACCENT_COLOR }}
                   >
                     Sign In
                   </Link>
+                )}
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
-                </div>
-
-              ) : (
-
-                <div className="px-5 mt-3">
-
-                  {/* Mobile User Info */}
-
-                  <div className="flex items-center gap-3 p-3 bg-[#F5EDE3] rounded-lg mb-3">
-
-                    {getProfilePicture() &&
-                    !profileImageError ? (
-
-                      <img
-                        src={getProfilePicture()}
-                        alt={getDisplayName()}
-                        onError={() =>
-                          setProfileImageError(
-                            true
-                          )
-                        }
-                        className="w-10 h-10 rounded-full object-cover border-2 border-[#8B9D83]/30"
-                      />
-
-                    ) : (
-
-                      <div className="w-10 h-10 rounded-full bg-[#8B9D83] flex items-center justify-center text-white font-semibold text-sm">
-
-                        {getInitials()}
-
-                      </div>
-
-                    )}
-
-                    <div className="flex-1">
-
-                      <p
-                        className="font-semibold text-[#3D3D3D] text-sm"
-                        style={{
-                          fontFamily:
-                            '"Raleway", "Inter", sans-serif',
-                        }}
-                      >
-                        {getDisplayName()}
-                      </p>
-
-                      <p
-                        className="text-[#8B9D83] text-xs truncate"
-                        style={{
-                          fontFamily:
-                            '"Raleway", "Inter", sans-serif',
-                        }}
-                      >
-                        {user.email}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  {/* Dashboard */}
-
-                  <div
-                    onClick={() => {
-                      setIsMenuOpen(
-                        false
-                      );
-
-                      window.location.href =
-                        getDashboardLink();
-                    }}
-                    className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors mb-1 cursor-pointer"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
-                  >
-
-                    <LayoutDashboard className="w-4 h-4 text-[#8B9D83]" />
-
-                    Dashboard
-
-                  </div>
-
-                  {/* Settings */}
-
-                  <div
-                    onClick={() => {
-                      setIsMenuOpen(
-                        false
-                      );
-
-                      window.location.href =
-                        getSettingsLink();
-                    }}
-                    className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-[#3D3D3D] hover:bg-[#F2F5F0] transition-colors mb-2 cursor-pointer"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
-                  >
-
-                    <Settings className="w-4 h-4 text-[#8B9D83]" />
-
-                    Settings
-
-                  </div>
-
-                  {/* Logout */}
-
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(
-                        false
-                      );
-
-                      logout();
-                    }}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-all"
-                    style={{
-                      fontFamily:
-                        '"Raleway", "Inter", sans-serif',
-                    }}
-                  >
-
-                    <LogOut className="w-4 h-4" />
-
-                    Logout
-
-                  </button>
-
-                </div>
-
-              )}
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* ========================================================
-          CART SIDEBAR
-      ======================================================== */}
-
-      <CartSidebar
-        isOpen={isCartOpen}
-        onClose={() =>
-          setIsCartOpen(false)
-        }
+      {/* =====================================================
+          CATEGORY SIDEBAR (desktop "ALL" button only)
+      ===================================================== */}
+      <CategorySidebar
+        isOpen={categorySidebarOpen}
+        onClose={() => setCategorySidebarOpen(false)}
+        categories={navbarData?.categories || []}
       />
 
-      {/* ========================================================
-          ANIMATIONS
-      ======================================================== */}
+      {/* =====================================================
+          OUTLET MODAL
+      ===================================================== */}
+      <OutletModal
+        isOpen={outletModalOpen}
+        onClose={() => setOutletModalOpen(false)}
+        outlet={navbarData?.outlet}
+      />
 
-      <style jsx>{`
-
-        @keyframes slideLeft {
-          from {
-            opacity: 0;
-            transform: translateX(20px);
-          }
-
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .animate-slideLeft {
-          animation: slideLeft 0.25s ease-out;
-        }
-
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-slideDown {
-          animation: slideDown 0.25s ease-out;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }
-
-        .w-4.5 {
-          width: 1.125rem;
-        }
-
-        .h-4.5 {
-          height: 1.125rem;
-        }
-
-      `}</style>
+      {/* =====================================================
+          CART SIDEBAR
+      ===================================================== */}
+      <CartSidebar
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+      />
     </>
   );
 }

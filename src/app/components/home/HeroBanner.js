@@ -1,116 +1,113 @@
 
-
-// // components/home/HeroBannerCarousel.js
-// // components/home/HeroBannerCarousel.js
 // 'use client';
 
-// import React, { useCallback, useEffect, useRef, useState, Fragment } from 'react';
+// import React, { useCallback, useEffect, useRef, useState } from 'react';
 // import { AnimatePresence, motion } from 'framer-motion';
 // import Link from 'next/link';
 // import {
 //   FaArrowRight,
 //   FaChevronLeft,
 //   FaChevronRight,
-//   FaLeaf,
+//   FaBullhorn
 // } from 'react-icons/fa';
 
-// import FeatureBadges from './FeatureBadges';
-
 // const FONT_FAMILY = "'Raleway', 'Inter', sans-serif";
+// const ACCENT_RED = '#CC1C34';
 
-// // Default slides in case API fails
-// const DEFAULT_SLIDES = [
-//   {
-//     id: 'default-1',
-//     tagline: 'Timeless Collection',
-//     title: 'Timeless Comfort,',
-//     highlightedText: 'Modern Craftsmanship.',
-//     description: 'Heritage technique meets contemporary design — each piece crafted to last.',
-//     bgImage: '/images/hh.PNG',
-//     ctaLabel: 'Explore the Collection',
-//     ctaHref: '/collection',
-//     trustIndicators: ['Heirloom Quality', 'Sustainably Made', 'Lifetime Care']
-//   },
-//   {
-//     id: 'default-2',
-//     tagline: 'New Arrivals',
-//     title: 'Discover the',
-//     highlightedText: 'Art of Living.',
-//     description: 'Curated pieces that bring warmth and elegance to your everyday spaces.',
-//     bgImage: '/images/hh2.PNG',
-//     ctaLabel: 'Shop New Arrivals',
-//     ctaHref: '/new-arrivals',
-//     trustIndicators: ['Premium Quality', 'Handcrafted', 'Sustainably Sourced']
-//   },
-// ];
+// const DEFAULT_DATA = {
+//   slides: [
+//     {
+//       id: 'default-1',
+//       bgImage: '/images/hh.PNG',
+//       ctaLabel: 'Explore the Collection',
+//       ctaHref: '/collection'
+//     },
+//     {
+//       id: 'default-2',
+//       bgImage: '/images/hh2.PNG',
+//       ctaLabel: 'Shop New Arrivals',
+//       ctaHref: '/new-arrivals'
+//     }
+//   ],
+//   announcements: [
+//     { id: 'a1', text: '🚚 Free Delivery on orders over ৳1000', order: 0 },
+//     { id: 'a2', text: '💳 Cash on Delivery Available', order: 1 },
+//     { id: 'a3', text: '🎁 Get 10% Off on Your First Order', order: 2 }
+//   ]
+// };
 
-// const AUTOPLAY_MS = 6000;
+// const AUTOPLAY_MS = 5000;
 
 // export default function HeroBannerCarousel({ slides: propSlides }) {
+//   // ============================================================
+//   // STATE
+//   // ============================================================
 //   const [slides, setSlides] = useState([]);
+//   const [announcements, setAnnouncements] = useState([]);
 //   const [index, setIndex] = useState(0);
-//   const [direction, setDirection] = useState(1);
 //   const [isPaused, setIsPaused] = useState(false);
 //   const [isLoading, setIsLoading] = useState(true);
 
 //   const timerRef = useRef(null);
 
-//   // Fetch banners from API
+//   // ============================================================
+//   // FETCH
+//   // ============================================================
 //   useEffect(() => {
-//     const fetchBanners = async () => {
+//     const fetchData = async () => {
 //       try {
 //         setIsLoading(true);
-
-//         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+//         const apiUrl =
+//           process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 //         const response = await fetch(`${apiUrl}/api/banners/homepage`, {
-//           cache: 'no-store',
+//           cache: 'no-store'
 //         });
 
 //         if (response.ok) {
 //           const result = await response.json();
+//           if (result.success && result.data) {
+//             const { slides: s = [], announcements: a = [] } = result.data;
 
-//           if (result.success && result.data && result.data.length > 0) {
-//             setSlides(result.data);
+//             if (s.length > 0) {
+//               setSlides(s);
+//             } else if (propSlides?.length) {
+//               setSlides(propSlides);
+//             } else {
+//               setSlides(DEFAULT_DATA.slides);
+//             }
+
+//             setAnnouncements(a.length > 0 ? a : DEFAULT_DATA.announcements);
 //             setIsLoading(false);
 //             return;
 //           }
 //         }
 
-//         if (propSlides && propSlides.length > 0) {
-//           setSlides(propSlides);
-//         } else {
-//           setSlides(DEFAULT_SLIDES);
-//         }
+//         setSlides(propSlides?.length ? propSlides : DEFAULT_DATA.slides);
+//         setAnnouncements(DEFAULT_DATA.announcements);
 //       } catch (error) {
-//         console.error('Error fetching banners:', error);
-
-//         if (propSlides && propSlides.length > 0) {
-//           setSlides(propSlides);
-//         } else {
-//           setSlides(DEFAULT_SLIDES);
-//         }
+//         console.error('Error fetching banner data:', error);
+//         setSlides(propSlides?.length ? propSlides : DEFAULT_DATA.slides);
+//         setAnnouncements(DEFAULT_DATA.announcements);
 //       } finally {
 //         setIsLoading(false);
 //       }
 //     };
 
-//     fetchBanners();
+//     fetchData();
 //   }, [propSlides]);
 
+//   // ============================================================
+//   // BANNER NAVIGATION
+//   // ============================================================
 //   const total = slides.length;
 //   const slide = slides[index] || slides[0];
 
 //   const goTo = useCallback(
 //     (next) => {
 //       if (total <= 1) return;
-
-//       setDirection(
-//         next > index || (index === total - 1 && next === 0) ? 1 : -1
-//       );
-
 //       setIndex(((next % total) + total) % total);
 //     },
-//     [index, total]
+//     [total]
 //   );
 
 //   const goNext = useCallback(() => goTo(index + 1), [goTo, index]);
@@ -118,21 +115,19 @@
 
 //   // Autoplay
 //   useEffect(() => {
-//     if (isPaused || total <= 1 || isLoading) {
-//       return undefined;
-//     }
-
+//     if (isPaused || total <= 1 || isLoading) return undefined;
 //     timerRef.current = setInterval(goNext, AUTOPLAY_MS);
-
 //     return () => clearInterval(timerRef.current);
 //   }, [goNext, isPaused, total, isLoading]);
 
-//   // Loading state
+//   // ============================================================
+//   // LOADING
+//   // ============================================================
 //   if (isLoading) {
 //     return (
-//       <section className="relative w-full h-[70vh] md:h-[85vh] lg:h-[90vh] overflow-hidden bg-gray-200 animate-pulse">
+//       <section className="relative h-[45vh] w-full overflow-hidden bg-gray-200 sm:h-[55vh] md:h-[65vh] lg:h-[70vh]">
 //         <div className="absolute inset-0 flex items-center justify-center">
-//           <div className="text-gray-400 text-sm">Loading banners...</div>
+//           <div className="text-sm text-gray-400">Loading...</div>
 //         </div>
 //       </section>
 //     );
@@ -140,431 +135,354 @@
 
 //   if (!slide) return null;
 
-//  const bgVariants = {
-//   enter: {
-//     opacity: 0,
-//     scale: 1.02,
-//   },
-//   center: {
-//     opacity: 1,
-//     scale: 1,
-//     transition: {
-//       opacity: {
-//         duration: 0.9,
-//         ease: [0.4, 0, 0.2, 1],
-//       },
-//       scale: {
-//         duration: 1.2,
-//         ease: [0.4, 0, 0.2, 1],
-//       },
-//     },
-//   },
-//   exit: {
-//     opacity: 0,
-//     scale: 0.99,
-//     transition: {
-//       opacity: {
-//         duration: 0.9,
-//         ease: [0.4, 0, 0.2, 1],
-//       },
-//       scale: {
-//         duration: 0.9,
-//         ease: [0.4, 0, 0.2, 1],
-//       },
-//     },
-//   },
-// };
-
-//   // Content variants - smooth fade with slight movement
-//   const contentVariants = {
-//     enter: (direction) => ({
-//       opacity: 0,
-//       y: 20,
-//     }),
+//   // ============================================================
+//   // VARIANTS
+//   // ============================================================
+//   const bgVariants = {
+//     enter: { opacity: 0, scale: 1.03 },
 //     center: {
 //       opacity: 1,
-//       y: 0,
+//       scale: 1,
 //       transition: {
-//         duration: 0.6,
-//         ease: [0.4, 0, 0.2, 1],
+//         opacity: { duration: 0.8, ease: [0.4, 0, 0.2, 1] },
+//         scale: { duration: 5.5, ease: [0.4, 0, 0.2, 1] }
 //       }
 //     },
-//     exit: (direction) => ({
+//     exit: {
 //       opacity: 0,
-//       y: -20,
+//       scale: 0.99,
 //       transition: {
-//         duration: 0.4,
-//         ease: [0.4, 0, 0.2, 1],
+//         opacity: { duration: 0.8, ease: [0.4, 0, 0.2, 1] }
 //       }
-//     })
+//     }
 //   };
 
 //   return (
 //     <>
-//     <section
-//       className="relative w-full h-[70vh] md:h-[85vh] lg:h-[90vh] overflow-hidden"
-//       onMouseEnter={() => setIsPaused(true)}
-//       onMouseLeave={() => setIsPaused(false)}
-//     >
-//       {/* Background Image - Always present, smooth crossfade */}
-//       <div className="absolute inset-0">
-//         <AnimatePresence initial={false}>
-//           <motion.div
-//             key={`bg-${index}`}
-//             variants={bgVariants}
-//             initial="enter"
-//             animate="center"
-//             exit="exit"
-//             className="absolute inset-0"
-//           >
-//             {/* Background Image */}
-//             <div
-//               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-//               style={{
-//                 backgroundImage: `url('${slide.bgImage || '/images/hh.PNG'}')`,
-//               }}
+//       {/* ============================================================
+//           HERO BANNER
+//       ============================================================ */}
+//       <section
+//         className="relative h-[45vh] w-full overflow-hidden sm:h-[55vh] md:h-[65vh] lg:h-[70vh]"
+//         onMouseEnter={() => setIsPaused(true)}
+//         onMouseLeave={() => setIsPaused(false)}
+//       >
+//         {/* Background Image — crossfade */}
+//         <div className="absolute inset-0">
+//           <AnimatePresence initial={false}>
+//             <motion.div
+//               key={`bg-${index}`}
+//               variants={bgVariants}
+//               initial="enter"
+//               animate="center"
+//               exit="exit"
+//               className="absolute inset-0"
 //             >
-//               {/* Gradient overlay */}
-//               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/5" />
-//             </div>
-
-//             {/* Decorative botanical elements */}
-//             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-//               <div className="absolute top-10 left-[8%] opacity-10 animate-float">
-//                 <FaLeaf className="w-10 h-10 text-white/30" />
-//               </div>
-//               <div className="absolute bottom-20 right-[10%] opacity-8 animate-float-delayed">
-//                 <FaLeaf className="w-12 h-12 text-white/20 rotate-45" />
-//               </div>
-//               <div className="absolute top-1/3 right-[5%] opacity-8 animate-float-slow">
-//                 <FaLeaf className="w-8 h-8 text-white/20 -rotate-12" />
-//               </div>
-//             </div>
-//           </motion.div>
-//         </AnimatePresence>
-//       </div>
-
-//       {/* Content Container - Smooth fade with stagger */}
-//       <div className="container mx-auto px-4 md:px-6 lg:px-8 h-full relative z-10">
-//         <div className="flex flex-col justify-end h-full pb-6 md:pb-8 lg:pb-10 max-w-2xl">
-          
-//           {/* Tag/Badge */}
-//           {slide.tagline && (
-//             <AnimatePresence mode="wait">
-//               <motion.div
-//                 key={`tagline-${index}`}
-//                 variants={contentVariants}
-//                 initial="enter"
-//                 animate="center"
-//                 exit="exit"
-//                 transition={{ duration: 0.5, delay: 0.05 }}
-//                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-[#8B9D83]/30 mb-2 w-fit"
-//               >
-//                 <span className="w-1 h-1 rounded-full bg-[#8B9D83]" />
-//                 <span
-//                   className="text-[10px] md:text-[11px] font-medium tracking-[0.2em] uppercase text-white/80"
-//                   style={{
-//                     fontFamily: FONT_FAMILY,
-//                     letterSpacing: '0.2em',
-//                   }}
-//                 >
-//                   {slide.tagline}
-//                 </span>
-//               </motion.div>
-//             </AnimatePresence>
-//           )}
-
-//           {/* Main Heading */}
-//           {slide.title && (
-//             <AnimatePresence mode="wait">
-//               <motion.h1
-//                 key={`title-${index}`}
-//                 variants={contentVariants}
-//                 initial="enter"
-//                 animate="center"
-//                 exit="exit"
-//                 transition={{ duration: 0.5, delay: 0.1 }}
-//                 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.1] tracking-wide text-white mb-1.5"
+//               <div
+//                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
 //                 style={{
-//                   fontFamily: FONT_FAMILY,
-//                   letterSpacing: '0.02em',
+//                   backgroundImage: `url('${slide.bgImage || '/images/hh.PNG'}')`
 //                 }}
 //               >
-//                 {slide.title}
-//                 {slide.highlightedText && (
-//                   <>
-//                     <br />
-//                     <span className="text-[#8B9D83] font-medium">
-//                       {slide.highlightedText}
-//                     </span>
-//                   </>
-//                 )}
-//               </motion.h1>
-//             </AnimatePresence>
-//           )}
-
-//           {/* Description */}
-//           {slide.description && (
-//             <AnimatePresence mode="wait">
-//               <motion.p
-//                 key={`desc-${index}`}
-//                 variants={contentVariants}
-//                 initial="enter"
-//                 animate="center"
-//                 exit="exit"
-//                 transition={{ duration: 0.5, delay: 0.15 }}
-//                 className="text-sm md:text-base text-white/70 max-w-lg leading-relaxed mb-4"
-//                 style={{
-//                   fontFamily: FONT_FAMILY,
-//                   fontWeight: 300,
-//                   letterSpacing: '0.02em',
-//                 }}
-//               >
-//                 {slide.description}
-//               </motion.p>
-//             </AnimatePresence>
-//           )}
-
-//           {/* CTA Button */}
-//           {slide.ctaLabel && (
-//             <AnimatePresence mode="wait">
-//               <motion.div
-//                 key={`cta-${index}`}
-//                 variants={contentVariants}
-//                 initial="enter"
-//                 animate="center"
-//                 exit="exit"
-//                 transition={{ duration: 0.5, delay: 0.2 }}
-//               >
-//                 <Link
-//                   href={slide.ctaHref || '/collection'}
-//                   className="group inline-flex items-center gap-1.5 px-5 py-2 md:px-6 md:py-2.5 bg-[#8B9D83] text-white text-xs md:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-//                   style={{
-//                     fontFamily: FONT_FAMILY,
-//                     letterSpacing: '0.06em',
-//                   }}
-//                 >
-//                   {slide.ctaLabel}
-//                   <FaArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-//                 </Link>
-//               </motion.div>
-//             </AnimatePresence>
-//           )}
-
-//           {/* Trust Indicators */}
-//           {slide.trustIndicators && slide.trustIndicators.length > 0 && (
-//             <AnimatePresence mode="wait">
-//               <motion.div
-//                 key={`trust-${index}`}
-//                 variants={contentVariants}
-//                 initial="enter"
-//                 animate="center"
-//                 exit="exit"
-//                 transition={{ duration: 0.5, delay: 0.25 }}
-//                 className="flex items-center gap-4 mt-5 pt-4 border-t border-white/10 flex-wrap"
-//               >
-//                 {slide.trustIndicators.map((indicator, i) => (
-//                   <Fragment key={i}>
-//                     <span
-//                       className="text-[10px] md:text-xs text-white/50 font-medium tracking-[0.15em] uppercase"
-//                       style={{
-//                         fontFamily: FONT_FAMILY,
-//                         letterSpacing: '0.15em',
-//                       }}
-//                     >
-//                       {indicator}
-//                     </span>
-//                     {i < slide.trustIndicators.length - 1 && (
-//                       <span className="w-px h-3 bg-white/15" />
-//                     )}
-//                   </Fragment>
-//                 ))}
-//               </motion.div>
-//             </AnimatePresence>
-//           )}
+//                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+//               </div>
+//             </motion.div>
+//           </AnimatePresence>
 //         </div>
-//       </div>
 
-//       {/* Navigation Arrows - Bottom Right */}
-//       {total > 1 && (
-//         <div className="absolute bottom-24 md:bottom-28 lg:bottom-32 right-4 md:right-6 lg:right-8 z-30 flex items-center gap-2">
+//         {/* ============================================================
+//             LEFT ARROW — center-left of banner
+//         ============================================================ */}
+//         {total > 1 && (
 //           <button
 //             onClick={goPrev}
 //             aria-label="Previous slide"
-//             className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/25 transition-all border border-white/20 hover:border-white/40 hover:scale-105"
+//             className="absolute left-3 top-1/2 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-sm transition-all hover:scale-105 hover:border-white/60 hover:bg-black/50 sm:left-5 sm:h-10 sm:w-10 md:left-8 md:h-11 md:w-11"
 //           >
-//             <FaChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+//             <FaChevronLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
 //           </button>
+//         )}
+
+//         {/* ============================================================
+//             RIGHT ARROW — center-right of banner
+//         ============================================================ */}
+//         {total > 1 && (
 //           <button
 //             onClick={goNext}
 //             aria-label="Next slide"
-//             className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/25 transition-all border border-white/20 hover:border-white/40 hover:scale-105"
+//             className="absolute right-3 top-1/2 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-sm transition-all hover:scale-105 hover:border-white/60 hover:bg-black/50 sm:right-5 sm:h-10 sm:w-10 md:right-8 md:h-11 md:w-11"
 //           >
-//             <FaChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+//             <FaChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
 //           </button>
-//         </div>
+//         )}
+
+//         {/* ============================================================
+//             CTA BUTTON — centered at bottom
+//         ============================================================ */}
+//         {slide.ctaLabel && slide.ctaLabel.trim() !== '' && (
+//           <div className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 sm:bottom-8 md:bottom-10">
+//             <AnimatePresence mode="wait">
+//               <motion.div
+//                 key={`cta-${index}`}
+//                 initial={{ opacity: 0, y: 20 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 exit={{ opacity: 0, y: -20 }}
+//                 transition={{ duration: 0.5, delay: 0.15 }}
+//               >
+//                 <Link
+//                   href={slide.ctaHref || '/products'}
+//                   className="group inline-flex items-center gap-2 rounded-sm px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:px-6 sm:py-3 sm:text-xs md:px-7 md:py-3.5 md:text-sm"
+//                   style={{
+//                     backgroundColor: ACCENT_RED,
+//                     fontFamily: FONT_FAMILY
+//                   }}
+//                 >
+//                   {slide.ctaLabel}
+//                   <FaArrowRight className="h-2.5 w-2.5 transition-transform group-hover:translate-x-1 sm:h-3 sm:w-3" />
+//                 </Link>
+//               </motion.div>
+//             </AnimatePresence>
+//           </div>
+//         )}
+
+//         {/* ============================================================
+//             DOT INDICATORS — bottom center
+//         ============================================================ */}
+//         {total > 1 && (
+//           <div className="absolute bottom-2 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-3 sm:gap-2">
+//             {slides.map((_, i) => (
+//               <button
+//                 key={i}
+//                 onClick={() => goTo(i)}
+//                 aria-label={`Go to slide ${i + 1}`}
+//                 className={`rounded-full transition-all duration-300 ${
+//                   i === index
+//                     ? 'h-1 w-6 sm:h-1.5 sm:w-8'
+//                     : 'h-1 w-1 bg-white/40 hover:bg-white/70 sm:h-1.5 sm:w-1.5'
+//                 }`}
+//                 style={{
+//                   backgroundColor: i === index ? ACCENT_RED : undefined
+//                 }}
+//               />
+//             ))}
+//           </div>
+//         )}
+//       </section>
+
+//       {/* ============================================================
+//           ANNOUNCEMENT MARQUEE
+//       ============================================================ */}
+//       {announcements.length > 0 && (
+//         <AnnouncementMarquee
+//           announcements={announcements}
+//           backgroundColor={ACCENT_RED}
+//         />
 //       )}
-
-//       {/* Dot Indicators - Bottom Center */}
-//       {total > 1 && (
-//         <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-//           {slides.map((_, i) => (
-//             <button
-//               key={i}
-//               onClick={() => goTo(i)}
-//               aria-label={`Go to slide ${i + 1}`}
-//               className={`
-//                 rounded-full transition-all duration-300
-//                 ${i === index
-//                   ? 'w-8 h-2 bg-[#8B9D83]'
-//                   : 'w-2 h-2 bg-white/30 hover:bg-white/50'
-//                 }
-//               `}
-//             />
-//           ))}
-//         </div>
-//       )}
-
-//       {/* Animations */}
-//       <style jsx>{`
-//         @keyframes float {
-//           0%, 100% { transform: translateY(0px) rotate(0deg); }
-//           50% { transform: translateY(-15px) rotate(5deg); }
-//         }
-//         @keyframes float-delayed {
-//           0%, 100% { transform: translateY(0px) rotate(0deg); }
-//           50% { transform: translateY(-12px) rotate(-3deg); }
-//         }
-//         @keyframes float-slow {
-//           0%, 100% { transform: translateY(0px); }
-//           50% { transform: translateY(-20px); }
-//         }
-//         .animate-float {
-//           animation: float 6s ease-in-out infinite;
-//         }
-//         .animate-float-delayed {
-//           animation: float-delayed 7s ease-in-out infinite;
-//         }
-//         .animate-float-slow {
-//           animation: float-slow 8s ease-in-out infinite;
-//         }
-//       `}</style>
-//     </section>
-
-//     <FeatureBadges />
 //     </>
 //   );
 // }
-// components/home/HeroBannerCarousel.js
+
+// // ============================================================
+// // ANNOUNCEMENT MARQUEE
+// // — continuous scrolling, evenly spaced notices
+// // ============================================================
+// function AnnouncementMarquee({ announcements, backgroundColor }) {
+//   // Build the combined text with even spacing between notices
+//   const parts = announcements.map((a) => a.text);
+
+//   return (
+//     <div
+//       className="relative w-full overflow-hidden"
+//       style={{ backgroundColor }}
+//     >
+//       <div className="flex h-8 items-center sm:h-9">
+//         {/* Static left icon (no text label) */}
+//         <div
+//           className="flex h-full flex-shrink-0 items-center justify-center px-3 sm:px-4"
+//           style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}
+//         >
+//           <FaBullhorn className="h-3 w-3 text-white sm:h-3.5 sm:w-3.5" />
+//         </div>
+
+//         {/* Marquee track */}
+//         <div className="relative flex-1 overflow-hidden">
+//           <div className="marquee-track flex whitespace-nowrap">
+//             {/* Copy 1 */}
+//             <div className="flex flex-shrink-0">
+//               {parts.map((text, i) => (
+//                 <React.Fragment key={`a-${i}`}>
+//                   <span
+//                     className="text-[11px] font-medium text-white sm:text-xs"
+//                     style={{ fontFamily: FONT_FAMILY }}
+//                   >
+//                     {text}
+//                   </span>
+//                   {/* Even gap between every notice */}
+//                   <span
+//                     aria-hidden="true"
+//                     className="mx-6 text-[11px] text-white/60 sm:mx-8 sm:text-xs"
+//                   >
+//                     •
+//                   </span>
+//                 </React.Fragment>
+//               ))}
+//             </div>
+
+//             {/* Copy 2 — duplicate for seamless loop */}
+//             <div
+//               className="flex flex-shrink-0"
+//               aria-hidden="true"
+//             >
+//               {parts.map((text, i) => (
+//                 <React.Fragment key={`b-${i}`}>
+//                   <span
+//                     className="text-[11px] font-medium text-white sm:text-xs"
+//                     style={{ fontFamily: FONT_FAMILY }}
+//                   >
+//                     {text}
+//                   </span>
+//                   <span className="mx-6 text-[11px] text-white/60 sm:mx-8 sm:text-xs">
+//                     •
+//                   </span>
+//                 </React.Fragment>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Marquee animation */}
+//       <style jsx>{`
+//         .marquee-track {
+//           animation: marquee-scroll 50s linear infinite;
+//           will-change: transform;
+//         }
+//         .marquee-track:hover {
+//           animation-play-state: paused;
+//         }
+//         @keyframes marquee-scroll {
+//           0% {
+//             transform: translateX(0);
+//           }
+//           100% {
+//             transform: translateX(-50%);
+//           }
+//         }
+//         @media (max-width: 640px) {
+//           .marquee-track {
+//             animation-duration: 35s;
+//           }
+//         }
+//       `}</style>
+//     </div>
+//   );
+// }
+
+
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState, Fragment } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
-import {
-  FaArrowRight,
-  FaChevronLeft,
-  FaChevronRight,
-  FaLeaf,
-} from 'react-icons/fa';
-
-import FeatureBadges from './FeatureBadges';
+import { FaArrowRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const FONT_FAMILY = "'Raleway', 'Inter', sans-serif";
+const ACCENT_RED = '#CC1C34';
 
-// Default slides in case API fails
-const DEFAULT_SLIDES = [
-  {
-    id: 'default-1',
-    tagline: 'Timeless Collection',
-    title: 'Timeless Comfort,',
-    highlightedText: 'Modern Craftsmanship.',
-    description: 'Heritage technique meets contemporary design — each piece crafted to last.',
-    bgImage: '/images/hh.PNG',
-    ctaLabel: 'Explore the Collection',
-    ctaHref: '/collection',
-    trustIndicators: ['Heirloom Quality', 'Sustainably Made', 'Lifetime Care']
-  },
-  {
-    id: 'default-2',
-    tagline: 'New Arrivals',
-    title: 'Discover the',
-    highlightedText: 'Art of Living.',
-    description: 'Curated pieces that bring warmth and elegance to your everyday spaces.',
-    bgImage: '/images/hh2.PNG',
-    ctaLabel: 'Shop New Arrivals',
-    ctaHref: '/new-arrivals',
-    trustIndicators: ['Premium Quality', 'Handcrafted', 'Sustainably Sourced']
-  },
-];
+const DEFAULT_DATA = {
+  slides: [
+    {
+      id: 'default-1',
+      bgImage: '/images/hh.PNG',
+      ctaLabel: 'Explore the Collection',
+      ctaHref: '/collection'
+    },
+    {
+      id: 'default-2',
+      bgImage: '/images/hh2.PNG',
+      ctaLabel: 'Shop New Arrivals',
+      ctaHref: '/new-arrivals'
+    }
+  ],
+  announcements: [
+    { id: 'a1', text: '🚚 Free Delivery on orders over ৳1000', order: 0 },
+    { id: 'a2', text: '💳 Cash on Delivery Available', order: 1 },
+    { id: 'a3', text: '🎁 Get 10% Off on Your First Order', order: 2 }
+  ]
+};
 
-const AUTOPLAY_MS = 6000;
+const AUTOPLAY_MS = 5000;
 
 export default function HeroBannerCarousel({ slides: propSlides }) {
+  // ============================================================
+  // STATE
+  // ============================================================
   const [slides, setSlides] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const timerRef = useRef(null);
 
-  // Fetch banners from API
+  // ============================================================
+  // FETCH
+  // ============================================================
   useEffect(() => {
-    const fetchBanners = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
-
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         const response = await fetch(`${apiUrl}/api/banners/homepage`, {
-          cache: 'no-store',
+          cache: 'no-store'
         });
 
         if (response.ok) {
           const result = await response.json();
+          if (result.success && result.data) {
+            const { slides: s = [], announcements: a = [] } = result.data;
 
-          if (result.success && result.data && result.data.length > 0) {
-            setSlides(result.data);
+            if (s.length > 0) {
+              setSlides(s);
+            } else if (propSlides?.length) {
+              setSlides(propSlides);
+            } else {
+              setSlides(DEFAULT_DATA.slides);
+            }
+
+            setAnnouncements(a.length > 0 ? a : DEFAULT_DATA.announcements);
             setIsLoading(false);
             return;
           }
         }
 
-        if (propSlides && propSlides.length > 0) {
-          setSlides(propSlides);
-        } else {
-          setSlides(DEFAULT_SLIDES);
-        }
+        setSlides(propSlides?.length ? propSlides : DEFAULT_DATA.slides);
+        setAnnouncements(DEFAULT_DATA.announcements);
       } catch (error) {
-        console.error('Error fetching banners:', error);
-
-        if (propSlides && propSlides.length > 0) {
-          setSlides(propSlides);
-        } else {
-          setSlides(DEFAULT_SLIDES);
-        }
+        console.error('Error fetching banner data:', error);
+        setSlides(propSlides?.length ? propSlides : DEFAULT_DATA.slides);
+        setAnnouncements(DEFAULT_DATA.announcements);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchBanners();
+    fetchData();
   }, [propSlides]);
 
+  // ============================================================
+  // BANNER NAVIGATION
+  // ============================================================
   const total = slides.length;
   const slide = slides[index] || slides[0];
 
   const goTo = useCallback(
     (next) => {
       if (total <= 1) return;
-
-      setDirection(
-        next > index || (index === total - 1 && next === 0) ? 1 : -1
-      );
-
       setIndex(((next % total) + total) % total);
     },
-    [index, total]
+    [total]
   );
 
   const goNext = useCallback(() => goTo(index + 1), [goTo, index]);
@@ -572,21 +490,24 @@ export default function HeroBannerCarousel({ slides: propSlides }) {
 
   // Autoplay
   useEffect(() => {
-    if (isPaused || total <= 1 || isLoading) {
-      return undefined;
-    }
-
+    if (isPaused || total <= 1 || isLoading) return undefined;
     timerRef.current = setInterval(goNext, AUTOPLAY_MS);
-
     return () => clearInterval(timerRef.current);
   }, [goNext, isPaused, total, isLoading]);
 
-  // Loading state
+  // ============================================================
+  // LOADING
+  // ============================================================
   if (isLoading) {
     return (
-      <section className="relative w-full h-[70vh] md:h-[85vh] lg:h-[90vh] overflow-hidden bg-gray-200 animate-pulse">
+      <section className="relative w-full overflow-hidden bg-gray-200">
+        {/* Mobile — natural aspect ratio */}
+        <div className="aspect-[1902/630] w-full sm:hidden" />
+        {/* Desktop — fixed heights */}
+        <div className="hidden h-[55vh] w-full sm:block md:h-[65vh] lg:h-[70vh]" />
+
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-gray-400 text-sm">Loading banners...</div>
+          <div className="text-sm text-gray-400">Loading...</div>
         </div>
       </section>
     );
@@ -594,320 +515,245 @@ export default function HeroBannerCarousel({ slides: propSlides }) {
 
   if (!slide) return null;
 
- const bgVariants = {
-  enter: {
-    opacity: 0,
-    scale: 1.02,
-  },
-  center: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      opacity: {
-        duration: 0.9,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      scale: {
-        duration: 1.2,
-        ease: [0.4, 0, 0.2, 1],
-      },
-    },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.99,
-    transition: {
-      opacity: {
-        duration: 0.9,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      scale: {
-        duration: 0.9,
-        ease: [0.4, 0, 0.2, 1],
-      },
-    },
-  },
-};
-
-  // Content variants - smooth fade with slight movement
-  const contentVariants = {
-    enter: (direction) => ({
-      opacity: 0,
-      y: 20,
-    }),
+  // ============================================================
+  // VARIANTS
+  // ============================================================
+  const bgVariants = {
+    enter: { opacity: 0, scale: 1.03 },
     center: {
       opacity: 1,
-      y: 0,
+      scale: 1,
       transition: {
-        duration: 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        opacity: { duration: 0.8, ease: [0.4, 0, 0.2, 1] },
+        scale: { duration: 5.5, ease: [0.4, 0, 0.2, 1] }
       }
     },
-    exit: (direction) => ({
+    exit: {
       opacity: 0,
-      y: -20,
+      scale: 0.99,
       transition: {
-        duration: 0.4,
-        ease: [0.4, 0, 0.2, 1],
+        opacity: { duration: 0.8, ease: [0.4, 0, 0.2, 1] }
       }
-    })
+    }
   };
 
   return (
     <>
-    <section
-      className="relative w-full aspect-[16/9] sm:h-[70vh] md:h-[85vh] lg:h-[90vh] overflow-hidden"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
-      {/* Background Image - Always present, smooth crossfade */}
-      <div className="absolute inset-0">
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={`bg-${index}`}
-            variants={bgVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            className="absolute inset-0"
-          >
-            {/* Background Image - Full cover on all devices */}
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: `url('${slide.bgImage || '/images/hh.PNG'}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
+      {/* ============================================================
+          HERO BANNER
+          Mobile  → aspect-ratio based (full image visible, no crop)
+          Desktop → fixed viewport heights (as before)
+      ============================================================ */}
+      <section
+        className="
+          relative w-full overflow-hidden
+          aspect-[1902/630]
+          sm:aspect-auto sm:h-[55vh]
+          md:h-[65vh]
+          lg:h-[70vh]
+        "
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Background Image — crossfade */}
+        <div className="absolute inset-0">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={`bg-${index}`}
+              variants={bgVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              className="absolute inset-0"
             >
-              {/* Gradient overlay - More opacity on mobile for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5 sm:from-black/60 sm:via-black/20 sm:to-black/5" />
-            </div>
-
-            {/* Decorative botanical elements - Hidden on mobile, visible on larger screens */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-10 left-[8%] opacity-10 animate-float hidden sm:block">
-                <FaLeaf className="w-8 h-8 sm:w-10 sm:h-10 text-white/30" />
-              </div>
-              <div className="absolute bottom-20 right-[10%] opacity-8 animate-float-delayed hidden md:block">
-                <FaLeaf className="w-10 h-10 sm:w-12 sm:h-12 text-white/20 rotate-45" />
-              </div>
-              <div className="absolute top-1/3 right-[5%] opacity-8 animate-float-slow hidden lg:block">
-                <FaLeaf className="w-6 h-6 sm:w-8 sm:h-8 text-white/20 -rotate-12" />
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Content Container - Smooth fade with stagger */}
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 h-full relative z-10">
-        <div className="flex flex-col justify-end h-full pb-3 sm:pb-6 md:pb-8 lg:pb-10 max-w-2xl">
-          
-          {/* Tag/Badge - Smaller on mobile */}
-          {slide.tagline && (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`tagline-${index}`}
-                variants={contentVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.5, delay: 0.05 }}
-                className="inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/10 backdrop-blur-sm border border-[#8B9D83]/30 mb-1 sm:mb-2 w-fit"
-              >
-                <span className="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-[#8B9D83]" />
-                <span
-                  className="text-[7px] sm:text-[10px] md:text-[11px] font-medium tracking-[0.1em] sm:tracking-[0.2em] uppercase text-white/80"
-                  style={{
-                    fontFamily: FONT_FAMILY,
-                    letterSpacing: '0.1em',
-                  }}
-                >
-                  {slide.tagline}
-                </span>
-              </motion.div>
-            </AnimatePresence>
-          )}
-
-          {/* Main Heading - Smaller on mobile */}
-          {slide.title && (
-            <AnimatePresence mode="wait">
-              <motion.h1
-                key={`title-${index}`}
-                variants={contentVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-base sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.1] tracking-wide text-white mb-0.5 sm:mb-1.5"
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 style={{
-                  fontFamily: FONT_FAMILY,
-                  letterSpacing: '0.02em',
+                  backgroundImage: `url('${slide.bgImage || '/images/hh.PNG'}')`
                 }}
               >
-                {slide.title}
-                {slide.highlightedText && (
-                  <>
-                    <br />
-                    <span className="text-[#8B9D83] font-medium">
-                      {slide.highlightedText}
-                    </span>
-                  </>
-                )}
-              </motion.h1>
-            </AnimatePresence>
-          )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-          {/* Description - Smaller on mobile */}
-          {slide.description && (
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={`desc-${index}`}
-                variants={contentVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.5, delay: 0.15 }}
-                className="text-[9px] sm:text-sm md:text-base text-white/70 max-w-lg leading-relaxed mb-1.5 sm:mb-4 line-clamp-1 sm:line-clamp-3"
+        {/* ============================================================
+            LEFT ARROW — center-left of banner
+        ============================================================ */}
+        {total > 1 && (
+    <button
+  onClick={goPrev}
+  aria-label="Previous slide"
+  className="absolute left-2 top-1/2 z-30 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-sm transition-all hover:scale-105 hover:border-white/60 hover:bg-black/50 sm:left-5 sm:h-10 sm:w-10 md:left-8 md:h-11 md:w-11"
+>
+  <FaChevronLeft className="h-2 w-2 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+</button>
+        )}
+
+        {/* ============================================================
+            RIGHT ARROW — center-right of banner
+        ============================================================ */}
+        {total > 1 && (
+        <button
+  onClick={goNext}
+  aria-label="Next slide"
+  className="absolute right-2 top-1/2 z-30 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-sm transition-all hover:scale-105 hover:border-white/60 hover:bg-black/50 sm:right-5 sm:h-10 sm:w-10 md:right-8 md:h-11 md:w-11"
+>
+  <FaChevronRight className="h-2 w-2 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+</button>
+        )}
+
+        {/* ============================================================
+            CTA BUTTON — centered at bottom
+        ============================================================ */}
+       {/* ============================================================
+    CTA BUTTON — centered at bottom
+    Very small on mobile, original size on sm+
+============================================================ */}
+{slide.ctaLabel && slide.ctaLabel.trim() !== '' && (
+  <div className="absolute bottom-2 left-1/2 z-20 -translate-x-1/2 sm:bottom-8 md:bottom-10">
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={`cta-${index}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        <Link
+          href={slide.ctaHref || '/products'}
+          className="
+            group inline-flex items-center gap-1 rounded-sm font-semibold uppercase text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg
+            px-2.5 py-1 text-[8px] tracking-[0.06em]
+            sm:gap-2 sm:px-6 sm:py-3 sm:text-xs sm:tracking-[0.1em] sm:shadow-lg sm:hover:shadow-xl
+            md:px-7 md:py-3.5 md:text-sm
+          "
+          style={{
+            backgroundColor: ACCENT_RED,
+            fontFamily: FONT_FAMILY
+          }}
+        >
+          {slide.ctaLabel}
+          <FaArrowRight className="h-1.5 w-1.5 transition-transform group-hover:translate-x-1 sm:h-3 sm:w-3" />
+        </Link>
+      </motion.div>
+    </AnimatePresence>
+  </div>
+)}
+
+        {/* ============================================================
+            DOT INDICATORS — bottom center
+        ============================================================ */}
+        {total > 1 && (
+          <div className="absolute bottom-2 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-3 sm:gap-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                className={`rounded-full transition-all duration-300 ${
+                  i === index
+                    ? 'h-1 w-6 sm:h-1.5 sm:w-8'
+                    : 'h-1 w-1 bg-white/40 hover:bg-white/70 sm:h-1.5 sm:w-1.5'
+                }`}
                 style={{
-                  fontFamily: FONT_FAMILY,
-                  fontWeight: 300,
-                  letterSpacing: '0.02em',
+                  backgroundColor: i === index ? ACCENT_RED : undefined
                 }}
-              >
-                {slide.description}
-              </motion.p>
-            </AnimatePresence>
-          )}
+              />
+            ))}
+          </div>
+        )}
+      </section>
 
-          {/* CTA Button - Smaller on mobile */}
-          {slide.ctaLabel && (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`cta-${index}`}
-                variants={contentVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <Link
-                  href={slide.ctaHref || '/collection'}
-                  className="group inline-flex items-center gap-1 px-3 py-1 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-[#8B9D83] text-white text-[8px] sm:text-xs md:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-                  style={{
-                    fontFamily: FONT_FAMILY,
-                    letterSpacing: '0.06em',
-                  }}
-                >
-                  {slide.ctaLabel}
-                  <FaArrowRight className="w-2 h-2 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </motion.div>
-            </AnimatePresence>
-          )}
+      {/* ============================================================
+          ANNOUNCEMENT MARQUEE
+      ============================================================ */}
+      {announcements.length > 0 && (
+        <AnnouncementMarquee
+          announcements={announcements}
+          backgroundColor={ACCENT_RED}
+        />
+      )}
+    </>
+  );
+}
+function AnnouncementMarquee({ announcements, backgroundColor }) {
+  const parts = announcements.map((a) => a.text);
 
-          {/* Trust Indicators - Smaller on mobile */}
-          {slide.trustIndicators && slide.trustIndicators.length > 0 && (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`trust-${index}`}
-                variants={contentVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.5, delay: 0.25 }}
-                className="flex items-center gap-1.5 sm:gap-4 mt-1.5 sm:mt-5 pt-1.5 sm:pt-4 border-t border-white/10 flex-wrap"
-              >
-                {slide.trustIndicators.map((indicator, i) => (
-                  <Fragment key={i}>
-                    <span
-                      className="text-[6px] sm:text-[10px] md:text-xs text-white/50 font-medium tracking-[0.05em] sm:tracking-[0.15em] uppercase whitespace-nowrap"
-                      style={{
-                        fontFamily: FONT_FAMILY,
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {indicator}
-                    </span>
-                    {i < slide.trustIndicators.length - 1 && (
-                      <span className="w-px h-1.5 sm:h-3 bg-white/15" />
-                    )}
-                  </Fragment>
-                ))}
-              </motion.div>
-            </AnimatePresence>
-          )}
+  return (
+    <div
+      className="relative w-full overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <div className="flex h-5 items-center sm:h-9">
+        {/* Marquee track (full width — no icon strip) */}
+        <div className="relative flex-1 overflow-hidden">
+          <div className="marquee-track flex whitespace-nowrap">
+            {/* Copy 1 */}
+            <div className="flex flex-shrink-0">
+              {parts.map((text, i) => (
+                <React.Fragment key={`a-${i}`}>
+                  <span
+                    className="text-[9px] font-medium text-white sm:text-xs"
+                    style={{ fontFamily: FONT_FAMILY }}
+                  >
+                    {text}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="mx-3 text-[9px] text-white/60 sm:mx-8 sm:text-xs"
+                  >
+                    •
+                  </span>
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Copy 2 — duplicate for seamless loop */}
+            <div className="flex flex-shrink-0" aria-hidden="true">
+              {parts.map((text, i) => (
+                <React.Fragment key={`b-${i}`}>
+                  <span
+                    className="text-[9px] font-medium text-white sm:text-xs"
+                    style={{ fontFamily: FONT_FAMILY }}
+                  >
+                    {text}
+                  </span>
+                  <span className="mx-3 text-[9px] text-white/60 sm:mx-8 sm:text-xs">
+                    •
+                  </span>
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Navigation Arrows - Bottom Right Corner */}
-      {total > 1 && (
-        <div className="absolute bottom-3 sm:bottom-4 md:bottom-5 lg:bottom-6 right-3 sm:right-4 md:right-5 lg:right-6 z-30 flex items-center gap-1.5 sm:gap-2">
-          <button
-            onClick={goPrev}
-            aria-label="Previous slide"
-            className="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/25 transition-all border border-white/20 hover:border-white/40 hover:scale-105"
-          >
-            <FaChevronLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-4.5 lg:h-4.5" />
-          </button>
-          <button
-            onClick={goNext}
-            aria-label="Next slide"
-            className="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/25 transition-all border border-white/20 hover:border-white/40 hover:scale-105"
-          >
-            <FaChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-4.5 lg:h-4.5" />
-          </button>
-        </div>
-      )}
-
-      {/* Dot Indicators - Bottom Center */}
-      {total > 1 && (
-        <div className="absolute bottom-1.5 sm:bottom-2 md:bottom-3 lg:bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 sm:gap-1.5 md:gap-2">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className={`
-                rounded-full transition-all duration-300
-                ${i === index
-                  ? 'w-3 sm:w-5 md:w-6 lg:w-7 h-0.5 sm:h-1.5 md:h-2 bg-[#8B9D83]'
-                  : 'w-0.5 sm:w-1.5 md:w-2 h-0.5 sm:h-1.5 md:h-2 bg-white/30 hover:bg-white/50'
-                }
-              `}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Animations */}
+      {/* Marquee animation */}
       <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-10px) rotate(3deg); }
+        .marquee-track {
+          animation: marquee-scroll 20s linear infinite;
+          will-change: transform;
         }
-        @keyframes float-delayed {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-8px) rotate(-2deg); }
+        .marquee-track:hover {
+          animation-play-state: paused;
         }
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-12px); }
+        @keyframes marquee-scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animate-float-delayed {
-          animation: float-delayed 7s ease-in-out infinite;
-        }
-        .animate-float-slow {
-          animation: float-slow 8s ease-in-out infinite;
+        /* Mobile — faster scroll */
+        @media (max-width: 640px) {
+          .marquee-track {
+            animation-duration: 10s;
+          }
         }
       `}</style>
-    </section>
-
-    <FeatureBadges />
-    </>
+    </div>
   );
 }
