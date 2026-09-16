@@ -112,6 +112,7 @@ import ProductGridSection from './ProductGridSection.js';
 import DealsSection from './DealsSection.js';
 import TrustResultsSection from './TrustResultsSection.js';
 import AchievementSection from './AchievementSection.js';
+import VideoSection from './VideoSection.js';
 
 export default function HomePage() {
   const [sections, setSections] = useState([]);
@@ -164,6 +165,9 @@ export default function HomePage() {
 
         case 'achievements':
   return section.isActive !== false && <AchievementSection key={section.id} />;
+
+  case 'videos':
+  return section.isActive !== false && <VideoSection key={section.id} />;
 
       case 'custom':
         return section.isActive !== false && (

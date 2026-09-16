@@ -63,7 +63,8 @@ import {
   Images,
   MessageCircle,
   Mail,
-  GiftIcon
+  GiftIcon,
+  Video
 } from 'lucide-react';
 import DynamicLogo from '../components/DynamicLogo';
 import { FaChartLine } from 'react-icons/fa';
@@ -201,6 +202,9 @@ export default function AuthorizeLayout({ children }) {
     }
     if (href === '/authorize/achievement-management') {
   return currentPath === '/authorize/achievement-management';
+}
+if (href === '/authorize/video-management') {
+  return currentPath === '/authorize/video-management';
 }
     
     if (href === '/authorize/trust-results-management') {
@@ -438,6 +442,20 @@ export default function AuthorizeLayout({ children }) {
           accessKey: 'create_category'
         },
         { 
+          name: 'All Barcodes',
+           href: '/authorize/barcodes', 
+           icon: QrCode,
+           accessKey: 'all-barcodes'
+           
+           },
+    { 
+      name: ' Barcodes Scan',
+       href: '/authorize/barcode-scanner', 
+       icon: ScanBarcode,
+accessKey: 'barcode-scanner'
+      },
+
+        { 
           name: 'Manage Brands', 
           href: '/authorize/brand-management', 
           icon: Tag,
@@ -478,11 +496,18 @@ export default function AuthorizeLayout({ children }) {
           accessKey: 'deal_management'
         },
         {
+  name: 'Video Management',
+  href: '/authorize/video-management',
+  icon: Video,  // import Video from 'lucide-react'
+  accessKey: 'video_management'
+},
+        {
   name: 'Achievement Management',
   href: '/authorize/achievement-management',
   icon: Award,  // import Award from 'lucide-react'
   accessKey: 'achievement_management'
 },
+
         {
           name: 'Trust Results',
           href: '/authorize/trust-results-management',
