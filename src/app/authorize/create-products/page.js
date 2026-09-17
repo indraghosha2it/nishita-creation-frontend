@@ -1,4 +1,5 @@
 
+
 // 'use client';
 
 // import { useState, useEffect, useRef, useCallback } from 'react';
@@ -485,6 +486,208 @@
 // };
 
 // // ============================================================
+// // ADD-ONES SECTION COMPONENT (Formerly Related Products)
+// // ============================================================
+// const AddOnesSection = ({ 
+//   addOnes, 
+//   onAddProduct, 
+//   onRemoveProduct,
+//   maxProducts = 5 
+// }) => {
+//   const [searchTerm, setSearchTerm] = useState('');
+//   const [searchResults, setSearchResults] = useState([]);
+//   const [isSearching, setIsSearching] = useState(false);
+//   const [showResults, setShowResults] = useState(false);
+//   const searchTimeoutRef = useRef(null);
+
+//   const searchProducts = async (query) => {
+//     if (!query.trim() || query.length < 2) {
+//       setSearchResults([]);
+//       setShowResults(false);
+//       return;
+//     }
+
+//     setIsSearching(true);
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(
+//         `${API_URL}/api/products?search=${encodeURIComponent(query)}&limit=10`,
+//         { headers: { 'Authorization': `Bearer ${token}` } }
+//       );
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         const filtered = data.data.filter(
+//           product => !addOnes.some(rp => rp._id === product._id)
+//         );
+//         setSearchResults(filtered);
+//         setShowResults(true);
+//       }
+//     } catch (error) {
+//       console.error('Search error:', error);
+//       toast.error('Failed to search products');
+//     } finally {
+//       setIsSearching(false);
+//     }
+//   };
+
+//   const handleSearchChange = (e) => {
+//     const value = e.target.value;
+//     setSearchTerm(value);
+    
+//     if (searchTimeoutRef.current) {
+//       clearTimeout(searchTimeoutRef.current);
+//     }
+    
+//     searchTimeoutRef.current = setTimeout(() => {
+//       searchProducts(value);
+//     }, 500);
+//   };
+
+//   const handleAddProduct = (product) => {
+//     if (addOnes.length >= maxProducts) {
+//       toast.error(`Maximum ${maxProducts} add-ones allowed`);
+//       return;
+//     }
+//     onAddProduct(product);
+//     setSearchTerm('');
+//     setSearchResults([]);
+//     setShowResults(false);
+//     toast.success(`"${product.productName}" added as add-on`);
+//   };
+
+//   const handleRemoveProduct = (productId) => {
+//     onRemoveProduct(productId);
+//     toast.success('Add-on removed');
+//   };
+
+//   return (
+//     <div className="bg-white rounded-xl shadow-sm border border-[#708268]/20">
+//       <div className="p-5 border-b border-[#708268]/20">
+//         <h2 className="text-lg font-semibold text-[#004767] flex items-center gap-2">
+//           <LinkIcon className="w-5 h-5 text-[#708268]" />
+//           Add-Ones <span className="text-gray-400 text-xs">(Optional, Max {maxProducts})</span>
+//         </h2>
+//         <p className="text-xs text-gray-500 mt-1">Search and add products that can be purchased as add-ons with this product</p>
+//       </div>
+//       <div className="p-5">
+//         {/* Search Input */}
+//         <div className="relative mb-4">
+//           <div className="relative">
+//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+//             <input
+//               type="text"
+//               value={searchTerm}
+//               onChange={handleSearchChange}
+//               placeholder="Search products by name, SKU, or brand..."
+//               className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//               disabled={addOnes.length >= maxProducts}
+//             />
+//             {isSearching && (
+//               <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#708268] animate-spin" />
+//             )}
+//           </div>
+          
+//           {/* Search Results Dropdown */}
+//           {showResults && searchResults.length > 0 && (
+//             <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+//               {searchResults.map(product => (
+//                 <div
+//                   key={product._id}
+//                   onClick={() => handleAddProduct(product)}
+//                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-pink-50 transition-colors text-left border-b border-gray-100 last:border-0 cursor-pointer"
+//                 >
+//                   {product.images && product.images.length > 0 ? (
+//                     <img 
+//                       src={product.images[0].url} 
+//                       alt={product.productName}
+//                       className="w-10 h-10 rounded-lg object-cover border border-gray-200"
+//                     />
+//                   ) : (
+//                     <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+//                       <Package className="w-5 h-5 text-gray-400" />
+//                     </div>
+//                   )}
+//                   <div className="flex-1 min-w-0">
+//                     <p className="text-sm font-medium text-gray-900 truncate">{product.productName}</p>
+//                     <div className="flex items-center gap-3 text-xs text-gray-500">
+//                       <span>৳{product.regularPrice}</span>
+//                       {product.brand && <span>• {product.brand}</span>}
+//                       {product.skuCode && <span>• {product.skuCode}</span>}
+//                     </div>
+//                   </div>
+//                   <div className="p-1 text-[#708268] hover:bg-pink-100 rounded">
+//                     <Plus className="w-4 h-4" />
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+          
+//           {showResults && searchResults.length === 0 && searchTerm.length >= 2 && (
+//             <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-4 text-center">
+//               <p className="text-sm text-gray-500">No products found matching "{searchTerm}"</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Add-Ones List */}
+//         {addOnes.length > 0 ? (
+//           <div className="space-y-2">
+//             {addOnes.map((product, index) => (
+//               <div 
+//                 key={product._id || index}
+//                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#708268]/40 transition-colors"
+//               >
+//                 {product.images && product.images.length > 0 ? (
+//                   <img 
+//                     src={product.images[0].url} 
+//                     alt={product.productName}
+//                     className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+//                   />
+//                 ) : (
+//                   <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
+//                     <Package className="w-6 h-6 text-gray-400" />
+//                   </div>
+//                 )}
+//                 <div className="flex-1 min-w-0">
+//                   <p className="text-sm font-medium text-gray-900 truncate">{product.productName}</p>
+//                   <div className="flex items-center gap-3 text-xs text-gray-500">
+//                     <span>৳{product.regularPrice}</span>
+//                     {product.brand && <span>• {product.brand}</span>}
+//                     {product.skuCode && <span>• {product.skuCode}</span>}
+//                     <span className="text-gray-400">• Added as add-on</span>
+//                   </div>
+//                 </div>
+//                 <button
+//                   type="button"
+//                   onClick={() => handleRemoveProduct(product._id)}
+//                   className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+//                 >
+//                   <X className="w-4 h-4" />
+//                 </button>
+//               </div>
+//             ))}
+//           </div>
+//         ) : (
+//           <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+//             <LinkIcon className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+//             <p className="text-sm text-gray-500">No add-ones added yet</p>
+//             <p className="text-xs text-gray-400 mt-1">Search and add up to {maxProducts} add-on products</p>
+//           </div>
+//         )}
+        
+//         {addOnes.length > 0 && (
+//           <p className="text-xs text-gray-400 mt-3 text-center">
+//             {addOnes.length} of {maxProducts} add-ones added
+//           </p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// // ============================================================
 // // VARIANT COLOR PICKER COMPONENT
 // // ============================================================
 // const VariantColorPicker = ({ color, onChange, onRemove }) => {
@@ -557,257 +760,6 @@
 //           </div>
 //         </div>
 //       )}
-//     </div>
-//   );
-// };
-
-// // ============================================================
-// // RENDER SUB VARIANT FORM FOR NEW VARIANT (In the Add Variant form)
-// // ============================================================
-// const renderSubVariantFormInAddVariant = () => {
-//   return (
-//     <div className="border border-[#708268]/40 rounded-lg p-4 bg-[#708268]/5 mt-3">
-//       <div className="flex items-center justify-between mb-3">
-//         <h4 className="text-sm font-medium text-[#004767]">Add Sub Variant</h4>
-//         <button
-//           type="button"
-//           onClick={() => setShowAddSubVariantInForm(false)}
-//           className="text-gray-400 hover:text-gray-600"
-//         >
-//           <X className="w-4 h-4" />
-//         </button>
-//       </div>
-      
-//       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Sub Variant Name *</label>
-//           <input
-//             type="text"
-//             value={newSubVariant.name}
-//             onChange={(e) => setNewSubVariant(prev => ({ ...prev, name: e.target.value }))}
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//             placeholder="e.g., Red, Large, Cotton"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Color <span className="text-gray-400">(Optional)</span></label>
-//           <VariantColorPicker
-//             color={newSubVariant.color || '#000000'}
-//             onChange={(color) => setNewSubVariant(prev => ({ ...prev, color }))}
-//             onRemove={() => {}}
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Regular Price (৳) *</label>
-//           <input
-//             type="number"
-//             value={newSubVariant.regularPrice}
-//             onChange={(e) => setNewSubVariant(prev => ({ ...prev, regularPrice: e.target.value }))}
-//             onWheel={(e) => e.target.blur()}
-//             min="0"
-//             step="1"
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//             placeholder="0"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Discount Price (৳) <span className="text-gray-400">(Optional)</span></label>
-//           <input
-//             type="number"
-//             value={newSubVariant.discountPrice}
-//             onChange={(e) => setNewSubVariant(prev => ({ ...prev, discountPrice: e.target.value }))}
-//             onWheel={(e) => e.target.blur()}
-//             min="0"
-//             step="1"
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//             placeholder="0"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Stock Quantity *</label>
-//           <input
-//             type="number"
-//             value={newSubVariant.stockQuantity}
-//             onChange={(e) => setNewSubVariant(prev => ({ ...prev, stockQuantity: e.target.value }))}
-//             onWheel={(e) => e.target.blur()}
-//             min="0"
-//             step="1"
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//             placeholder="0"
-//           />
-//         </div>
-
-//         {isAdminOrSuperAdmin && (
-//           <div>
-//             <label className="block text-xs font-medium text-gray-700 mb-1">Buying Price (৳) <span className="text-amber-600 text-xs">(Admin Only)</span></label>
-//             <input
-//               type="number"
-//               value={newSubVariant.buyingPrice}
-//               onChange={(e) => setNewSubVariant(prev => ({ ...prev, buyingPrice: e.target.value }))}
-//               onWheel={(e) => e.target.blur()}
-//               min="0"
-//               step="1"
-//               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//               placeholder="0"
-//             />
-//           </div>
-//         )}
-
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Packaging Cost (৳) <span className="text-gray-400">(Optional)</span></label>
-//           <input
-//             type="number"
-//             value={newSubVariant.packagingCost}
-//             onChange={(e) => setNewSubVariant(prev => ({ ...prev, packagingCost: e.target.value }))}
-//             onWheel={(e) => e.target.blur()}
-//             min="0"
-//             step="1"
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//             placeholder={defaultPackagingCost || '0'}
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Cost (৳) <span className="text-gray-400">(Optional)</span></label>
-//           <input
-//             type="number"
-//             value={newSubVariant.deliveryCost}
-//             onChange={(e) => setNewSubVariant(prev => ({ ...prev, deliveryCost: e.target.value }))}
-//             onWheel={(e) => e.target.blur()}
-//             min="0"
-//             step="1"
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//             placeholder={defaultDeliveryCost || '0'}
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Cost Per Item (Auto-calculated)</label>
-//           <input
-//             type="text"
-//             value={calculateVariantCost(
-//               newSubVariant.buyingPrice,
-//               newSubVariant.packagingCost,
-//               newSubVariant.deliveryCost
-//             )}
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed text-gray-700"
-//             readOnly
-//             disabled
-//           />
-//         </div>
-
-//         {/* Sub Variant Images */}
-//         <div className="md:col-span-2">
-//           <div className="flex items-center justify-between mb-2">
-//             <label className="block text-xs font-medium text-gray-700">Sub Variant Images <span className="text-gray-400">(Max 4, Optional)</span></label>
-//             {getFilledCount(newSubVariant.images) < 4 && (
-//               <button
-//                 type="button"
-//                 onClick={() => subVariantFileInputRef.current?.click()}
-//                 disabled={isSubVariantUploading}
-//                 className="text-xs text-[#708268] hover:text-[#52634a] font-medium flex items-center gap-1 disabled:opacity-50"
-//               >
-//                 {isSubVariantUploading ? (
-//                   <Loader2 className="w-3 h-3 animate-spin" />
-//                 ) : (
-//                   <Upload className="w-3 h-3" />
-//                 )}
-//                 {isSubVariantUploading ? 'Uploading...' : 'Select Images'}
-//               </button>
-//             )}
-//           </div>
-          
-//           <div className="grid grid-cols-4 gap-2">
-//             {[0, 1, 2, 3].map((slotIdx) => {
-//               const imageUrl = newSubVariant.imagePreviews && newSubVariant.imagePreviews[slotIdx];
-              
-//               return (
-//                 <div
-//                   key={slotIdx}
-//                   className={`border-2 border-dashed rounded-lg p-2 text-center h-28 flex flex-col items-center justify-center transition-colors ${
-//                     imageUrl 
-//                       ? 'border-gray-200 bg-gray-100' 
-//                       : 'border-gray-300 bg-gray-50 hover:border-[#708268] hover:bg-[#708268]/5'
-//                   }`}
-//                 >
-//                   {imageUrl ? (
-//                     <div className="relative w-full h-full">
-//                       <img 
-//                         src={imageUrl} 
-//                         alt={`Sub variant ${slotIdx + 1}`} 
-//                         className="w-full h-full object-contain pointer-events-none select-none"
-//                         draggable="false"
-//                       />
-//                       <button
-//                         type="button"
-//                         onClick={() => removeSubVariantImageFromForm(slotIdx)}
-//                         className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//                       >
-//                         <X className="w-3 h-3" />
-//                       </button>
-//                       <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-[10px] rounded">
-//                         {slotIdx + 1}
-//                       </span>
-//                     </div>
-//                   ) : (
-//                     <>
-//                       <ImageIcon className="w-6 h-6 text-gray-400" />
-//                       <p className="text-[10px] text-gray-400 mt-1">Empty</p>
-//                     </>
-//                   )}
-//                 </div>
-//               );
-//             })}
-//           </div>
-//           <input
-//             ref={subVariantFileInputRef}
-//             type="file"
-//             accept="image/jpeg,image/jpg,image/png,image/webp"
-//             multiple
-//             className="hidden"
-//             onChange={handleSubVariantImageSelectForForm}
-//             disabled={isSubVariantUploading}
-//           />
-//           <p className="text-xs text-gray-400 mt-1">Select multiple images at once (up to 4 total)</p>
-//         </div>
-//       </div>
-
-//       <div className="flex items-center gap-3 mt-4">
-//         <button
-//           type="button"
-//           onClick={addSubVariantToForm}
-//           className="px-4 py-2 text-sm font-medium text-white bg-[#708268] rounded-lg hover:bg-[#52634a] transition-colors"
-//         >
-//           <Plus className="w-4 h-4 inline mr-1" />
-//           Add Sub Variant
-//         </button>
-//         <button
-//           type="button"
-//           onClick={() => {
-//             setShowAddSubVariantInForm(false);
-//             setNewSubVariant({
-//               name: '',
-//               color: '',
-//               regularPrice: '',
-//               discountPrice: '',
-//               stockQuantity: '',
-//               buyingPrice: '',
-//               packagingCost: defaultPackagingCost || '',
-//               deliveryCost: defaultDeliveryCost || '',
-//               costPerItem: 0,
-//               images: [null, null, null, null],
-//               imagePreviews: [null, null, null, null]
-//             });
-//           }}
-//           className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-//         >
-//           Cancel
-//         </button>
-//       </div>
 //     </div>
 //   );
 // };
@@ -1270,6 +1222,9 @@
 //   );
 // };
 
+// // ============================================================
+// // VARIANT TYPE SECTION COMPONENT
+// // ============================================================
 // const VariantTypeSection = ({ 
 //   variantType, 
 //   onVariantTypeChange, 
@@ -1335,16 +1290,66 @@
 //     return (images || []).filter(Boolean).length;
 //   };
 
-//  // Update addSubVariantToForm function
-// const addSubVariantToForm = () => {
+//   // Update addSubVariantToForm function
+//   // const addSubVariantToForm = () => {
+//   //   if (!newSubVariant.name.trim()) {
+//   //     toast.error('Please enter a sub variant name');
+//   //     return;
+//   //   }
+
+//   //   const subVariantToAdd = {
+//   //     // id: Date.now().toString(),
+//   //     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+//   //     ...newSubVariant,
+//   //     costPerItem: calculateVariantCost(
+//   //       newSubVariant.buyingPrice,
+//   //       newSubVariant.packagingCost,
+//   //       newSubVariant.deliveryCost
+//   //     ),
+//   //     images: [...newSubVariant.images],
+//   //     imagePreviews: [...newSubVariant.imagePreviews]
+//   //   };
+
+//   //   setNewVariantSubVariants([...newVariantSubVariants, subVariantToAdd]);
+
+//   //   // Auto-expand the newly added sub-variant
+//   //   setExpandedSubVariant(newVariantSubVariants.length);
+
+//   //   // Reset form
+//   //   setNewSubVariant({
+//   //     name: '',
+//   //     color: '',
+//   //     regularPrice: '',
+//   //     discountPrice: '',
+//   //     stockQuantity: '',
+//   //     buyingPrice: '',
+//   //     packagingCost: defaultPackagingCost || '',
+//   //     deliveryCost: defaultDeliveryCost || '',
+//   //     costPerItem: 0,
+//   //     images: [null, null, null, null],
+//   //     imagePreviews: [null, null, null, null]
+//   //   });
+//   //   setShowAddSubVariantInForm(false);
+//   //   toast.success('Sub variant added to variant');
+//   // };
+
+//   const addSubVariantToForm = () => {
 //   if (!newSubVariant.name.trim()) {
 //     toast.error('Please enter a sub variant name');
 //     return;
 //   }
 
+//   // ✅ FIX: Explicitly include all fields including color
 //   const subVariantToAdd = {
-//     id: Date.now().toString(),
-//     ...newSubVariant,
+//     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+//     name: newSubVariant.name || '',
+//     color: newSubVariant.color || '', // ✅ Ensure color is included
+//     regularPrice: newSubVariant.regularPrice || '',
+//     discountPrice: newSubVariant.discountPrice || '',
+//     stockQuantity: newSubVariant.stockQuantity || '',
+//     buyingPrice: newSubVariant.buyingPrice || '',
+//     packagingCost: newSubVariant.packagingCost || '',
+//     deliveryCost: newSubVariant.deliveryCost || '',
 //     costPerItem: calculateVariantCost(
 //       newSubVariant.buyingPrice,
 //       newSubVariant.packagingCost,
@@ -1355,14 +1360,12 @@
 //   };
 
 //   setNewVariantSubVariants([...newVariantSubVariants, subVariantToAdd]);
-
-//   // ✅ Auto-expand the newly added sub-variant
 //   setExpandedSubVariant(newVariantSubVariants.length);
 
-//   // Reset form
+//   // Reset form - keep color as empty string
 //   setNewSubVariant({
 //     name: '',
-//     color: '',
+//     color: '', // ✅ Keep as empty string
 //     regularPrice: '',
 //     discountPrice: '',
 //     stockQuantity: '',
@@ -1443,8 +1446,62 @@
 //     }));
 //   };
 
-//  // Update addSubVariant function for existing variants
-// const addSubVariant = (variantIndex) => {
+//   // Update addSubVariant function for existing variants
+//   // const addSubVariant = (variantIndex) => {
+//   //   if (!newSubVariant.name.trim()) {
+//   //     toast.error('Please enter a sub variant name');
+//   //     return;
+//   //   }
+
+//   //   const updatedVariants = [...variants];
+//   //   const variant = { ...updatedVariants[variantIndex] };
+    
+//   //   if (!variant.subVariants) {
+//   //     variant.subVariants = [];
+//   //   }
+
+//   //   const subVariantToAdd = {
+//   //     // id: Date.now().toString(),
+//   //     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+//   //     ...newSubVariant,
+//   //     costPerItem: calculateVariantCost(
+//   //       newSubVariant.buyingPrice,
+//   //       newSubVariant.packagingCost,
+//   //       newSubVariant.deliveryCost
+//   //     ),
+//   //     images: [...newSubVariant.images],
+//   //     imagePreviews: [...newSubVariant.imagePreviews]
+//   //   };
+
+//   //   // Get the index where the new sub-variant will be added
+//   //   const newIndex = variant.subVariants.length;
+    
+//   //   variant.subVariants.push(subVariantToAdd);
+//   //   updatedVariants[variantIndex] = variant;
+//   //   onVariantsChange(updatedVariants);
+
+//   //   // Auto-expand the newly added sub-variant
+//   //   setExpandedSubVariant(newIndex);
+
+//   //   // Reset form
+//   //   setNewSubVariant({
+//   //     name: '',
+//   //     color: '',
+//   //     regularPrice: '',
+//   //     discountPrice: '',
+//   //     stockQuantity: '',
+//   //     buyingPrice: '',
+//   //     packagingCost: defaultPackagingCost || '',
+//   //     deliveryCost: defaultDeliveryCost || '',
+//   //     costPerItem: 0,
+//   //     images: [null, null, null, null],
+//   //     imagePreviews: [null, null, null, null]
+//   //   });
+//   //   setShowAddSubVariant(null);
+//   //   toast.success('Sub variant added successfully');
+//   // };
+
+//   const addSubVariant = (variantIndex) => {
 //   if (!newSubVariant.name.trim()) {
 //     toast.error('Please enter a sub variant name');
 //     return;
@@ -1457,9 +1514,17 @@
 //     variant.subVariants = [];
 //   }
 
+//   // ✅ FIX: Explicitly include all fields including color
 //   const subVariantToAdd = {
-//     id: Date.now().toString(),
-//     ...newSubVariant,
+//     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+//     name: newSubVariant.name || '',
+//     color: newSubVariant.color || '', // ✅ Ensure color is included
+//     regularPrice: newSubVariant.regularPrice || '',
+//     discountPrice: newSubVariant.discountPrice || '',
+//     stockQuantity: newSubVariant.stockQuantity || '',
+//     buyingPrice: newSubVariant.buyingPrice || '',
+//     packagingCost: newSubVariant.packagingCost || '',
+//     deliveryCost: newSubVariant.deliveryCost || '',
 //     costPerItem: calculateVariantCost(
 //       newSubVariant.buyingPrice,
 //       newSubVariant.packagingCost,
@@ -1469,20 +1534,16 @@
 //     imagePreviews: [...newSubVariant.imagePreviews]
 //   };
 
-//   // Get the index where the new sub-variant will be added
 //   const newIndex = variant.subVariants.length;
-  
 //   variant.subVariants.push(subVariantToAdd);
 //   updatedVariants[variantIndex] = variant;
 //   onVariantsChange(updatedVariants);
-
-//   // ✅ Auto-expand the newly added sub-variant
 //   setExpandedSubVariant(newIndex);
 
-//   // Reset form
+//   // Reset form - keep color as empty string
 //   setNewSubVariant({
 //     name: '',
-//     color: '',
+//     color: '', // ✅ Keep as empty string
 //     regularPrice: '',
 //     discountPrice: '',
 //     stockQuantity: '',
@@ -1497,14 +1558,35 @@
 //   toast.success('Sub variant added successfully');
 // };
 
-//   const updateSubVariant = (variantIndex, subVariantIndex, updatedSubVariant) => {
-//     const updatedVariants = [...variants];
-//     const variant = { ...updatedVariants[variantIndex] };
-//     variant.subVariants[subVariantIndex] = updatedSubVariant;
-//     updatedVariants[variantIndex] = variant;
-//     onVariantsChange(updatedVariants);
-//   };
+//   // const updateSubVariant = (variantIndex, subVariantIndex, updatedSubVariant) => {
+//   //   const updatedVariants = [...variants];
+//   //   const variant = { ...updatedVariants[variantIndex] };
+//   //   variant.subVariants[subVariantIndex] = updatedSubVariant;
+//   //   updatedVariants[variantIndex] = variant;
+//   //   onVariantsChange(updatedVariants);
+//   // };
 
+//   const updateSubVariant = (variantIndex, subVariantIndex, updatedSubVariant) => {
+//   const updatedVariants = [...variants];
+//   const variant = { ...updatedVariants[variantIndex] };
+  
+//   // Ensure subVariants array exists
+//   if (!variant.subVariants) {
+//     variant.subVariants = [];
+//   }
+  
+//   // Ensure the index exists
+//   if (subVariantIndex >= variant.subVariants.length) {
+//     // If the index is out of bounds, push the new sub-variant
+//     variant.subVariants.push(updatedSubVariant);
+//   } else {
+//     // Otherwise update the existing one
+//     variant.subVariants[subVariantIndex] = updatedSubVariant;
+//   }
+  
+//   updatedVariants[variantIndex] = variant;
+//   onVariantsChange(updatedVariants);
+// };
 //   const removeSubVariant = (variantIndex, subVariantIndex) => {
 //     if (!confirm('Remove this sub variant?')) return;
     
@@ -1723,7 +1805,8 @@
 //     const paddedPreviews = [0, 1, 2, 3].map(i => newVariantImagePreviews[i] ?? null);
 
 //     const newVariant = {
-//       id: Date.now().toString(),
+//       // id: Date.now().toString(),
+//       id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 //       name: newVariantName.trim(),
 //       color: variantType.type === 'color' ? newVariantColor : undefined,
 //       regularPrice: parseFloat(newVariantPrice) || 0,
@@ -2494,296 +2577,294 @@
 //                     </button>
 //                   </div>
 
-          
+//                   {expandedVariant === index && (
+//                     <div className="p-4 border-t border-gray-200 space-y-3">
+//                       {/* ALWAYS SHOW VARIANT FIELDS - Even when sub-variants exist */}
+//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//                         <div>
+//                           <label className="block text-xs font-medium text-gray-700 mb-1">Variant Name</label>
+//                           <input
+//                             type="text"
+//                             value={variant.name}
+//                             onChange={(e) => updateVariantField(index, 'name', e.target.value)}
+//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//                           />
+//                         </div>
 
-// {expandedVariant === index && (
-//   <div className="p-4 border-t border-gray-200 space-y-3">
-//     {/* ✅ ALWAYS SHOW VARIANT FIELDS - Even when sub-variants exist */}
-//     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-//       <div>
-//         <label className="block text-xs font-medium text-gray-700 mb-1">Variant Name</label>
-//         <input
-//           type="text"
-//           value={variant.name}
-//           onChange={(e) => updateVariantField(index, 'name', e.target.value)}
-//           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//         />
-//       </div>
+//                         {variantType.type === 'color' && (
+//                           <div>
+//                             <label className="block text-xs font-medium text-gray-700 mb-1">Color</label>
+//                             <VariantColorPicker
+//                               color={variant.color || '#000000'}
+//                               onChange={(color) => updateVariantColor(index, color)}
+//                               onRemove={() => {}}
+//                             />
+//                           </div>
+//                         )}
 
-//       {variantType.type === 'color' && (
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Color</label>
-//           <VariantColorPicker
-//             color={variant.color || '#000000'}
-//             onChange={(color) => updateVariantColor(index, color)}
-//             onRemove={() => {}}
-//           />
-//         </div>
-//       )}
+//                         <div>
+//                           <label className="block text-xs font-medium text-gray-700 mb-1">Regular Price (৳) *</label>
+//                           <input
+//                             type="number"
+//                             value={variant.regularPrice || ''}
+//                             onChange={(e) => updateVariantField(index, 'regularPrice', e.target.value)}
+//                             onWheel={(e) => e.target.blur()}
+//                             min="0"
+//                             step="1"
+//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//                             placeholder="0"
+//                           />
+//                         </div>
 
-//       <div>
-//         <label className="block text-xs font-medium text-gray-700 mb-1">Regular Price (৳) *</label>
-//         <input
-//           type="number"
-//           value={variant.regularPrice || ''}
-//           onChange={(e) => updateVariantField(index, 'regularPrice', e.target.value)}
-//           onWheel={(e) => e.target.blur()}
-//           min="0"
-//           step="1"
-//           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//           placeholder="0"
-//         />
-//       </div>
+//                         <div>
+//                           <label className="block text-xs font-medium text-gray-700 mb-1">Discount Price (৳) <span className="text-gray-400">(Optional)</span></label>
+//                           <input
+//                             type="number"
+//                             value={variant.discountPrice || ''}
+//                             onChange={(e) => updateVariantField(index, 'discountPrice', e.target.value)}
+//                             onWheel={(e) => e.target.blur()}
+//                             min="0"
+//                             step="1"
+//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//                             placeholder="0"
+//                           />
+//                         </div>
 
-//       <div>
-//         <label className="block text-xs font-medium text-gray-700 mb-1">Discount Price (৳) <span className="text-gray-400">(Optional)</span></label>
-//         <input
-//           type="number"
-//           value={variant.discountPrice || ''}
-//           onChange={(e) => updateVariantField(index, 'discountPrice', e.target.value)}
-//           onWheel={(e) => e.target.blur()}
-//           min="0"
-//           step="1"
-//           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//           placeholder="0"
-//         />
-//       </div>
+//                         <div>
+//                           <label className="block text-xs font-medium text-gray-700 mb-1">Stock Quantity *</label>
+//                           <input
+//                             type="number"
+//                             value={variant.stockQuantity || ''}
+//                             onChange={(e) => updateVariantField(index, 'stockQuantity', e.target.value)}
+//                             onWheel={(e) => e.target.blur()}
+//                             min="0"
+//                             step="1"
+//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//                             placeholder="0"
+//                           />
+//                         </div>
 
-//       <div>
-//         <label className="block text-xs font-medium text-gray-700 mb-1">Stock Quantity *</label>
-//         <input
-//           type="number"
-//           value={variant.stockQuantity || ''}
-//           onChange={(e) => updateVariantField(index, 'stockQuantity', e.target.value)}
-//           onWheel={(e) => e.target.blur()}
-//           min="0"
-//           step="1"
-//           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//           placeholder="0"
-//         />
-//       </div>
+//                         {isAdminOrSuperAdmin && (
+//                           <div>
+//                             <label className="block text-xs font-medium text-gray-700 mb-1">Buying Price (৳) <span className="text-amber-600 text-xs">(Admin Only)</span></label>
+//                             <input
+//                               type="number"
+//                               value={variant.buyingPrice || ''}
+//                               onChange={(e) => updateVariantField(index, 'buyingPrice', e.target.value)}
+//                               onWheel={(e) => e.target.blur()}
+//                               min="0"
+//                               step="1"
+//                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//                               placeholder="0"
+//                             />
+//                           </div>
+//                         )}
 
-//       {isAdminOrSuperAdmin && (
-//         <div>
-//           <label className="block text-xs font-medium text-gray-700 mb-1">Buying Price (৳) <span className="text-amber-600 text-xs">(Admin Only)</span></label>
-//           <input
-//             type="number"
-//             value={variant.buyingPrice || ''}
-//             onChange={(e) => updateVariantField(index, 'buyingPrice', e.target.value)}
-//             onWheel={(e) => e.target.blur()}
-//             min="0"
-//             step="1"
-//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//             placeholder="0"
-//           />
-//         </div>
-//       )}
+//                         <div>
+//                           <label className="block text-xs font-medium text-gray-700 mb-1">Packaging Cost (৳) <span className="text-gray-400">(Optional)</span></label>
+//                           <input
+//                             type="number"
+//                             value={variant.packagingCost || ''}
+//                             onChange={(e) => updateVariantField(index, 'packagingCost', e.target.value)}
+//                             onWheel={(e) => e.target.blur()}
+//                             min="0"
+//                             step="1"
+//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//                             placeholder="0"
+//                           />
+//                         </div>
 
-//       <div>
-//         <label className="block text-xs font-medium text-gray-700 mb-1">Packaging Cost (৳) <span className="text-gray-400">(Optional)</span></label>
-//         <input
-//           type="number"
-//           value={variant.packagingCost || ''}
-//           onChange={(e) => updateVariantField(index, 'packagingCost', e.target.value)}
-//           onWheel={(e) => e.target.blur()}
-//           min="0"
-//           step="1"
-//           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//           placeholder="0"
-//         />
-//       </div>
+//                         <div>
+//                           <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Cost (৳) <span className="text-gray-400">(Optional)</span></label>
+//                           <input
+//                             type="number"
+//                             value={variant.deliveryCost || ''}
+//                             onChange={(e) => updateVariantField(index, 'deliveryCost', e.target.value)}
+//                             onWheel={(e) => e.target.blur()}
+//                             min="0"
+//                             step="1"
+//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
+//                             placeholder="0"
+//                           />
+//                         </div>
 
-//       <div>
-//         <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Cost (৳) <span className="text-gray-400">(Optional)</span></label>
-//         <input
-//           type="number"
-//           value={variant.deliveryCost || ''}
-//           onChange={(e) => updateVariantField(index, 'deliveryCost', e.target.value)}
-//           onWheel={(e) => e.target.blur()}
-//           min="0"
-//           step="1"
-//           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition"
-//           placeholder="0"
-//         />
-//       </div>
+//                         <div>
+//                           <label className="block text-xs font-medium text-gray-700 mb-1">Cost Per Item (৳) <span className="text-gray-400 text-xs">(Auto-calculated)</span></label>
+//                           <input
+//                             type="text"
+//                             value={variant.costPerItem || 0}
+//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed text-gray-700"
+//                             readOnly
+//                             disabled
+//                           />
+//                         </div>
 
-//       <div>
-//         <label className="block text-xs font-medium text-gray-700 mb-1">Cost Per Item (৳) <span className="text-gray-400 text-xs">(Auto-calculated)</span></label>
-//         <input
-//           type="text"
-//           value={variant.costPerItem || 0}
-//           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed text-gray-700"
-//           readOnly
-//           disabled
-//         />
-//       </div>
+//                         {/* Variant Images */}
+//                         <div className="md:col-span-2">
+//                           <div className="flex items-center justify-between mb-2">
+//                             <label className="block text-xs font-medium text-gray-700">Variant Images <span className="text-gray-400">(Max 4)</span></label>
+//                             {getFilledCount(variant.images) < 4 && (
+//                               <button
+//                                 type="button"
+//                                 onClick={() => {
+//                                   const input = document.createElement('input');
+//                                   input.type = 'file';
+//                                   input.accept = 'image/jpeg,image/jpg,image/png,image/webp';
+//                                   input.multiple = true;
+//                                   input.onchange = (e) => {
+//                                     const files = e.target.files;
+//                                     if (files) updateVariantImages(index, Array.from(files));
+//                                   };
+//                                   input.click();
+//                                 }}
+//                                 disabled={isUploading}
+//                                 className="text-xs text-[#708268] hover:text-[#52634a] font-medium flex items-center gap-1 disabled:opacity-50"
+//                               >
+//                                 {isUploading ? (
+//                                   <Loader2 className="w-3 h-3 animate-spin" />
+//                                 ) : (
+//                                   <Upload className="w-3 h-3" />
+//                                 )}
+//                                 {isUploading ? 'Uploading...' : 'Add Images'}
+//                               </button>
+//                             )}
+//                           </div>
+                          
+//                           <div className="grid grid-cols-4 gap-2">
+//                             {[0, 1, 2, 3].map((slotIdx) => {
+//                               const imageUrl = variant.imagePreviews && variant.imagePreviews[slotIdx];
+//                               const isDragging = draggedItem && 
+//                                 draggedItem.variantIndex === index && 
+//                                 draggedItem.imageIndex === slotIdx;
+//                               const isDragOver = dragOverItem && 
+//                                 dragOverItem.variantIndex === index && 
+//                                 dragOverItem.imageIndex === slotIdx && 
+//                                 !isDragging;
+                              
+//                               return (
+//                                 <div 
+//                                   key={slotIdx}
+//                                   draggable={!!imageUrl}
+//                                   onDragStart={(e) => {
+//                                     if (imageUrl) {
+//                                       handleDragStart(e, index, slotIdx);
+//                                     } else {
+//                                       e.preventDefault();
+//                                     }
+//                                   }}
+//                                   onDragOver={(e) => {
+//                                     handleDragOver(e, index, slotIdx);
+//                                   }}
+//                                   onDragLeave={handleDragLeave}
+//                                   onDrop={(e) => {
+//                                     handleDrop(e, index, slotIdx);
+//                                   }}
+//                                   onDragEnd={handleDragEnd}
+//                                   style={{ 
+//                                     zIndex: isDragging ? 9999 : 'auto',
+//                                     position: 'relative'
+//                                   }}
+//                                   className={`transition-all duration-200 ${
+//                                     isDragging ? 'opacity-50 scale-95' : ''
+//                                   } ${
+//                                     isDragOver ? 'ring-2 ring-[#708268] ring-offset-2 rounded-lg' : ''
+//                                   }`}
+//                                 >
+//                                   {imageUrl ? (
+//                                     <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-32 hover:border-[#708268] transition-colors cursor-grab active:cursor-grabbing bg-gray-100">
+//                                       <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+//                                         <GripVertical className="w-3 h-3 text-white" />
+//                                       </div>
+//                                       <img 
+//                                         src={imageUrl} 
+//                                         alt={`Variant ${slotIdx + 1}`} 
+//                                         className="w-full h-full object-contain bg-gray-100 pointer-events-none select-none"
+//                                         draggable="false"
+//                                       />
+//                                       <button
+//                                         type="button"
+//                                         onClick={(e) => {
+//                                           e.stopPropagation();
+//                                           removeVariantImage(index, slotIdx);
+//                                         }}
+//                                         className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-20"
+//                                       >
+//                                         <X className="w-3 h-3" />
+//                                       </button>
+//                                       <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
+//                                         {slotIdx + 1}
+//                                       </span>
+//                                     </div>
+//                                   ) : (
+//                                     <div className={`border-2 border-dashed rounded-lg p-2 text-center h-32 flex flex-col items-center justify-center transition-colors ${
+//                                       isDragOver ? 'border-[#708268] bg-pink-50' : 'border-gray-300 bg-gray-50 hover:border-[#708268] hover:bg-[#708268]/5'
+//                                     }`}>
+//                                       <ImageIcon className="w-6 h-6 text-gray-400" />
+//                                       <p className="text-xs text-gray-600">Slot {slotIdx + 1}</p>
+//                                       <p className="text-[10px] text-gray-400 mt-1">Empty</p>
+//                                     </div>
+//                                   )}
+//                                 </div>
+//                               );
+//                             })}
+//                           </div>
+//                           <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+//                             <GripVertical className="w-3 h-3" />
+//                             Drag and drop to reorder images
+//                           </p>
+//                           {getFilledCount(variant.images) > 0 && (
+//                             <p className="text-xs text-[#708268] mt-1">{getFilledCount(variant.images)} of 4 images uploaded</p>
+//                           )}
+//                         </div>
+//                       </div>
 
-//       {/* Variant Images */}
-//       <div className="md:col-span-2">
-//         <div className="flex items-center justify-between mb-2">
-//           <label className="block text-xs font-medium text-gray-700">Variant Images <span className="text-gray-400">(Max 4)</span></label>
-//           {getFilledCount(variant.images) < 4 && (
-//             <button
-//               type="button"
-//               onClick={() => {
-//                 const input = document.createElement('input');
-//                 input.type = 'file';
-//                 input.accept = 'image/jpeg,image/jpg,image/png,image/webp';
-//                 input.multiple = true;
-//                 input.onchange = (e) => {
-//                   const files = e.target.files;
-//                   if (files) updateVariantImages(index, Array.from(files));
-//                 };
-//                 input.click();
-//               }}
-//               disabled={isUploading}
-//               className="text-xs text-[#708268] hover:text-[#52634a] font-medium flex items-center gap-1 disabled:opacity-50"
-//             >
-//               {isUploading ? (
-//                 <Loader2 className="w-3 h-3 animate-spin" />
-//               ) : (
-//                 <Upload className="w-3 h-3" />
-//               )}
-//               {isUploading ? 'Uploading...' : 'Add Images'}
-//             </button>
-//           )}
-//         </div>
-        
-//         <div className="grid grid-cols-4 gap-2">
-//           {[0, 1, 2, 3].map((slotIdx) => {
-//             const imageUrl = variant.imagePreviews && variant.imagePreviews[slotIdx];
-//             const isDragging = draggedItem && 
-//               draggedItem.variantIndex === index && 
-//               draggedItem.imageIndex === slotIdx;
-//             const isDragOver = dragOverItem && 
-//               dragOverItem.variantIndex === index && 
-//               dragOverItem.imageIndex === slotIdx && 
-//               !isDragging;
-            
-//             return (
-//               <div 
-//                 key={slotIdx}
-//                 draggable={!!imageUrl}
-//                 onDragStart={(e) => {
-//                   if (imageUrl) {
-//                     handleDragStart(e, index, slotIdx);
-//                   } else {
-//                     e.preventDefault();
-//                   }
-//                 }}
-//                 onDragOver={(e) => {
-//                   handleDragOver(e, index, slotIdx);
-//                 }}
-//                 onDragLeave={handleDragLeave}
-//                 onDrop={(e) => {
-//                   handleDrop(e, index, slotIdx);
-//                 }}
-//                 onDragEnd={handleDragEnd}
-//                 style={{ 
-//                   zIndex: isDragging ? 9999 : 'auto',
-//                   position: 'relative'
-//                 }}
-//                 className={`transition-all duration-200 ${
-//                   isDragging ? 'opacity-50 scale-95' : ''
-//                 } ${
-//                   isDragOver ? 'ring-2 ring-[#708268] ring-offset-2 rounded-lg' : ''
-//                 }`}
-//               >
-//                 {imageUrl ? (
-//                   <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-32 hover:border-[#708268] transition-colors cursor-grab active:cursor-grabbing bg-gray-100">
-//                     <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
-//                       <GripVertical className="w-3 h-3 text-white" />
+//                       {/* SUB VARIANTS SECTION - ALWAYS SHOW */}
+//                       <div className="mt-4 pt-4 border-t border-gray-200">
+//                         <div className="flex items-center justify-between mb-3">
+//                           <h4 className="text-sm font-medium text-gray-700">
+//                             Sub Variants {variant.subVariants && variant.subVariants.length > 0 && `(${variant.subVariants.length})`}
+//                           </h4>
+//                           <button
+//                             type="button"
+//                             onClick={() => setShowAddSubVariant(index)}
+//                             className="text-xs text-[#708268] hover:text-[#52634a] font-medium flex items-center gap-1"
+//                           >
+//                             <Plus className="w-3 h-3" />
+//                             Add Sub Variant
+//                           </button>
+//                         </div>
+
+//                         {/* Show existing sub variants */}
+//                         {variant.subVariants && variant.subVariants.length > 0 ? (
+//                           <div className="space-y-2">
+//                             {variant.subVariants.map((subVariant, subIndex) => (
+//                               <SubVariantItem
+//                                 key={subVariant.id || subIndex}
+//                                 subVariant={subVariant}
+//                                 index={subIndex}
+//                                 variantIndex={index}
+//                                 onUpdate={updateSubVariant}
+//                                 onRemove={removeSubVariant}
+//                                 isAdminOrSuperAdmin={isAdminOrSuperAdmin}
+//                                 defaultPackagingCost={defaultPackagingCost}
+//                                 defaultDeliveryCost={defaultDeliveryCost}
+//                                 expandedSubVariant={expandedSubVariant}
+//                                 setExpandedSubVariant={setExpandedSubVariant}
+//                               />
+//                             ))}
+//                           </div>
+//                         ) : (
+//                           <div className="text-center py-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+//                             <p className="text-sm text-gray-500">No sub variants added yet</p>
+//                             <p className="text-xs text-gray-400 mt-1">Click "Add Sub Variant" to add one</p>
+//                           </div>
+//                         )}
+
+//                         {/* Add Sub Variant Form */}
+//                         {showAddSubVariant === index && renderSubVariantForm(index)}
+//                       </div>
 //                     </div>
-//                     <img 
-//                       src={imageUrl} 
-//                       alt={`Variant ${slotIdx + 1}`} 
-//                       className="w-full h-full object-contain bg-gray-100 pointer-events-none select-none"
-//                       draggable="false"
-//                     />
-//                     <button
-//                       type="button"
-//                       onClick={(e) => {
-//                         e.stopPropagation();
-//                         removeVariantImage(index, slotIdx);
-//                       }}
-//                       className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-20"
-//                     >
-//                       <X className="w-3 h-3" />
-//                     </button>
-//                     <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
-//                       {slotIdx + 1}
-//                     </span>
-//                   </div>
-//                 ) : (
-//                   <div className={`border-2 border-dashed rounded-lg p-2 text-center h-32 flex flex-col items-center justify-center transition-colors ${
-//                     isDragOver ? 'border-[#708268] bg-pink-50' : 'border-gray-300 bg-gray-50 hover:border-[#708268] hover:bg-[#708268]/5'
-//                   }`}>
-//                     <ImageIcon className="w-6 h-6 text-gray-400" />
-//                     <p className="text-xs text-gray-600">Slot {slotIdx + 1}</p>
-//                     <p className="text-[10px] text-gray-400 mt-1">Empty</p>
-//                   </div>
-//                 )}
-//               </div>
-//             );
-//           })}
-//         </div>
-//         <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-//           <GripVertical className="w-3 h-3" />
-//           Drag and drop to reorder images
-//         </p>
-//         {getFilledCount(variant.images) > 0 && (
-//           <p className="text-xs text-[#708268] mt-1">{getFilledCount(variant.images)} of 4 images uploaded</p>
-//         )}
-//       </div>
-//     </div>
-
-//     {/* ✅ SUB VARIANTS SECTION - ALWAYS SHOW (if sub-variants exist or button to add) */}
-//     <div className="mt-4 pt-4 border-t border-gray-200">
-//       <div className="flex items-center justify-between mb-3">
-//         <h4 className="text-sm font-medium text-gray-700">
-//           Sub Variants {variant.subVariants && variant.subVariants.length > 0 && `(${variant.subVariants.length})`}
-//         </h4>
-//         <button
-//           type="button"
-//           onClick={() => setShowAddSubVariant(index)}
-//           className="text-xs text-[#708268] hover:text-[#52634a] font-medium flex items-center gap-1"
-//         >
-//           <Plus className="w-3 h-3" />
-//           Add Sub Variant
-//         </button>
-//       </div>
-
-//       {/* Show existing sub variants */}
-//       {variant.subVariants && variant.subVariants.length > 0 ? (
-//         <div className="space-y-2">
-//           {variant.subVariants.map((subVariant, subIndex) => (
-//             <SubVariantItem
-//               key={subVariant.id || subIndex}
-//               subVariant={subVariant}
-//               index={subIndex}
-//               variantIndex={index}
-//               onUpdate={updateSubVariant}
-//               onRemove={removeSubVariant}
-//               isAdminOrSuperAdmin={isAdminOrSuperAdmin}
-//               defaultPackagingCost={defaultPackagingCost}
-//               defaultDeliveryCost={defaultDeliveryCost}
-//               expandedSubVariant={expandedSubVariant}
-//               setExpandedSubVariant={setExpandedSubVariant}
-//             />
-//           ))}
-//         </div>
-//       ) : (
-//         <div className="text-center py-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-//           <p className="text-sm text-gray-500">No sub variants added yet</p>
-//           <p className="text-xs text-gray-400 mt-1">Click "Add Sub Variant" to add one</p>
-//         </div>
-//       )}
-
-//       {/* Add Sub Variant Form */}
-//       {showAddSubVariant === index && renderSubVariantForm(index)}
-//     </div>
-//   </div>
-// )}
+//                   )}
 //                 </div>
 //               );
 //             })}
@@ -3360,6 +3441,9 @@
 //   const [showAddVariantType, setShowAddVariantType] = useState(false);
 //   const [customVariantTypeName, setCustomVariantTypeName] = useState('');
   
+// // ========== ADD-ONES STATE ==========
+// const [addOnes, setAddOnes] = useState([]);
+  
 //   // Video states
 //   const [videoType, setVideoType] = useState('upload');
 //   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -3417,7 +3501,9 @@
 //     videoType: 'upload',
 //     // Variant data
 //     hasVariants: false,
-//     variants: []
+//     variants: [],
+//     // Related products
+//     addOnes: [] 
 //   });
 
 //   // ========== PRODUCT IMAGES ==========
@@ -3494,6 +3580,31 @@
 //     setFormData(prev => ({ ...prev, faqs: updatedFaqs }));
 //     saveToLocalStorage();
 //   };
+
+//   // ADD-ONES HANDLERS
+// // ============================================================
+// const handleAddAddOne = (product) => {
+//   if (addOnes.length >= 5) {
+//     toast.error('Maximum 5 add-ones allowed');
+//     return;
+//   }
+//   setAddOnes([...addOnes, product]);
+//   setFormData(prev => ({
+//     ...prev,
+//     addOnes: [...prev.addOnes, product]
+//   }));
+//   saveToLocalStorage();
+// };
+
+// const handleRemoveAddOne = (productId) => {
+//   setAddOnes(addOnes.filter(p => p._id !== productId));
+//   setFormData(prev => ({
+//     ...prev,
+//     addOnes: prev.addOnes.filter(p => p._id !== productId)
+//   }));
+//   saveToLocalStorage();
+// };
+
 
 //   // ============================================================
 //   // VARIANT HANDLERS
@@ -3628,48 +3739,50 @@
 //     };
 //   }, [formData.slug, isSlugManuallyEdited]);
 
-//   const saveToLocalStorage = () => {
-//     if (isRestoringRef.current) return;
-    
-//     try {
-//       const draft = {
-//         formData: {
-//           ...formData,
-//           shortDescription: shortDescEditor?.getHTML() || formData.shortDescription,
-//           fullDescription: fullDescEditor?.getHTML() || formData.fullDescription,
-//           deliveryInfo: deliveryInfoEditor?.getHTML() || formData.deliveryInfo,
-//           showOnBanner: formData.showOnBanner,
-//           videoUrl: formData.videoUrl,
-//           videoPublicId: formData.videoPublicId,
-//           videoType: videoType,
-//           rating: formData.rating,
-//           faqs: formData.faqs,
-//           slug: formData.slug,
-//           buyingPrice: formData.buyingPrice,
-//           hasVariants: formData.hasVariants,
-//           variants: formData.variants
-//         },
-//         productImages: productImages.map(img => ({
-//           ...img,
-//           preview: img.url || null,
-//           file: null,
-//           uploading: false
-//         })),
-//         videoUpload: {
-//           ...videoUpload,
-//           preview: videoUpload.url || null,
-//           file: null,
-//           uploading: false
-//         },
-//         variantTypes: variantTypes,
-//         lastSaved: new Date().toISOString()
-//       };
-//       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-//       setLastSaved(new Date());
-//     } catch (error) {
-//       console.error('Error saving draft:', error);
-//     }
-//   };
+// const saveToLocalStorage = () => {
+//   if (isRestoringRef.current) return;
+  
+//   try {
+//     const draft = {
+//       formData: {
+//         ...formData,
+//         shortDescription: shortDescEditor?.getHTML() || formData.shortDescription,
+//         fullDescription: fullDescEditor?.getHTML() || formData.fullDescription,
+//         deliveryInfo: deliveryInfoEditor?.getHTML() || formData.deliveryInfo,
+//         showOnBanner: formData.showOnBanner,
+//         videoUrl: formData.videoUrl,
+//         videoPublicId: formData.videoPublicId,
+//         videoType: videoType,
+//         rating: formData.rating,
+//         faqs: formData.faqs,
+//         slug: formData.slug,
+//         buyingPrice: formData.buyingPrice,
+//         hasVariants: formData.hasVariants,
+//         variants: formData.variants,
+//         addOnes: formData.addOnes  // ✅ Changed
+//       },
+//       productImages: productImages.map(img => ({
+//         ...img,
+//         preview: img.url || null,
+//         file: null,
+//         uploading: false
+//       })),
+//       videoUpload: {
+//         ...videoUpload,
+//         preview: videoUpload.url || null,
+//         file: null,
+//         uploading: false
+//       },
+//       variantTypes: variantTypes,
+//       addOnes: addOnes,  // ✅ Changed
+//       lastSaved: new Date().toISOString()
+//     };
+//     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+//     setLastSaved(new Date());
+//   } catch (error) {
+//     console.error('Error saving draft:', error);
+//   }
+// };
 
 //   useEffect(() => {
 //     fetchDefaultCosts();
@@ -3778,7 +3891,7 @@
 //       if (hasData && !isRestoringRef.current) saveToLocalStorage();
 //     }, 3000);
 //     return () => { if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current); };
-//   }, [formData, productImages, videoUpload, youtubeUrl, videoType, variantTypes, shortDescEditor?.getHTML(), fullDescEditor?.getHTML(), deliveryInfoEditor?.getHTML()]);
+//   }, [formData, productImages, videoUpload, youtubeUrl, videoType, variantTypes, addOnes, shortDescEditor?.getHTML(), fullDescEditor?.getHTML(), deliveryInfoEditor?.getHTML()]);
 
 //   useEffect(() => {
 //     const loadDraft = () => {
@@ -3830,8 +3943,13 @@
 //             slug: pendingDraft.formData.slug || '',
 //             buyingPrice: pendingDraft.formData.buyingPrice || '',
 //             hasVariants: pendingDraft.formData.hasVariants || false,
-//             variants: pendingDraft.formData.variants || []
+//             variants: pendingDraft.formData.variants || [],
+//             addOnes: pendingDraft.formData.addOnes || []
 //           });
+          
+//           if (pendingDraft.addOnes) {
+//           setAddOnes(pendingDraft.addOnes);  // ✅ Changed
+//         }
           
 //           if (pendingDraft.variantTypes) {
 //             setVariantTypes(pendingDraft.variantTypes);
@@ -3914,9 +4032,11 @@
 //         showOnBanner: false, rating: 0, faqs: [],
 //         metaSettings: { metaTitle: '', metaDescription: '', metaKeywords: [] },
 //         videoUrl: '', videoPublicId: '', videoType: 'upload',
-//         hasVariants: false, variants: []
+//         hasVariants: false, variants: [],
+//         addOnes: []  // ✅ Changed
 //       });
 //       setVariantTypes([]);
+//        setAddOnes([]);
       
 //       if (shortDescEditor) shortDescEditor.commands.setContent('');
 //       if (fullDescEditor) fullDescEditor.commands.setContent('');
@@ -4666,12 +4786,12 @@
 //             deliveryCost: parseFloat(v.deliveryCost) || 0,
 //             costPerItem: parseFloat(v.costPerItem) || 0,
 //             stockQuantity: parseFloat(v.stockQuantity) || 0,
-//             image: v.image || null,
+//             images: v.images || [null, null, null, null],  // ✅ ADD THIS
+//     imagePreviews: v.imagePreviews || [null, null, null, null],
 //             // Include sub-variants
 //             subVariants: v.subVariants ? v.subVariants.map(sv => ({
 //               name: sv.name,
-//               subType: sv.subType || '',
-//               customTypeValue: sv.customTypeValue || '',
+//                color: sv.color || undefined, 
 //               regularPrice: parseFloat(sv.regularPrice) || 0,
 //               discountPrice: parseFloat(sv.discountPrice) || 0,
 //               buyingPrice: parseFloat(sv.buyingPrice) || 0,
@@ -4717,7 +4837,8 @@
 //         videoPublicId: videoUpload.publicId || '',
 //         videoType: videoType,
 //         hasVariants: hasVariants,
-//         variants: variantData
+//         variants: variantData,
+//         addOnes: addOnes.map(p => p._id)
 //       };
 
 //       const response = await fetch(`${API_URL}/api/products`, {
@@ -4793,7 +4914,7 @@
 //                     Last saved: {lastSaved.toLocaleTimeString()}
 //                   </span>
 //                 )}
-//                 <button onClick={handleClearDraft} className="px-4 py-2 text-sm border border-pink-400/50 text-[#708268] rounded-lg hover:bg-pink-500/20 transition-colors">
+//                 <button onClick={handleClearDraft} className="px-4 py-2 text-sm border border-black text-[#708268] rounded-lg hover:bg-[#e4ebe1] transition-colors">
 //                   Clear Draft
 //                 </button>
 //                 <button onClick={handleSaveDraft} disabled={isSavingDraft} className="px-4 py-2 text-sm bg-[#708268] text-white rounded-lg hover:bg-[#52634a] transition-colors flex items-center gap-2 disabled:opacity-50 font-semibold">
@@ -4837,29 +4958,15 @@
 //                           name="slug" 
 //                           value={formData.slug || ''} 
 //                           onChange={handleSlugChange}
-//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition font-mono ${
-//                             errors.slug ? 'border-red-500' : 
-//                             isSlugManuallyEdited && isSlugAvailable === true ? 'border-green-500' :
-//                             isSlugManuallyEdited && isSlugAvailable === false ? 'border-red-500' : 'border-gray-300'
-//                           }`} 
+//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition font-mono ${errors.slug ? 'border-red-500' : isSlugManuallyEdited && isSlugAvailable === true ? 'border-green-500' : isSlugManuallyEdited && isSlugAvailable === false ? 'border-red-500' : 'border-gray-300'}`} 
 //                           placeholder="Auto-generated from product name..." 
 //                         />
 //                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-//                           {isCheckingSlug && (
-//                             <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
-//                           )}
-//                           {!isCheckingSlug && formData.slug && isSlugManuallyEdited && isSlugAvailable === true && (
-//                             <CheckCircle className="w-4 h-4 text-green-500" />
-//                           )}
-//                           {!isCheckingSlug && formData.slug && isSlugManuallyEdited && isSlugAvailable === false && (
-//                             <X className="w-4 h-4 text-red-500" />
-//                           )}
-//                           {formData.slug && !isSlugManuallyEdited && (
-//                             <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Auto</span>
-//                           )}
-//                           {formData.slug && isSlugManuallyEdited && isSlugAvailable !== false && (
-//                             <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Custom</span>
-//                           )}
+//                           {isCheckingSlug && <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />}
+//                           {!isCheckingSlug && formData.slug && isSlugManuallyEdited && isSlugAvailable === true && <CheckCircle className="w-4 h-4 text-green-500" />}
+//                           {!isCheckingSlug && formData.slug && isSlugManuallyEdited && isSlugAvailable === false && <X className="w-4 h-4 text-red-500" />}
+//                           {formData.slug && !isSlugManuallyEdited && <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Auto</span>}
+//                           {formData.slug && isSlugManuallyEdited && isSlugAvailable !== false && <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Custom</span>}
 //                         </div>
 //                       </div>
                       
@@ -5163,9 +5270,7 @@
 //                             type="text" 
 //                             name="costPerItem" 
 //                             value={typeof formData.costPerItem === 'string' ? formData.costPerItem : (formData.costPerItem || '')} 
-//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition bg-gray-100 border-gray-300 cursor-not-allowed ${(
-//                               typeof formData.costPerItem === 'string' && formData.costPerItem.includes('?')) ? 'text-[#708268] font-medium' : 'text-gray-700'
-//                             }`} 
+//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition bg-gray-100 border-gray-300 cursor-not-allowed ${(typeof formData.costPerItem === 'string' && formData.costPerItem.includes('?')) ? 'text-[#708268] font-medium' : 'text-gray-700'}`} 
 //                             placeholder="Enter values above to calculate" 
 //                             readOnly 
 //                             disabled
@@ -5200,6 +5305,16 @@
 //                     )}
 //                   </div>
 //                 </div>
+
+//                 {/* ============================================================ */}
+// {/* ADD-ONES SECTION */}
+// {/* ============================================================ */}
+// <AddOnesSection 
+//   addOnes={addOnes}
+//   onAddProduct={handleAddAddOne}
+//   onRemoveProduct={handleRemoveAddOne}
+//   maxProducts={5}
+// />
 
 //                 {/* ============================================================ */}
 //                 {/* VARIANT SECTION */}
@@ -5546,11 +5661,7 @@
 //                       <button
 //                         type="button"
 //                         onClick={() => setVideoType('upload')}
-//                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-//                           videoType === 'upload'
-//                             ? 'bg-[#708268] text-white'
-//                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-//                         }`}
+//                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${videoType === 'upload' ? 'bg-[#708268] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
 //                       >
 //                         <Upload className="w-4 h-4 inline mr-1" />
 //                         Upload Video
@@ -5558,11 +5669,7 @@
 //                       <button
 //                         type="button"
 //                         onClick={() => setVideoType('youtube')}
-//                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-//                           videoType === 'youtube'
-//                             ? 'bg-[#708268] text-white'
-//                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-//                         }`}
+//                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${videoType === 'youtube' ? 'bg-[#708268] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
 //                       >
 //                         <Youtube className="w-4 h-4 inline mr-1" />
 //                         YouTube Link
@@ -5576,11 +5683,7 @@
 //                         <div className="flex flex-col sm:flex-row gap-3 mb-4">
 //                           <button
 //                             type="button"
-//                             onClick={() => {
-//                               if (videoInputRef.current) {
-//                                 videoInputRef.current.click();
-//                               }
-//                             }}
+//                             onClick={() => { if (videoInputRef.current) { videoInputRef.current.click(); } }}
 //                             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg border-2 border-dashed border-[#708268]/40 bg-[#708268]/5 text-[#708268] hover:bg-[#708268]/10 transition-colors"
 //                           >
 //                             <Upload className="w-5 h-5" />
@@ -5589,9 +5692,7 @@
                           
 //                           <button
 //                             type="button"
-//                             onClick={() => {
-//                               setShowVideoMediaPicker(true);
-//                             }}
+//                             onClick={() => { setShowVideoMediaPicker(true); }}
 //                             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg border-2 border-dashed border-[#708268]/40 bg-[#708268]/5 text-[#708268] hover:bg-[#708268]/10 transition-colors"
 //                           >
 //                             <Video className="w-5 h-5" />
@@ -5658,11 +5759,7 @@
 //                           className="transition-transform hover:scale-110"
 //                         >
 //                           <Star 
-//                             className={`w-8 h-8 ${
-//                               (ratingHover || formData.rating) >= star
-//                                 ? 'fill-yellow-400 text-yellow-400'
-//                                 : 'text-gray-300'
-//                             }`}
+//                             className={`w-8 h-8 ${(ratingHover || formData.rating) >= star ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
 //                           />
 //                         </button>
 //                       ))}
@@ -5745,11 +5842,7 @@
 //                               key={tag._id}
 //                               type="button"
 //                               onClick={() => handleTagSelect(tag._id)}
-//                               className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-full transition-all border ${
-//                                 isSelected
-//                                   ? 'bg-[#708268] text-white border-[#708268] ring-2 ring-[#708268] ring-offset-2 shadow-md'
-//                                   : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200 hover:border-gray-300'
-//                               }`}
+//                               className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-full transition-all border ${isSelected ? 'bg-[#708268] text-white border-[#708268] ring-2 ring-[#708268] ring-offset-2 shadow-md' : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200 hover:border-gray-300'}`}
 //                             >
 //                               {tag.image && tag.image.url && (
 //                                 <img 
@@ -5824,7 +5917,7 @@
 
 //             {/* Create Product Button at Bottom */}
 //             <div className="mt-8 flex justify-end">
-//               <button type="submit" disabled={isSubmitting} className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#708268] to-pink-800 text-white font-medium rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 text-sm shadow-md hover:shadow-lg">
+//               <button type="submit" disabled={isSubmitting} className="flex items-center gap-2 px-6 py-3 bg-[#52634a] text-white font-medium rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 text-sm shadow-md hover:shadow-lg">
 //                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
 //                 {isSubmitting ? 'Creating Product...' : 'Create Product'}
 //               </button>
@@ -5933,7 +6026,8 @@ import {
   ChevronRight,
   Grid,
   List,
-  Circle
+  Circle,
+  XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { MantineProvider } from '@mantine/core';
@@ -5988,6 +6082,332 @@ const COLOR_PRESETS = [
 
 // Draft key
 const DRAFT_KEY = 'beauty_bucket_product_draft';
+
+// ============================================================
+// BARCODE INPUT COMPONENT
+// ============================================================
+const BarcodeInput = ({ value, onChange, onValidate, disabled = false, error = '', onGenerate, isGenerating = false }) => {
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState(null);
+  const [isScannerMode, setIsScannerMode] = useState(false);
+  const [scannedValue, setScannedValue] = useState('');
+  const inputRef = useRef(null);
+  const scanTimeoutRef = useRef(null);
+
+  const validateBarcode = async (barcodeValue) => {
+    if (!barcodeValue || barcodeValue.length < 8) {
+      setValidationResult(null);
+      return;
+    }
+
+    setIsValidating(true);
+    try {
+      const response = await fetch(`${API_URL}/api/barcodes/validate/${barcodeValue}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setValidationResult(data.data);
+        if (onValidate) onValidate(data.data);
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
+      setValidationResult({ isValid: false, message: 'Network error' });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (value) {
+        validateBarcode(value);
+      } else {
+        setValidationResult(null);
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [value]);
+
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!isScannerMode) return;
+      
+      if (e.key === 'Enter') {
+        if (scannedValue) {
+          let cleanBarcode = scannedValue.replace(/[^0-9]/g, '');
+          if (cleanBarcode.length > 13) {
+            cleanBarcode = cleanBarcode.slice(0, 13);
+          }
+          onChange({ target: { name: 'barcode', value: cleanBarcode } });
+          setScannedValue('');
+          setIsScannerMode(false);
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }
+      } else {
+        if (/[0-9]/.test(e.key)) {
+          setScannedValue(prev => prev + e.key);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isScannerMode, scannedValue, onChange]);
+
+  const startScannerMode = () => {
+    setIsScannerMode(true);
+    setScannedValue('');
+    toast.info('Scan barcode now...');
+    
+    scanTimeoutRef.current = setTimeout(() => {
+      if (isScannerMode) {
+        setIsScannerMode(false);
+        toast.info('Scanner mode timeout');
+      }
+    }, 10000);
+  };
+
+  const cancelScannerMode = () => {
+    setIsScannerMode(false);
+    setScannedValue('');
+    if (scanTimeoutRef.current) {
+      clearTimeout(scanTimeoutRef.current);
+    }
+  };
+
+  const getValidationIcon = () => {
+    if (isValidating) return <Loader2 className="w-4 h-4 animate-spin text-gray-400" />;
+    if (!validationResult) return <Barcode className="w-4 h-4 text-gray-400" />;
+    if (validationResult.isValid && (validationResult.status === 'available' || validationResult.status === 'new')) {
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+    }
+    return <XCircle className="w-4 h-4 text-red-500" />;
+  };
+
+  const getValidationMessage = () => {
+    if (!validationResult) return null;
+    if (validationResult.isValid) {
+      if (validationResult.status === 'new') {
+        return <span className="text-green-600 text-xs">✓ New barcode - will be auto-generated</span>;
+      }
+      if (validationResult.status === 'available') {
+        return <span className="text-green-600 text-xs">✓ Barcode available for assignment</span>;
+      }
+    }
+    return <span className="text-red-600 text-xs">{validationResult.message}</span>;
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        Barcode <span className="text-gray-400 text-xs">(Optional - 8-13 digits)</span>
+      </label>
+      
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2">
+            {getValidationIcon()}
+          </div>
+          
+          <input
+            ref={inputRef}
+            type="text"
+            name="barcode"
+            value={value || ''}
+            onChange={onChange}
+            disabled={disabled || isScannerMode}
+            placeholder="Enter barcode number, scan, or generate"
+            className={`w-full pl-10 pr-4 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition ${
+              error ? 'border-red-500' : validationResult?.isValid === false ? 'border-red-500' : 'border-gray-300'
+            }`}
+            maxLength="13"
+          />
+        </div>
+        
+        {/* Scan Button */}
+        <button
+          type="button"
+          onClick={startScannerMode}
+          disabled={isScannerMode}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+        >
+          {isScannerMode ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Scan className="w-4 h-4" />
+          )}
+          Scan
+        </button>
+        
+        {/* Generate Button */}
+        <button
+          type="button"
+          onClick={onGenerate}
+          disabled={isGenerating}
+          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+        >
+          {isGenerating ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Sparkles className="w-4 h-4" />
+          )}
+          Generate
+        </button>
+      </div>
+      
+      {isScannerMode && (
+        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Scan className="w-4 h-4 text-blue-500 animate-pulse" />
+              <span className="text-sm text-blue-700">Scanner mode active - Scan barcode now</span>
+            </div>
+            <button
+              type="button"
+              onClick={cancelScannerMode}
+              className="text-xs text-red-600 hover:text-red-700"
+            >
+              Cancel
+            </button>
+          </div>
+          <p className="text-xs text-blue-600 mt-1">
+            Scanning: {scannedValue || 'waiting for barcode...'}
+          </p>
+        </div>
+      )}
+      
+      {getValidationMessage()}
+      
+      {error && !validationResult?.isValid === false && (
+        <p className="text-xs text-red-600 flex items-center gap-1">
+          <AlertCircle className="w-3 h-3" />
+          {error}
+        </p>
+      )}
+      
+      <p className="text-xs text-gray-500">
+        You can either:
+        <br />• Click <strong>Generate</strong> to create a unique barcode
+        <br />• Click <strong>Scan</strong> and scan a barcode using your USB scanner
+        <br />• Enter a barcode manually
+        <br />• Leave empty - no barcode will be assigned
+      </p>
+    </div>
+  );
+};
+
+// ============================================================
+// SKU INPUT COMPONENT
+// ============================================================
+const SkuInput = ({ value, onChange, error = '' }) => {
+  const [isValidating, setIsValidating] = useState(false);
+  const [isUnique, setIsUnique] = useState(null);
+  const validateTimeoutRef = useRef(null);
+
+  const validateSku = async (skuValue) => {
+    if (!skuValue || skuValue.length < 3) {
+      setIsUnique(null);
+      return;
+    }
+
+    setIsValidating(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/products/validate-sku/${skuValue}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsUnique(data.data.isUnique);
+        if (!data.data.isUnique && onChange) {
+          const event = { target: { name: 'skuCode', value: skuValue, validationError: data.data.message } };
+          onChange(event);
+        }
+      }
+    } catch (error) {
+      console.error('SKU validation error:', error);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (validateTimeoutRef.current) {
+      clearTimeout(validateTimeoutRef.current);
+    }
+    validateTimeoutRef.current = setTimeout(() => {
+      if (value) {
+        validateSku(value);
+      } else {
+        setIsUnique(null);
+      }
+    }, 500);
+    
+    return () => clearTimeout(validateTimeoutRef.current);
+  }, [value]);
+
+  const getValidationIcon = () => {
+    if (isValidating) return <Loader2 className="w-4 h-4 animate-spin text-gray-400" />;
+    if (!value) return <Hash className="w-4 h-4 text-gray-400" />;
+    if (isUnique === true) return <CheckCircle className="w-4 h-4 text-green-500" />;
+    if (isUnique === false) return <XCircle className="w-4 h-4 text-red-500" />;
+    return <Hash className="w-4 h-4 text-gray-400" />;
+  };
+
+  const getValidationMessage = () => {
+    if (!value) return null;
+    if (isValidating) return <span className="text-gray-500 text-xs">Checking availability...</span>;
+    if (isUnique === true) return <span className="text-green-600 text-xs">✓ SKU is available</span>;
+    if (isUnique === false) return <span className="text-red-600 text-xs">✗ SKU already exists</span>;
+    return null;
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        SKU Code <span className="text-gray-400 text-xs">(Optional - Auto-generated if empty)</span>
+      </label>
+      
+      <div className="relative flex-1">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2">
+          {getValidationIcon()}
+        </div>
+        
+        <input
+          type="text"
+          name="skuCode"
+          value={value || ''}
+          onChange={(e) => {
+            onChange(e);
+          }}
+          placeholder="Leave empty for auto-generation"
+          className={`w-full pl-10 pr-4 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition ${
+            error ? 'border-red-500' : (isUnique === false ? 'border-red-500' : 'border-gray-300')
+          }`}
+        />
+      </div>
+      
+      {getValidationMessage()}
+      
+      {error && (
+        <p className="text-xs text-red-600 flex items-center gap-1">
+          <AlertCircle className="w-3 h-3" />
+          {error}
+        </p>
+      )}
+      
+      <p className="text-xs text-gray-500">
+        • Leave empty for auto-generation<br />
+        • Must be unique across all products<br />
+        • Format: letters, numbers, and hyphens only (4-20 characters)
+      </p>
+    </div>
+  );
+};
 
 // ============================================================
 // COMPONENTS
@@ -6371,7 +6791,7 @@ const AddTagModal = ({ isOpen, onClose, onTagAdded }) => {
 };
 
 // ============================================================
-// ADD-ONES SECTION COMPONENT (Formerly Related Products)
+// ADD-ONES SECTION COMPONENT
 // ============================================================
 const AddOnesSection = ({ 
   addOnes, 
@@ -6650,7 +7070,7 @@ const VariantColorPicker = ({ color, onChange, onRemove }) => {
 };
 
 // ============================================================
-// SUB VARIANT COMPONENT - WITH ADD COLOR BUTTON
+// SUB VARIANT COMPONENT
 // ============================================================
 const SubVariantItem = ({ 
   subVariant, 
@@ -6670,7 +7090,6 @@ const SubVariantItem = ({
   const [subVariantImagePreviews, setSubVariantImagePreviews] = useState(subVariant.imagePreviews || [null, null, null, null]);
   const [showColorPicker, setShowColorPicker] = useState(!!subVariant.color);
 
-  // Check if this sub-variant is expanded
   const isExpanded = expandedSubVariant === index;
 
   const calculateCost = (buyingPrice, packagingCost, deliveryCost) => {
@@ -6814,11 +7233,9 @@ const SubVariantItem = ({
 
   const toggleColorPicker = () => {
     if (showColorPicker) {
-      // Remove color
       updateField('color', '');
       setShowColorPicker(false);
     } else {
-      // Show color picker with default color
       setShowColorPicker(true);
       if (!subVariant.color) {
         updateField('color', '#000000');
@@ -7137,14 +7554,12 @@ const VariantTypeSection = ({
   const [expandedVariant, setExpandedVariant] = useState(null);
   const [expandedSubVariant, setExpandedSubVariant] = useState(null);
   
-  // Sub variants for the new variant being created
   const [newVariantSubVariants, setNewVariantSubVariants] = useState([]);
   const [showAddSubVariantInForm, setShowAddSubVariantInForm] = useState(false);
   
-  // New sub variant form state - NO COLOR BY DEFAULT
   const [newSubVariant, setNewSubVariant] = useState({
     name: '',
-    color: '', // Empty by default
+    color: '',
     regularPrice: '',
     discountPrice: '',
     stockQuantity: '',
@@ -7158,11 +7573,9 @@ const VariantTypeSection = ({
   const [isSubVariantUploading, setIsSubVariantUploading] = useState(false);
   const subVariantFileInputRef = useRef(null);
 
-  // Drag state for variant images
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
 
-  // Calculate cost per item for a variant
   const calculateVariantCost = (buyingPrice, packagingCost, deliveryCost) => {
     const bp = parseFloat(buyingPrice) || 0;
     const pc = parseFloat(packagingCost) || 0;
@@ -7170,100 +7583,54 @@ const VariantTypeSection = ({
     return bp + pc + dc;
   };
 
-  // Get filled count (non-null images)
   const getFilledCount = (images) => {
     return (images || []).filter(Boolean).length;
   };
 
-  // Update addSubVariantToForm function
-  // const addSubVariantToForm = () => {
-  //   if (!newSubVariant.name.trim()) {
-  //     toast.error('Please enter a sub variant name');
-  //     return;
-  //   }
-
-  //   const subVariantToAdd = {
-  //     // id: Date.now().toString(),
-  //     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-  //     ...newSubVariant,
-  //     costPerItem: calculateVariantCost(
-  //       newSubVariant.buyingPrice,
-  //       newSubVariant.packagingCost,
-  //       newSubVariant.deliveryCost
-  //     ),
-  //     images: [...newSubVariant.images],
-  //     imagePreviews: [...newSubVariant.imagePreviews]
-  //   };
-
-  //   setNewVariantSubVariants([...newVariantSubVariants, subVariantToAdd]);
-
-  //   // Auto-expand the newly added sub-variant
-  //   setExpandedSubVariant(newVariantSubVariants.length);
-
-  //   // Reset form
-  //   setNewSubVariant({
-  //     name: '',
-  //     color: '',
-  //     regularPrice: '',
-  //     discountPrice: '',
-  //     stockQuantity: '',
-  //     buyingPrice: '',
-  //     packagingCost: defaultPackagingCost || '',
-  //     deliveryCost: defaultDeliveryCost || '',
-  //     costPerItem: 0,
-  //     images: [null, null, null, null],
-  //     imagePreviews: [null, null, null, null]
-  //   });
-  //   setShowAddSubVariantInForm(false);
-  //   toast.success('Sub variant added to variant');
-  // };
-
   const addSubVariantToForm = () => {
-  if (!newSubVariant.name.trim()) {
-    toast.error('Please enter a sub variant name');
-    return;
-  }
+    if (!newSubVariant.name.trim()) {
+      toast.error('Please enter a sub variant name');
+      return;
+    }
 
-  // ✅ FIX: Explicitly include all fields including color
-  const subVariantToAdd = {
-    id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: newSubVariant.name || '',
-    color: newSubVariant.color || '', // ✅ Ensure color is included
-    regularPrice: newSubVariant.regularPrice || '',
-    discountPrice: newSubVariant.discountPrice || '',
-    stockQuantity: newSubVariant.stockQuantity || '',
-    buyingPrice: newSubVariant.buyingPrice || '',
-    packagingCost: newSubVariant.packagingCost || '',
-    deliveryCost: newSubVariant.deliveryCost || '',
-    costPerItem: calculateVariantCost(
-      newSubVariant.buyingPrice,
-      newSubVariant.packagingCost,
-      newSubVariant.deliveryCost
-    ),
-    images: [...newSubVariant.images],
-    imagePreviews: [...newSubVariant.imagePreviews]
+    const subVariantToAdd = {
+      id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: newSubVariant.name || '',
+      color: newSubVariant.color || '',
+      regularPrice: newSubVariant.regularPrice || '',
+      discountPrice: newSubVariant.discountPrice || '',
+      stockQuantity: newSubVariant.stockQuantity || '',
+      buyingPrice: newSubVariant.buyingPrice || '',
+      packagingCost: newSubVariant.packagingCost || '',
+      deliveryCost: newSubVariant.deliveryCost || '',
+      costPerItem: calculateVariantCost(
+        newSubVariant.buyingPrice,
+        newSubVariant.packagingCost,
+        newSubVariant.deliveryCost
+      ),
+      images: [...newSubVariant.images],
+      imagePreviews: [...newSubVariant.imagePreviews]
+    };
+
+    setNewVariantSubVariants([...newVariantSubVariants, subVariantToAdd]);
+    setExpandedSubVariant(newVariantSubVariants.length);
+
+    setNewSubVariant({
+      name: '',
+      color: '',
+      regularPrice: '',
+      discountPrice: '',
+      stockQuantity: '',
+      buyingPrice: '',
+      packagingCost: defaultPackagingCost || '',
+      deliveryCost: defaultDeliveryCost || '',
+      costPerItem: 0,
+      images: [null, null, null, null],
+      imagePreviews: [null, null, null, null]
+    });
+    setShowAddSubVariantInForm(false);
+    toast.success('Sub variant added to variant');
   };
-
-  setNewVariantSubVariants([...newVariantSubVariants, subVariantToAdd]);
-  setExpandedSubVariant(newVariantSubVariants.length);
-
-  // Reset form - keep color as empty string
-  setNewSubVariant({
-    name: '',
-    color: '', // ✅ Keep as empty string
-    regularPrice: '',
-    discountPrice: '',
-    stockQuantity: '',
-    buyingPrice: '',
-    packagingCost: defaultPackagingCost || '',
-    deliveryCost: defaultDeliveryCost || '',
-    costPerItem: 0,
-    images: [null, null, null, null],
-    imagePreviews: [null, null, null, null]
-  });
-  setShowAddSubVariantInForm(false);
-  toast.success('Sub variant added to variant');
-};
 
   const removeSubVariantFromForm = (index) => {
     const updated = newVariantSubVariants.filter((_, i) => i !== index);
@@ -7331,147 +7698,79 @@ const VariantTypeSection = ({
     }));
   };
 
-  // Update addSubVariant function for existing variants
-  // const addSubVariant = (variantIndex) => {
-  //   if (!newSubVariant.name.trim()) {
-  //     toast.error('Please enter a sub variant name');
-  //     return;
-  //   }
-
-  //   const updatedVariants = [...variants];
-  //   const variant = { ...updatedVariants[variantIndex] };
-    
-  //   if (!variant.subVariants) {
-  //     variant.subVariants = [];
-  //   }
-
-  //   const subVariantToAdd = {
-  //     // id: Date.now().toString(),
-  //     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-  //     ...newSubVariant,
-  //     costPerItem: calculateVariantCost(
-  //       newSubVariant.buyingPrice,
-  //       newSubVariant.packagingCost,
-  //       newSubVariant.deliveryCost
-  //     ),
-  //     images: [...newSubVariant.images],
-  //     imagePreviews: [...newSubVariant.imagePreviews]
-  //   };
-
-  //   // Get the index where the new sub-variant will be added
-  //   const newIndex = variant.subVariants.length;
-    
-  //   variant.subVariants.push(subVariantToAdd);
-  //   updatedVariants[variantIndex] = variant;
-  //   onVariantsChange(updatedVariants);
-
-  //   // Auto-expand the newly added sub-variant
-  //   setExpandedSubVariant(newIndex);
-
-  //   // Reset form
-  //   setNewSubVariant({
-  //     name: '',
-  //     color: '',
-  //     regularPrice: '',
-  //     discountPrice: '',
-  //     stockQuantity: '',
-  //     buyingPrice: '',
-  //     packagingCost: defaultPackagingCost || '',
-  //     deliveryCost: defaultDeliveryCost || '',
-  //     costPerItem: 0,
-  //     images: [null, null, null, null],
-  //     imagePreviews: [null, null, null, null]
-  //   });
-  //   setShowAddSubVariant(null);
-  //   toast.success('Sub variant added successfully');
-  // };
-
   const addSubVariant = (variantIndex) => {
-  if (!newSubVariant.name.trim()) {
-    toast.error('Please enter a sub variant name');
-    return;
-  }
+    if (!newSubVariant.name.trim()) {
+      toast.error('Please enter a sub variant name');
+      return;
+    }
 
-  const updatedVariants = [...variants];
-  const variant = { ...updatedVariants[variantIndex] };
-  
-  if (!variant.subVariants) {
-    variant.subVariants = [];
-  }
+    const updatedVariants = [...variants];
+    const variant = { ...updatedVariants[variantIndex] };
+    
+    if (!variant.subVariants) {
+      variant.subVariants = [];
+    }
 
-  // ✅ FIX: Explicitly include all fields including color
-  const subVariantToAdd = {
-    id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: newSubVariant.name || '',
-    color: newSubVariant.color || '', // ✅ Ensure color is included
-    regularPrice: newSubVariant.regularPrice || '',
-    discountPrice: newSubVariant.discountPrice || '',
-    stockQuantity: newSubVariant.stockQuantity || '',
-    buyingPrice: newSubVariant.buyingPrice || '',
-    packagingCost: newSubVariant.packagingCost || '',
-    deliveryCost: newSubVariant.deliveryCost || '',
-    costPerItem: calculateVariantCost(
-      newSubVariant.buyingPrice,
-      newSubVariant.packagingCost,
-      newSubVariant.deliveryCost
-    ),
-    images: [...newSubVariant.images],
-    imagePreviews: [...newSubVariant.imagePreviews]
+    const subVariantToAdd = {
+      id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: newSubVariant.name || '',
+      color: newSubVariant.color || '',
+      regularPrice: newSubVariant.regularPrice || '',
+      discountPrice: newSubVariant.discountPrice || '',
+      stockQuantity: newSubVariant.stockQuantity || '',
+      buyingPrice: newSubVariant.buyingPrice || '',
+      packagingCost: newSubVariant.packagingCost || '',
+      deliveryCost: newSubVariant.deliveryCost || '',
+      costPerItem: calculateVariantCost(
+        newSubVariant.buyingPrice,
+        newSubVariant.packagingCost,
+        newSubVariant.deliveryCost
+      ),
+      images: [...newSubVariant.images],
+      imagePreviews: [...newSubVariant.imagePreviews]
+    };
+
+    const newIndex = variant.subVariants.length;
+    variant.subVariants.push(subVariantToAdd);
+    updatedVariants[variantIndex] = variant;
+    onVariantsChange(updatedVariants);
+    setExpandedSubVariant(newIndex);
+
+    setNewSubVariant({
+      name: '',
+      color: '',
+      regularPrice: '',
+      discountPrice: '',
+      stockQuantity: '',
+      buyingPrice: '',
+      packagingCost: defaultPackagingCost || '',
+      deliveryCost: defaultDeliveryCost || '',
+      costPerItem: 0,
+      images: [null, null, null, null],
+      imagePreviews: [null, null, null, null]
+    });
+    setShowAddSubVariant(null);
+    toast.success('Sub variant added successfully');
   };
 
-  const newIndex = variant.subVariants.length;
-  variant.subVariants.push(subVariantToAdd);
-  updatedVariants[variantIndex] = variant;
-  onVariantsChange(updatedVariants);
-  setExpandedSubVariant(newIndex);
-
-  // Reset form - keep color as empty string
-  setNewSubVariant({
-    name: '',
-    color: '', // ✅ Keep as empty string
-    regularPrice: '',
-    discountPrice: '',
-    stockQuantity: '',
-    buyingPrice: '',
-    packagingCost: defaultPackagingCost || '',
-    deliveryCost: defaultDeliveryCost || '',
-    costPerItem: 0,
-    images: [null, null, null, null],
-    imagePreviews: [null, null, null, null]
-  });
-  setShowAddSubVariant(null);
-  toast.success('Sub variant added successfully');
-};
-
-  // const updateSubVariant = (variantIndex, subVariantIndex, updatedSubVariant) => {
-  //   const updatedVariants = [...variants];
-  //   const variant = { ...updatedVariants[variantIndex] };
-  //   variant.subVariants[subVariantIndex] = updatedSubVariant;
-  //   updatedVariants[variantIndex] = variant;
-  //   onVariantsChange(updatedVariants);
-  // };
-
   const updateSubVariant = (variantIndex, subVariantIndex, updatedSubVariant) => {
-  const updatedVariants = [...variants];
-  const variant = { ...updatedVariants[variantIndex] };
-  
-  // Ensure subVariants array exists
-  if (!variant.subVariants) {
-    variant.subVariants = [];
-  }
-  
-  // Ensure the index exists
-  if (subVariantIndex >= variant.subVariants.length) {
-    // If the index is out of bounds, push the new sub-variant
-    variant.subVariants.push(updatedSubVariant);
-  } else {
-    // Otherwise update the existing one
-    variant.subVariants[subVariantIndex] = updatedSubVariant;
-  }
-  
-  updatedVariants[variantIndex] = variant;
-  onVariantsChange(updatedVariants);
-};
+    const updatedVariants = [...variants];
+    const variant = { ...updatedVariants[variantIndex] };
+    
+    if (!variant.subVariants) {
+      variant.subVariants = [];
+    }
+    
+    if (subVariantIndex >= variant.subVariants.length) {
+      variant.subVariants.push(updatedSubVariant);
+    } else {
+      variant.subVariants[subVariantIndex] = updatedSubVariant;
+    }
+    
+    updatedVariants[variantIndex] = variant;
+    onVariantsChange(updatedVariants);
+  };
+
   const removeSubVariant = (variantIndex, subVariantIndex) => {
     if (!confirm('Remove this sub variant?')) return;
     
@@ -7483,10 +7782,6 @@ const VariantTypeSection = ({
     toast.success('Sub variant removed');
   };
 
-  // ============================================================
-  // VARIANT IMAGE HANDLERS
-  // ============================================================
-  
   const validateImageFile = (file) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
     const maxSize = 5 * 1024 * 1024;
@@ -7593,10 +7888,6 @@ const VariantTypeSection = ({
     setNewVariantImagePreviews(updatedPreviews);
   };
 
-  // ============================================================
-  // DRAG & DROP FOR VARIANT IMAGES
-  // ============================================================
-  
   const moveVariantImage = (variantIndex, fromIndex, toIndex) => {
     const updatedVariants = [...variants];
     const variant = { ...updatedVariants[variantIndex] };
@@ -7677,9 +7968,6 @@ const VariantTypeSection = ({
     setDragOverItem(null);
   };
 
-  // ============================================================
-  // HANDLE ADD VARIANT - WITH SUB VARIANTS
-  // ============================================================
   const handleAddVariant = async () => {
     if (!newVariantName.trim()) {
       toast.error('Please enter a variant name');
@@ -7690,7 +7978,6 @@ const VariantTypeSection = ({
     const paddedPreviews = [0, 1, 2, 3].map(i => newVariantImagePreviews[i] ?? null);
 
     const newVariant = {
-      // id: Date.now().toString(),
       id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       name: newVariantName.trim(),
       color: variantType.type === 'color' ? newVariantColor : undefined,
@@ -7708,7 +7995,6 @@ const VariantTypeSection = ({
 
     onVariantsChange([...variants, newVariant]);
 
-    // Reset form
     setNewVariantName('');
     setNewVariantColor('#000000');
     setNewVariantPrice('');
@@ -7815,9 +8101,6 @@ const VariantTypeSection = ({
     return option ? option.label : type;
   };
 
-  // ============================================================
-  // RENDER SUB VARIANT FORM FOR NEW VARIANT (In the Add Variant form)
-  // ============================================================
   const renderSubVariantFormInAddVariant = () => {
     return (
       <div className="border border-[#708268]/40 rounded-lg p-4 bg-[#708268]/5 mt-3">
@@ -7844,7 +8127,6 @@ const VariantTypeSection = ({
             />
           </div>
 
-          {/* Color Section with Add/Remove Color Button */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-xs font-medium text-gray-700">Color <span className="text-gray-400">(add if needed)</span></label>
@@ -7982,7 +8264,6 @@ const VariantTypeSection = ({
             />
           </div>
 
-          {/* Sub Variant Images */}
           <div className="md:col-span-2">
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-medium text-gray-700">Sub Variant Images <span className="text-gray-400">(Max 4, Optional)</span></label>
@@ -8094,9 +8375,6 @@ const VariantTypeSection = ({
     );
   };
 
-  // ============================================================
-  // RENDER SUB VARIANT FORM FOR EXISTING VARIANTS
-  // ============================================================
   const renderSubVariantForm = (variantIndex) => {
     return (
       <div className="border border-[#708268]/40 rounded-lg p-4 bg-[#708268]/5 mt-3">
@@ -8123,7 +8401,6 @@ const VariantTypeSection = ({
             />
           </div>
 
-          {/* Color Section with Add/Remove Color Button */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-xs font-medium text-gray-700">Color</label>
@@ -8261,7 +8538,6 @@ const VariantTypeSection = ({
             />
           </div>
 
-          {/* Sub Variant Images */}
           <div className="md:col-span-2">
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-medium text-gray-700">Sub Variant Images <span className="text-gray-400">(Max 4, Optional)</span></label>
@@ -8399,7 +8675,6 @@ const VariantTypeSection = ({
       </div>
 
       <div className="p-5">
-        {/* Variants List */}
         {variants.length > 0 && (
           <div className="space-y-3 mb-4">
             {variants.map((variant, index) => {
@@ -8464,7 +8739,6 @@ const VariantTypeSection = ({
 
                   {expandedVariant === index && (
                     <div className="p-4 border-t border-gray-200 space-y-3">
-                      {/* ALWAYS SHOW VARIANT FIELDS - Even when sub-variants exist */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">Variant Name</label>
@@ -8584,7 +8858,6 @@ const VariantTypeSection = ({
                           />
                         </div>
 
-                        {/* Variant Images */}
                         <div className="md:col-span-2">
                           <div className="flex items-center justify-between mb-2">
                             <label className="block text-xs font-medium text-gray-700">Variant Images <span className="text-gray-400">(Max 4)</span></label>
@@ -8703,7 +8976,6 @@ const VariantTypeSection = ({
                         </div>
                       </div>
 
-                      {/* SUB VARIANTS SECTION - ALWAYS SHOW */}
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <div className="flex items-center justify-between mb-3">
                           <h4 className="text-sm font-medium text-gray-700">
@@ -8719,7 +8991,6 @@ const VariantTypeSection = ({
                           </button>
                         </div>
 
-                        {/* Show existing sub variants */}
                         {variant.subVariants && variant.subVariants.length > 0 ? (
                           <div className="space-y-2">
                             {variant.subVariants.map((subVariant, subIndex) => (
@@ -8745,7 +9016,6 @@ const VariantTypeSection = ({
                           </div>
                         )}
 
-                        {/* Add Sub Variant Form */}
                         {showAddSubVariant === index && renderSubVariantForm(index)}
                       </div>
                     </div>
@@ -8756,9 +9026,6 @@ const VariantTypeSection = ({
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/* ADD VARIANT FORM - WITH SUB VARIANT BUTTON INSIDE */}
-        {/* ============================================================ */}
         {showAddVariant ? (
           <div className="border border-[#708268]/40 rounded-lg p-4 bg-[#708268]/5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -8881,7 +9148,6 @@ const VariantTypeSection = ({
                 />
               </div>
 
-              {/* Variant Images */}
               <div className="md:col-span-2">
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-xs font-medium text-gray-700">Variant Images <span className="text-gray-400">(Max 4, Optional)</span></label>
@@ -8961,7 +9227,6 @@ const VariantTypeSection = ({
               </div>
             </div>
 
-            {/* SUB VARIANTS SECTION INSIDE ADD VARIANT FORM */}
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-gray-700">
@@ -8977,7 +9242,6 @@ const VariantTypeSection = ({
                 </button>
               </div>
 
-              {/* Show existing sub variants added to this new variant */}
               {newVariantSubVariants.length > 0 && (
                 <div className="space-y-2 mb-3">
                   {newVariantSubVariants.map((subVariant, subIndex) => (
@@ -9006,7 +9270,6 @@ const VariantTypeSection = ({
                 </div>
               )}
 
-              {/* Add Sub Variant Form */}
               {showAddSubVariantInForm && renderSubVariantFormInAddVariant()}
             </div>
 
@@ -9281,6 +9544,7 @@ export default function CreateProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isGeneratingSku, setIsGeneratingSku] = useState(false);
+  const [isGeneratingBarcode, setIsGeneratingBarcode] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [childSubcategories, setChildSubcategories] = useState([]);
@@ -9303,6 +9567,7 @@ export default function CreateProductPage() {
   const [productTags, setProductTags] = useState([]);
   const [isLoadingTags, setIsLoadingTags] = useState(false);
   const [ratingHover, setRatingHover] = useState(0);
+  const [barcodeValidation, setBarcodeValidation] = useState(null);
   
   // Media Library States
   const [showMediaPicker, setShowMediaPicker] = useState(false);
@@ -9326,8 +9591,8 @@ export default function CreateProductPage() {
   const [showAddVariantType, setShowAddVariantType] = useState(false);
   const [customVariantTypeName, setCustomVariantTypeName] = useState('');
   
-// ========== ADD-ONES STATE ==========
-const [addOnes, setAddOnes] = useState([]);
+  // ========== ADD-ONES STATE ==========
+  const [addOnes, setAddOnes] = useState([]);
   
   // Video states
   const [videoType, setVideoType] = useState('upload');
@@ -9348,11 +9613,11 @@ const [addOnes, setAddOnes] = useState([]);
   const autoSaveTimerRef = useRef(null);
   const isRestoringRef = useRef(false);
 
-  // ========== FORM DATA ==========
   const [formData, setFormData] = useState({
     productName: '',
     slug: '',
     skuCode: '',
+    barcode: '',
     shortDescription: '',
     fullDescription: '',
     category: '',
@@ -9374,6 +9639,8 @@ const [addOnes, setAddOnes] = useState([]);
     tags: [],
     isFeatured: false,
     showOnBanner: false,
+    comingSoon: false,
+    isActive: true,
     rating: 0,
     faqs: [],
     metaSettings: {
@@ -9384,10 +9651,8 @@ const [addOnes, setAddOnes] = useState([]);
     videoUrl: '',
     videoPublicId: '',
     videoType: 'upload',
-    // Variant data
     hasVariants: false,
     variants: [],
-    // Related products
     addOnes: [] 
   });
 
@@ -9466,30 +9731,30 @@ const [addOnes, setAddOnes] = useState([]);
     saveToLocalStorage();
   };
 
+  // ============================================================
   // ADD-ONES HANDLERS
-// ============================================================
-const handleAddAddOne = (product) => {
-  if (addOnes.length >= 5) {
-    toast.error('Maximum 5 add-ones allowed');
-    return;
-  }
-  setAddOnes([...addOnes, product]);
-  setFormData(prev => ({
-    ...prev,
-    addOnes: [...prev.addOnes, product]
-  }));
-  saveToLocalStorage();
-};
+  // ============================================================
+  const handleAddAddOne = (product) => {
+    if (addOnes.length >= 5) {
+      toast.error('Maximum 5 add-ones allowed');
+      return;
+    }
+    setAddOnes([...addOnes, product]);
+    setFormData(prev => ({
+      ...prev,
+      addOnes: [...prev.addOnes, product]
+    }));
+    saveToLocalStorage();
+  };
 
-const handleRemoveAddOne = (productId) => {
-  setAddOnes(addOnes.filter(p => p._id !== productId));
-  setFormData(prev => ({
-    ...prev,
-    addOnes: prev.addOnes.filter(p => p._id !== productId)
-  }));
-  saveToLocalStorage();
-};
-
+  const handleRemoveAddOne = (productId) => {
+    setAddOnes(addOnes.filter(p => p._id !== productId));
+    setFormData(prev => ({
+      ...prev,
+      addOnes: prev.addOnes.filter(p => p._id !== productId)
+    }));
+    saveToLocalStorage();
+  };
 
   // ============================================================
   // VARIANT HANDLERS
@@ -9586,6 +9851,71 @@ const handleRemoveAddOne = (productId) => {
   };
 
   // ============================================================
+  // BARCODE HANDLERS
+  // ============================================================
+  const generateUniqueBarcode = async () => {
+    setIsGeneratingBarcode(true);
+    const toastId = toast.loading('Generating unique barcode...');
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${API_URL}/api/barcodes/generate-single`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setFormData(prev => ({ ...prev, barcode: data.data.barcodeNumber }));
+        setBarcodeValidation({ isValid: true, status: 'available', message: 'New barcode generated and available' });
+        setErrors(prev => ({ ...prev, barcode: null }));
+        toast.success(`Barcode ${data.data.barcodeNumber} generated!`, { id: toastId });
+      } else {
+        toast.error(data.error || 'Failed to generate barcode', { id: toastId });
+      }
+    } catch (error) {
+      console.error('Error generating barcode:', error);
+      toast.error('Failed to generate barcode', { id: toastId });
+    } finally {
+      setIsGeneratingBarcode(false);
+    }
+  };
+
+  const handleBarcodeValidation = (result) => {
+    setBarcodeValidation(result);
+    if (result && !result.isValid) {
+      setErrors(prev => ({ ...prev, barcode: result.message }));
+    } else {
+      setErrors(prev => ({ ...prev, barcode: null }));
+    }
+  };
+
+  // ============================================================
+  // SKU HANDLERS
+  // ============================================================
+  const generateSkuFromBackend = async () => {
+    setIsGeneratingSku(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/products/generate-sku`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setFormData(prev => ({ ...prev, skuCode: data.data.skuCode }));
+        toast.success('SKU generated successfully');
+      } else toast.error(data.error || 'Failed to generate SKU');
+    } catch (error) { toast.error('Failed to generate SKU'); }
+    finally { setIsGeneratingSku(false); }
+  };
+
+  // ============================================================
   // EFFECTS
   // ============================================================
   
@@ -9624,50 +9954,52 @@ const handleRemoveAddOne = (productId) => {
     };
   }, [formData.slug, isSlugManuallyEdited]);
 
-const saveToLocalStorage = () => {
-  if (isRestoringRef.current) return;
-  
-  try {
-    const draft = {
-      formData: {
-        ...formData,
-        shortDescription: shortDescEditor?.getHTML() || formData.shortDescription,
-        fullDescription: fullDescEditor?.getHTML() || formData.fullDescription,
-        deliveryInfo: deliveryInfoEditor?.getHTML() || formData.deliveryInfo,
-        showOnBanner: formData.showOnBanner,
-        videoUrl: formData.videoUrl,
-        videoPublicId: formData.videoPublicId,
-        videoType: videoType,
-        rating: formData.rating,
-        faqs: formData.faqs,
-        slug: formData.slug,
-        buyingPrice: formData.buyingPrice,
-        hasVariants: formData.hasVariants,
-        variants: formData.variants,
-        addOnes: formData.addOnes  // ✅ Changed
-      },
-      productImages: productImages.map(img => ({
-        ...img,
-        preview: img.url || null,
-        file: null,
-        uploading: false
-      })),
-      videoUpload: {
-        ...videoUpload,
-        preview: videoUpload.url || null,
-        file: null,
-        uploading: false
-      },
-      variantTypes: variantTypes,
-      addOnes: addOnes,  // ✅ Changed
-      lastSaved: new Date().toISOString()
-    };
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    setLastSaved(new Date());
-  } catch (error) {
-    console.error('Error saving draft:', error);
-  }
-};
+  const saveToLocalStorage = () => {
+    if (isRestoringRef.current) return;
+    
+    try {
+      const draft = {
+        formData: {
+          ...formData,
+          shortDescription: shortDescEditor?.getHTML() || formData.shortDescription,
+          fullDescription: fullDescEditor?.getHTML() || formData.fullDescription,
+          deliveryInfo: deliveryInfoEditor?.getHTML() || formData.deliveryInfo,
+          showOnBanner: formData.showOnBanner,
+          videoUrl: formData.videoUrl,
+          videoPublicId: formData.videoPublicId,
+          videoType: videoType,
+          rating: formData.rating,
+          faqs: formData.faqs,
+          slug: formData.slug,
+          buyingPrice: formData.buyingPrice,
+          hasVariants: formData.hasVariants,
+          variants: formData.variants,
+          addOnes: formData.addOnes,
+          barcode: formData.barcode,
+          skuCode: formData.skuCode
+        },
+        productImages: productImages.map(img => ({
+          ...img,
+          preview: img.url || null,
+          file: null,
+          uploading: false
+        })),
+        videoUpload: {
+          ...videoUpload,
+          preview: videoUpload.url || null,
+          file: null,
+          uploading: false
+        },
+        variantTypes: variantTypes,
+        addOnes: addOnes,
+        lastSaved: new Date().toISOString()
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      setLastSaved(new Date());
+    } catch (error) {
+      console.error('Error saving draft:', error);
+    }
+  };
 
   useEffect(() => {
     fetchDefaultCosts();
@@ -9829,12 +10161,16 @@ const saveToLocalStorage = () => {
             buyingPrice: pendingDraft.formData.buyingPrice || '',
             hasVariants: pendingDraft.formData.hasVariants || false,
             variants: pendingDraft.formData.variants || [],
-            addOnes: pendingDraft.formData.addOnes || []
+            addOnes: pendingDraft.formData.addOnes || [],
+            barcode: pendingDraft.formData.barcode || '',
+            skuCode: pendingDraft.formData.skuCode || '',
+             comingSoon: pendingDraft.formData.comingSoon || false,
+            isActive: pendingDraft.formData.isActive !== undefined ? pendingDraft.formData.isActive : true
           });
           
           if (pendingDraft.addOnes) {
-          setAddOnes(pendingDraft.addOnes);  // ✅ Changed
-        }
+            setAddOnes(pendingDraft.addOnes);
+          }
           
           if (pendingDraft.variantTypes) {
             setVariantTypes(pendingDraft.variantTypes);
@@ -9908,20 +10244,20 @@ const saveToLocalStorage = () => {
   const handleClearDraft = () => {
     if (confirm('Are you sure you want to clear the draft? All unsaved data will be lost.')) {
       localStorage.removeItem(DRAFT_KEY);
-      setFormData({
-        productName: '', slug: '', skuCode: '', shortDescription: '', fullDescription: '', 
+    setFormData({
+        productName: '', slug: '', skuCode: '', barcode: '', shortDescription: '', fullDescription: '', 
         category: '', subcategory: '', childSubcategory: '', brand: '',
         stockQuantity: '', stockAlertQuantity: '', regularPrice: '', costPerItem: '', 
         discountPrice: '', buyingPrice: '', unit: 'pcs', customUnit: '',
         deliveryInfo: '', additionalInfo: [], tags: [], isFeatured: false, 
-        showOnBanner: false, rating: 0, faqs: [],
+        showOnBanner: false, comingSoon: false, isActive: true, rating: 0, faqs: [],
         metaSettings: { metaTitle: '', metaDescription: '', metaKeywords: [] },
         videoUrl: '', videoPublicId: '', videoType: 'upload',
         hasVariants: false, variants: [],
-        addOnes: []  // ✅ Changed
+        addOnes: []
       });
       setVariantTypes([]);
-       setAddOnes([]);
+      setAddOnes([]);
       
       if (shortDescEditor) shortDescEditor.commands.setContent('');
       if (fullDescEditor) fullDescEditor.commands.setContent('');
@@ -9933,6 +10269,7 @@ const saveToLocalStorage = () => {
       setIsSlugManuallyEdited(false);
       setIsSlugAvailable(null);
       setLastSaved(null);
+      setBarcodeValidation(null);
       toast.success('Draft cleared');
     }
   };
@@ -9941,23 +10278,6 @@ const saveToLocalStorage = () => {
     setIsSavingDraft(true);
     saveToLocalStorage();
     setTimeout(() => { setIsSavingDraft(false); toast.success('Draft saved successfully!'); }, 500);
-  };
-
-  const generateSkuFromBackend = async () => {
-    setIsGeneratingSku(true);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/products/generate-sku`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setFormData(prev => ({ ...prev, skuCode: data.data.skuCode }));
-        toast.success('SKU generated successfully');
-      } else toast.error(data.error || 'Failed to generate SKU');
-    } catch (error) { toast.error('Failed to generate SKU'); }
-    finally { setIsGeneratingSku(false); }
   };
 
   const fetchBrands = async () => {
@@ -10609,6 +10929,16 @@ const saveToLocalStorage = () => {
       newErrors.tags = 'Please select only one tag';
     }
     
+    // Barcode validation
+    if (formData.barcode) {
+      if (!/^[0-9]{8,13}$/.test(formData.barcode)) {
+        newErrors.barcode = 'Barcode must be 8-13 digits only';
+      }
+      if (barcodeValidation && barcodeValidation.isValid === false) {
+        newErrors.barcode = barcodeValidation.message;
+      }
+    }
+    
     const hasImages = productImages.some(img => img.url !== null && !img.uploading);
     if (!hasImages) {
       newErrors.images = 'At least one product image is required';
@@ -10671,12 +11001,11 @@ const saveToLocalStorage = () => {
             deliveryCost: parseFloat(v.deliveryCost) || 0,
             costPerItem: parseFloat(v.costPerItem) || 0,
             stockQuantity: parseFloat(v.stockQuantity) || 0,
-            images: v.images || [null, null, null, null],  // ✅ ADD THIS
-    imagePreviews: v.imagePreviews || [null, null, null, null],
-            // Include sub-variants
+            images: v.images || [null, null, null, null],
+            imagePreviews: v.imagePreviews || [null, null, null, null],
             subVariants: v.subVariants ? v.subVariants.map(sv => ({
               name: sv.name,
-               color: sv.color || undefined, 
+              color: sv.color || undefined, 
               regularPrice: parseFloat(sv.regularPrice) || 0,
               discountPrice: parseFloat(sv.discountPrice) || 0,
               buyingPrice: parseFloat(sv.buyingPrice) || 0,
@@ -10691,10 +11020,11 @@ const saveToLocalStorage = () => {
         }));
       }
 
-      const payload = {
+         const payload = {
         productName: formData.productName,
         slug: formData.slug || undefined,
         skuCode: formData.skuCode,
+        barcode: formData.barcode || undefined,
         shortDescription: formData.shortDescription || '',
         fullDescription: formData.fullDescription,
         category: formData.category,
@@ -10714,6 +11044,8 @@ const saveToLocalStorage = () => {
         tags: formData.tags,
         isFeatured: formData.isFeatured,
         showOnBanner: formData.showOnBanner,
+        comingSoon: formData.comingSoon || false,
+        isActive: formData.isActive !== undefined ? formData.isActive : true,
         rating: formData.rating || 0,
         faqs: formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim()),
         metaSettings: formData.metaSettings,
@@ -10738,11 +11070,28 @@ const saveToLocalStorage = () => {
       const data = await response.json();
       
       if (data.success) {
-        toast.success('Product created successfully!');
+        toast.success(`✅ Product created successfully!${formData.barcode ? ` Barcode: ${formData.barcode}` : ''}`);
         localStorage.removeItem(DRAFT_KEY);
         window.location.href = '/authorize/all-products';
       } else {
-        toast.error(data.error || 'Failed to create product');
+        const errorMessage = data.error || 'Failed to create product';
+        toast.error(errorMessage);
+        
+        if (errorMessage.includes('already exists')) {
+          setErrors(prev => ({ ...prev, productName: errorMessage }));
+          document.querySelector('input[name="productName"]')?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+        
+        if (errorMessage.includes('barcode')) {
+          setErrors(prev => ({ ...prev, barcode: errorMessage }));
+        }
+        
+        if (errorMessage.includes('SKU') || errorMessage.includes('sku')) {
+          setErrors(prev => ({ ...prev, skuCode: errorMessage }));
+        }
       }
     } catch (error) {
       console.error('Error creating product:', error);
@@ -10832,6 +11181,26 @@ const saveToLocalStorage = () => {
                       {errors.productName && <p className="text-xs text-red-600 mt-1">{errors.productName}</p>}
                     </div>
 
+                    {/* SKU Input Component */}
+                    <SkuInput
+                      value={formData.skuCode}
+                      onChange={handleChange}
+                      error={errors.skuCode}
+                    />
+
+                    {/* Barcode Input Component */}
+                    <BarcodeInput
+                      value={formData.barcode}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, barcode: e.target.value }));
+                        setErrors(prev => ({ ...prev, barcode: null }));
+                      }}
+                      onValidate={handleBarcodeValidation}
+                      error={errors.barcode}
+                      onGenerate={generateUniqueBarcode}
+                      isGenerating={isGeneratingBarcode}
+                    />
+
                     {/* SLUG FIELD */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -10901,18 +11270,6 @@ const saveToLocalStorage = () => {
                       <p className="text-xs text-gray-400 mt-1">
                         💡 The slug is automatically generated from the product name. Edit it if you want a custom URL.
                       </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">SKU Code <span className="text-red-500">*</span></label>
-                      <div className="flex gap-2">
-                        <input type="text" name="skuCode" value={formData.skuCode} onChange={handleChange} className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#708268] focus:border-transparent outline-none transition ${errors.skuCode ? 'border-red-500' : 'border-gray-300'}`} placeholder="Auto-generated SKU" readOnly />
-                        <button type="button" onClick={generateSkuFromBackend} disabled={isGeneratingSku} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2">
-                          {isGeneratingSku ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                          Regenerate
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">SKU is auto-generated from backend. Click regenerate for a new one.</p>
                     </div>
 
                     <div>
@@ -11191,19 +11548,15 @@ const saveToLocalStorage = () => {
                   </div>
                 </div>
 
-                {/* ============================================================ */}
-{/* ADD-ONES SECTION */}
-{/* ============================================================ */}
-<AddOnesSection 
-  addOnes={addOnes}
-  onAddProduct={handleAddAddOne}
-  onRemoveProduct={handleRemoveAddOne}
-  maxProducts={5}
-/>
+                {/* ADD-ONES SECTION */}
+                <AddOnesSection 
+                  addOnes={addOnes}
+                  onAddProduct={handleAddAddOne}
+                  onRemoveProduct={handleRemoveAddOne}
+                  maxProducts={5}
+                />
 
-                {/* ============================================================ */}
                 {/* VARIANT SECTION */}
-                {/* ============================================================ */}
                 <div className="bg-white rounded-xl shadow-sm border border-[#708268]/20">
                   <div className="p-5 border-b border-[#708268]/20">
                     <h2 className="text-lg font-semibold text-[#004767] flex items-center gap-2">
@@ -11786,14 +12139,62 @@ const saveToLocalStorage = () => {
                 </div>
 
                 {/* Status Card */}
+                               {/* Status Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-[#708268]/20">
                   <div className="p-5 border-b border-[#708268]/20">
-                    <h2 className="text-lg font-semibold text-[#004767] flex items-center gap-2"><Box className="w-5 h-5 text-[#708268]" /> Product Status</h2>
+                    <h2 className="text-lg font-semibold text-[#004767] flex items-center gap-2">
+                      <Box className="w-5 h-5 text-[#708268]" /> 
+                      Product Status
+                    </h2>
                   </div>
-                  <div className="p-5">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" checked={true} disabled className="w-5 h-5 rounded border-gray-300 text-[#708268]" />
-                      <div><span className="text-sm font-medium text-gray-700">Active Product</span><p className="text-xs text-gray-500">Product will be visible to customers</p></div>
+                  <div className="p-5 space-y-4">
+                    {/* Active Product Checkbox */}
+                    <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.isActive} 
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, isActive: e.target.checked }));
+                          saveToLocalStorage();
+                        }}
+                        className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#708268] focus:ring-[#708268] cursor-pointer" 
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">
+                          Active Product
+                        </span>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {formData.isActive 
+                            ? 'Product will be visible to customers' 
+                            : 'Product will be hidden from customers'}
+                        </p>
+                      </div>
+                    </label>
+
+                    {/* Coming Soon Checkbox */}
+                    <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-amber-50 transition-colors border border-amber-100">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.comingSoon} 
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, comingSoon: e.target.checked }));
+                          saveToLocalStorage();
+                        }}
+                        className="w-5 h-5 mt-0.5 rounded border-gray-300 text-amber-500 focus:ring-amber-500 cursor-pointer" 
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                          Coming Soon
+                          <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700">
+                            Pre-launch
+                          </span>
+                        </span>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {formData.comingSoon
+                            ? 'Product shows a "Coming Soon" badge'
+                            : 'Product will be shown normally'}
+                        </p>
+                      </div>
                     </label>
                   </div>
                 </div>

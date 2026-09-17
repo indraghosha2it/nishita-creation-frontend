@@ -687,7 +687,7 @@ const handlePrintBarcode = (barcode) => {
         <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[#2D3A5C] flex items-center gap-2">
-              <Barcode className="w-6 h-6 text-[#4A8A90]" />
+              <Barcode className="w-6 h-6 text-[#A6242E]" />
               Barcode Management
             </h1>
             <p className="text-sm text-gray-500 mt-1">Generate and manage numeric CODE-128 barcodes</p>
@@ -697,7 +697,7 @@ const handlePrintBarcode = (barcode) => {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`px-3 py-2 text-sm transition ${
-                  viewMode === 'grid' ? 'bg-[#4A8A90] text-white' : 'text-gray-600 hover:bg-gray-50'
+                  viewMode === 'grid' ? 'bg-[#A6242E] text-white' : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 Grid View
@@ -705,7 +705,7 @@ const handlePrintBarcode = (barcode) => {
               <button
                 onClick={() => setViewMode('table')}
                 className={`px-3 py-2 text-sm transition ${
-                  viewMode === 'table' ? 'bg-[#4A8A90] text-white' : 'text-gray-600 hover:bg-gray-50'
+                  viewMode === 'table' ? 'bg-[#A6242E] text-white' : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 Table View
@@ -713,7 +713,7 @@ const handlePrintBarcode = (barcode) => {
             </div>
             <button
               onClick={() => setGenerateModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#4A8A90] text-white rounded-lg hover:bg-[#3A7A80] transition"
+              className="flex items-center gap-2 px-4 py-2 bg-[#A6242E] text-white rounded-lg hover:bg-[#3A7A80] transition"
             >
               <Plus className="w-4 h-4" />
               Generate Barcodes
@@ -749,7 +749,7 @@ const handlePrintBarcode = (barcode) => {
             onClick={() => setActiveTab('available')}
             className={`px-4 py-2 font-medium transition ${
               activeTab === 'available'
-                ? 'text-[#4A8A90] border-b-2 border-[#4A8A90]'
+                ? 'text-[#A6242E] border-b-2 border-[#A6242E]'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -759,7 +759,7 @@ const handlePrintBarcode = (barcode) => {
             onClick={() => setActiveTab('assigned')}
             className={`px-4 py-2 font-medium transition ${
               activeTab === 'assigned'
-                ? 'text-[#4A8A90] border-b-2 border-[#4A8A90]'
+                ? 'text-[#A6242E] border-b-2 border-[#A6242E]'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -776,7 +776,7 @@ const handlePrintBarcode = (barcode) => {
               placeholder="Search barcodes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A6242E] focus:border-transparent outline-none"
             />
           </div>
         </div>
@@ -786,7 +786,7 @@ const handlePrintBarcode = (barcode) => {
           <div className="mb-4 flex justify-end">
             <button
               onClick={selectAll}
-              className="text-sm text-[#4A8A90] hover:underline"
+              className="text-sm text-[#A6242E] hover:underline"
             >
               {selectedProducts.length === barcodes.length ? 'Deselect All' : 'Select All'}
             </button>
@@ -804,7 +804,7 @@ const handlePrintBarcode = (barcode) => {
         {/* Loading State */}
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-[#4A8A90]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#A6242E]" />
           </div>
         ) : barcodes.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
@@ -812,7 +812,7 @@ const handlePrintBarcode = (barcode) => {
             <p className="text-gray-500">No barcodes found</p>
             <button
               onClick={() => setGenerateModalOpen(true)}
-              className="mt-3 text-[#4A8A90] hover:underline"
+              className="mt-3 text-[#A6242E] hover:underline"
             >
               Generate some barcodes
             </button>
@@ -833,9 +833,9 @@ const handlePrintBarcode = (barcode) => {
                 <div
                   className={`bg-white rounded-xl shadow-sm border-2 p-4 transition-all hover:shadow-md ${
                     selectedProducts.includes(barcode._id) 
-                      ? 'border-[#4A8A90] bg-[#D4EDEE]/20' 
+                      ? 'border-[#A6242E] bg-[#D4EDEE]/20' 
                       : 'border-gray-200 hover:border-[#FFB6C1]'
-                  } ${barcode.status === 'assigned' ? 'hover:border-[#4A8A90]' : ''}`}
+                  } ${barcode.status === 'assigned' ? 'hover:border-[#A6242E]' : ''}`}
                 >
                   <div className="text-center">
                     {/* Checkbox */}
@@ -844,7 +844,7 @@ const handlePrintBarcode = (barcode) => {
                         type="checkbox"
                         checked={selectedProducts.includes(barcode._id)}
                         onChange={() => toggleProductSelection(barcode._id)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#4A8A90]"
+                        className="w-4 h-4 rounded border-gray-300 text-[#A6242E]"
                       />
                     </div>
 
@@ -913,7 +913,7 @@ const handlePrintBarcode = (barcode) => {
                           className="p-1.5 rounded hover:bg-gray-100 transition-colors"
                           title="View Product"
                         >
-                          <Eye className="w-4 h-4 text-[#4A8A90]" />
+                          <Eye className="w-4 h-4 text-[#A6242E]" />
                         </button>
                       )}
                       <button
@@ -968,7 +968,7 @@ const handlePrintBarcode = (barcode) => {
                         type="checkbox"
                         checked={selectedProducts.length === barcodes.length && barcodes.length > 0}
                         onChange={selectAll}
-                        className="w-4 h-4 rounded border-gray-300 text-[#4A8A90]"
+                        className="w-4 h-4 rounded border-gray-300 text-[#A6242E]"
                       />
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Barcode Image</th>
@@ -996,7 +996,7 @@ const handlePrintBarcode = (barcode) => {
                           type="checkbox"
                           checked={selectedProducts.includes(barcode._id)}
                           onChange={() => toggleProductSelection(barcode._id)}
-                          className="w-4 h-4 rounded border-gray-300 text-[#4A8A90]"
+                          className="w-4 h-4 rounded border-gray-300 text-[#A6242E]"
                         />
                       </td>
                       <td className="px-4 py-3">
@@ -1077,7 +1077,7 @@ const handlePrintBarcode = (barcode) => {
                           {barcode.status === 'assigned' && (
                             <button
                               onClick={() => handleBarcodeClick(barcode)}
-                              className="p-1 text-[#4A8A90] hover:text-[#3A7A80]"
+                              className="p-1 text-[#A6242E] hover:text-[#3A7A80]"
                               title="View Product"
                             >
                               <Eye className="w-4 h-4" />
@@ -1134,7 +1134,7 @@ const handlePrintBarcode = (barcode) => {
                   onChange={(e) => setGenerateCount(Math.min(1000, Math.max(1, parseInt(e.target.value) || 1)))}
                   min="1"
                   max="1000"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A6242E] focus:border-transparent outline-none"
                 />
                 <p className="text-xs text-gray-500 mt-1">Generate 1 to 1000 barcodes at a time</p>
               </div>
@@ -1161,7 +1161,7 @@ const handlePrintBarcode = (barcode) => {
               <button
                 onClick={handleGenerateBarcodes}
                 disabled={generating}
-                className="flex-1 px-4 py-2 bg-[#4A8A90] text-white rounded-lg hover:bg-[#3A7A80] transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-[#A6242E] text-white rounded-lg hover:bg-[#3A7A80] transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Barcode className="w-4 h-4" />}
                 {generating ? 'Generating...' : 'Generate'}

@@ -42,7 +42,7 @@ const generateId = () => `section_${Date.now()}_${Math.random().toString(36).sub
 const SYSTEM_SECTION_TYPES = [
   { value: 'hero', label: 'Hero Banner', icon: LayoutTemplate, deletable: false, hasProducts: false },
 
-  { value: 'categories', label: 'Categories', icon: Grid3x3, deletable: false, hasProducts: false },
+  { value: 'categories', label: 'Collections', icon: Grid3x3, deletable: false, hasProducts: false },
    { value: 'deals', label: 'Deals You Can\'t Miss', icon: Zap, deletable: false, hasProducts: false },
      { value: 'big_sale', label: 'Big Sale', icon: Car, deletable: false, hasProducts: false },
   { value: 'featured', label: 'Featured Products', icon: Zap, deletable: false, hasProducts: false },
@@ -1007,7 +1007,7 @@ const getDefaultSections = () => [
 
   {
     id: generateId(),
-    name: 'Categories',
+    name: 'Collections',
     type: 'categories',
     isActive: true,
     displayOrder: 1,

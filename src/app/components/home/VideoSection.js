@@ -1917,6 +1917,7 @@ export default function VideoSection({
   sm:gap-3
   mt-8
   md:mt-10
+  -mb-15 md:-mb-1
 ">
   {/* LEFT ARROW — white bg */}
   <button
